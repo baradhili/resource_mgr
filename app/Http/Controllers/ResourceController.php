@@ -115,12 +115,8 @@ class ResourceController extends Controller
             }
 
         }
-        Log::info("View: ", [
-            'resources' => json_encode($resources),
-            'resourceAvailability' => json_encode($resourceAvailability),
-            'nextTwelveMonths' => json_encode($nextTwelveMonths)
-        ]);
-        return view('resource.index', compact('resources', 'nextTwelveMonths'))
+
+        return view('resource.index', compact('resources', 'resourceAvailability','nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
 
