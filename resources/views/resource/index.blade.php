@@ -37,6 +37,7 @@
 									<th >Full Name</th>
                                         <!-- Dynamically add columns for the next twelve months -->
                                         @foreach ($nextTwelveMonths as $month)
+
                                             <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
                                         @endforeach
                                         <th></th>
@@ -47,8 +48,10 @@
                                         <tr>
                                             
 										<td >{{ $resource->full_name }}</td>
+
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
+
                                                 @php
                                                     $monthKey = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                                                     $availability = $resourceAvailability[$resource['id']]['availability'][$monthKey] ?? '-';
