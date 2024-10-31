@@ -6,17 +6,24 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "avadim/fast-excel-laravel": "^2.7",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.14",
         "fakerphp/faker": "^1.9.1",
+        "ibex/crud-generator": "^2.1",
+        "jeroenzwart/laravel-csv-seeder": "^1.6",
+        "kitloong/laravel-migrations-generator": "^7.0",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
+        "laravel/ui": "^4.5",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
+        "orangehill/iseed": "^3.0",
         "phpunit/phpunit": "^10.1",
         "spatie/laravel-ignition": "^2.0"
     },
