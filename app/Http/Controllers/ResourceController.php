@@ -47,7 +47,6 @@ class ResourceController extends Controller
                 ->where('end_date', '>=', now())
                 ->first();
 
-            // Log::info("contract: " . print_r($currentContract,true));
             if ($currentContract) {
                 // Calculate base availability for each month
                 $contractStartDate = Carbon::parse($currentContract->start_date);
@@ -117,10 +116,7 @@ class ResourceController extends Controller
 
         }
 
-
-
-
-        return view('resource.index', compact('resources', 'nextTwelveMonths'))
+        return view('resource.index', compact('resources', 'resourceAvailability','nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
 

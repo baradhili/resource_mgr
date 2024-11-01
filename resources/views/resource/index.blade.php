@@ -35,7 +35,11 @@
                                 <thead class="thead">
                                     <tr>                                       
 									<th >Full Name</th>
+                                        <!-- Dynamically add columns for the next twelve months -->
+                                        @foreach ($nextTwelveMonths as $month)
 
+                                            <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
+                                        @endforeach
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -45,6 +49,15 @@
                                             
 										<td >{{ $resource->full_name }}</td>
 
+                                            <!-- Populate availability for each month -->
+                                            @foreach ($nextTwelveMonths as $month)
+
+                                                @php
+                                                    $monthKey = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                                                    $availability = $resourceAvailability[$resource['id']]['availability'][$monthKey] ?? '-';
+                                                @endphp
+                                                <td>{{ $availability }}</td>
+                                            @endforeach
                                             <td>
                                                 <form action="{{ route('resources.destroy', $resource->id) }}" method="POST">
                                                     <a class="btn btn-sm btn-primary " href="{{ route('resources.show', $resource->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
