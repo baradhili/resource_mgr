@@ -24,24 +24,53 @@ class AllocationController extends Controller
      */
     public function index(Request $request): View
     {
-        $nowYear = now()->year;
-        $nowMonth = now()->month;
-        $endMonth = ($nowMonth + 12) % 12;
-        if ($endMonth !== ($nowMonth + 12)) {
-            $endYear = $nowYear + 1;
-        } else {
-            $endYear = $nowYear; // Ensure $endYear is set for the edge case where +12 months doesn't cross the year boundary
+        // Build our next twelve month array
+        $nextTwelveMonths = [];
+
+        for ($i = 0; $i < 12; $i++) {
+            $date = Carbon::now()->addMonthsNoOverflow($i);
+            $nextTwelveMonths[] = [
+                'year' => $date->year,
+                'month' => $date->month,
+                'monthName' => $date->format('M'),
+                'monthFullName' => $date->format('F')
+            ];
         }
-        $startDate = Carbon::create($nowYear, $nowMonth, 1);
-        $endDate = Carbon::create($endYear, $endMonth, 1);
+        //  Start and end dates for the period
+        $startDate = Carbon::now()->startOfMonth();
+        $endDate = Carbon::now()->addYear()->startOfMonth();
 
-        $allocations = Allocation::whereBetween('allocation_date', [$startDate, $endDate])
-            ->orderBy('allocation_date', 'asc')
-            ->paginate();
-  
+        // Collect our resources who have a current contract
+        $resources = Resource::whereHas('contracts', function ($query) {
+            $query->where('start_date', '<=', now())
+                ->where('end_date', '>=', now());
+        })->paginate();
 
-        return view('allocation.index', compact('allocations'))
-            ->with('i', ($request->input('page', 1) - 1) * $allocations->perPage());
+        // For each resource - find teh allocations for the period
+        foreach ($resources as $resource) {
+
+            $resourceAvailability[$resource->id] = [
+                'name' => $resource->full_name,
+            ];
+
+            foreach ($nextTwelveMonths as $month) {
+                $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
+                // $monthEndDate = $monthStartDate->copy()->endOfMonth();
+                $totalAllocation = Allocation::where('allocation_date', '=', $monthStartDate)
+                    ->where('resources_id', '=', $resource->id)
+                    ->sum('fte');
+                // Use year-month as the key
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+
+                // Add the calculated base availability to the resource availability array - only if not zero
+                if ($totalAllocation > 0) {
+                    $resourceAllocation[$resource->id]['allocation'][$key] = $totalAllocation;
+                }
+            }
+        }
+Log::info("Return: " . json_encode($resourceAllocation));
+        return view('allocation.index', compact('resources', 'resourceAllocation'))
+            ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
 
     /**

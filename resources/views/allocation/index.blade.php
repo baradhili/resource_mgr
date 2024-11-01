@@ -79,41 +79,21 @@ Allocations
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($allocations as $allocation)
+                               
                                     <tr>
-                                        <td>{{ ++$i }}</td>
-
-                                        <td>{{ $allocation->year }}</td>
-                                        <td>{{ $allocation->month }}</td>
-                                        <td>{{ $allocation->fte }}</td>
-                                        <td>{{ $allocation->resources_id }}</td>
-                                        <td>{{ $allocation->projects_id }}</td>
-                                        <td>{{ $allocation->status }}</td>
+                                       
 
                                         <td>
-                                            <form action="{{ route('allocations.destroy', $allocation->id) }}"
-                                                method="POST">
-                                                <a class="btn btn-sm btn-primary "
-                                                    href="{{ route('allocations.show', $allocation->id) }}"><i
-                                                        class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                <a class="btn btn-sm btn-success"
-                                                    href="{{ route('allocations.edit', $allocation->id) }}"><i
-                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"
-                                                    onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                        class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
-                                            </form>
+                                            
                                         </td>
                                     </tr>
-                                @endforeach
+                                
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            {!! $allocations->withQueryString()->links() !!}
+            
         </div>
     </div>
 </div>
