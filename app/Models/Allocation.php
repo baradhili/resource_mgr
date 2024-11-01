@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Allocation
  *
  * @property $id
- * @property $year
- * @property $month
+ * @property $allocation_date
  * @property $fte
  * @property $resources_id
  * @property $projects_id
@@ -32,7 +31,7 @@ class Allocation extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['year', 'month', 'fte', 'resources_id', 'projects_id', 'status'];
+    protected $fillable = ['allocation_date', 'fte', 'resources_id', 'projects_id', 'status'];
 
 
     /**

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    Resources
+    Resources and Availability
 @endsection
 
 @section('content')
@@ -13,7 +13,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
                             <span id="card_title">
-                                {{ __('Resources') }}
+                                {{ __('Resources and Availability') }}
                             </span>
 
                              <div class="float-right">
@@ -37,7 +37,6 @@
 									<th >Full Name</th>
                                         <!-- Dynamically add columns for the next twelve months -->
                                         @foreach ($nextTwelveMonths as $month)
-
                                             <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
                                         @endforeach
                                         <th></th>
@@ -48,10 +47,8 @@
                                         <tr>
                                             
 										<td >{{ $resource->full_name }}</td>
-
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
-
                                                 @php
                                                     $monthKey = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                                                     $availability = $resourceAvailability[$resource['id']]['availability'][$monthKey] ?? '-';

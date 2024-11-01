@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use \avadim\FastExcelReader\Excel;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class AllocationController extends Controller
 {
@@ -23,7 +24,21 @@ class AllocationController extends Controller
      */
     public function index(Request $request): View
     {
-        $allocations = Allocation::paginate();
+        $nowYear = now()->year;
+        $nowMonth = now()->month;
+        $endMonth = ($nowMonth + 12) % 12;
+        if ($endMonth !== ($nowMonth + 12)) {
+            $endYear = $nowYear + 1;
+        } else {
+            $endYear = $nowYear; // Ensure $endYear is set for the edge case where +12 months doesn't cross the year boundary
+        }
+        $startDate = Carbon::create($nowYear, $nowMonth, 1);
+        $endDate = Carbon::create($endYear, $endMonth, 1);
+
+        $allocations = Allocation::whereBetween('allocation_date', [$startDate, $endDate])
+            ->orderBy('allocation_date', 'asc')
+            ->paginate();
+  
 
         return view('allocation.index', compact('allocations'))
             ->with('i', ($request->input('page', 1) - 1) * $allocations->perPage());
@@ -116,8 +131,7 @@ class AllocationController extends Controller
 
             $sheet = $excel->getSheet('Dataset_Empower');
 
-            //collect up teh dates in row 5
-
+            //collect up the dates in row 5
 
             foreach ($sheet->nextRow() as $rowNum => $rowData) {
                 if ($rowNum == 5) { //grab header row
@@ -139,7 +153,7 @@ class AllocationController extends Controller
                         $resource = Resource::where('empowerID', $resourceName)->first();
                         $resourceID = $resource->id ?? null;
                         if (is_null($resourceID)) {
-                            return redirect()->back()->with('failure', 'Missing resource: '.$resourceName);
+                            return redirect()->back()->with('failure', 'Missing resource: ' . $resourceName);
                         }
                         $empowerID = $rowData['B'];
                         $projectName = preg_replace('/[^\x00-\x7F]/', '', $rowData['C']);
@@ -152,7 +166,7 @@ class AllocationController extends Controller
                             );
                             $projectID = $project->id;
                         }
-                        
+
                         // Log::info(message: $resourceName." " . $rowNum ." ". $projectID." ". $projectName);
 
                         for ($i = 0; $i < count($monthYear); $i++) {
@@ -165,8 +179,7 @@ class AllocationController extends Controller
                                     [
                                         'resources_id' => $resourceID,
                                         'projects_id' => $projectID,
-                                        'year' => substr($monthYear[$i], 0, 4),
-                                        'month' => substr($monthYear[$i], 5, 2)
+                                        'allocation_date' => \Carbon\Carbon::createFromFormat('Y-m', $monthYear[$i])->format('Y-m-d')
                                     ],
                                     [
                                         'fte' => $fte
@@ -188,7 +201,7 @@ class AllocationController extends Controller
                             );
                             $projectID = $project->id;
                         }
-                        
+
                         // Log::info(message: $resourceName." " . $rowNum ." ". $projectID." ". $projectName);
 
                         for ($i = 0; $i < count($monthYear); $i++) {
@@ -197,7 +210,7 @@ class AllocationController extends Controller
                             if ($fte > 0) {
                                 Log::info("fte " . $monthYear[$i] . " " . $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
 
-                                
+
                             }
 
                         }
@@ -205,45 +218,7 @@ class AllocationController extends Controller
 
                 }
             }
-            // Read XLSX-file
-            // $result['#1'] = $excel
-            //     // select sheet by name
-            //     ->selectSheet('Dataset_Empower') 
-            //     ->readCells();
-            //     // select area with data where the first row contains column keys
-            //     // ->setReadArea('B4:D11', true)  
-            //     // set date format
-            //     // ->setDateFormat('Y-m-d') 
-            //     // set key for column 'C' to 'Birthday'
-            //     // ->readRows(['C' => 'Birthday']); 
-            // Log::info("read" . print_r($result, true));
         }
-        // $startYear = $request->input('start_year');
-        // $startMonth = $request->input('start_month');
-        // $endYear = $request->input('end_year');
-        // $endMonth = $request->input('end_month');
-        // $resourceId = $request->input('resource_id');
-        // $projectId = $request->input('project_id');
-        // $fte = $request->input('fte');
-
-        // $startDateTime = new \DateTime($startYear . '-' . $startMonth . '-01');
-        // $endDateTime = new \DateTime($endYear . '-' . $endMonth . '-01');
-
-        // while ($startDateTime <= $endDateTime) {
-        //     $year = $startDateTime->format('Y');
-        //     $month = $startDateTime->format('m');
-
-        //     $allocation = new Allocation();
-        //     $allocation->year = $year;
-        //     $allocation->month = $month;
-        //     $allocation->fte = $fte;
-        //     $allocation->resources_id = $resourceId;
-        //     $allocation->projects_id = $projectId;
-        //     $allocation->status = 'pending'; // or any default status you prefer
-        //     $allocation->save();
-
-        //     $startDateTime->modify('first day of next month');
-        // }
 
         return redirect()->back()->with('success', 'Allocations populated successfully.');
     }
