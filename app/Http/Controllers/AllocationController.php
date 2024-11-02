@@ -68,8 +68,8 @@ class AllocationController extends Controller
                 }
             }
         }
-Log::info("Return: " . json_encode($resourceAllocation));
-        return view('allocation.index', compact('resources', 'resourceAllocation'))
+// Log::info("Return: " . json_encode($resourceAllocation));
+        return view('allocation.index', compact('resources', 'resourceAllocation','nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
 
