@@ -65,17 +65,18 @@ class DemandController extends Controller
             foreach ($nextTwelveMonths as $month) {
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 $totalAllocation = Demand::where('demand_date', '=', $monthStartDate)
-                    ->sum('fte');
-                // Use year-month as the key
+                    ->where('projects_id', '=', $project->id)
+                    ->pluck('fte')
+                    ->first();
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
-                    $resourceAllocation[$project->id]['demand'][$key] = $totalAllocation;
+                    $demandArray[$project->id]['demand'][$key] = $totalAllocation;
                 }
             }
         }
- 
+Log::info("return: " . print_r($demandArray, true));
         return view('demand.index', compact('projects', 'demandArray','nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }

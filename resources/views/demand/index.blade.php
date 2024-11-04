@@ -16,11 +16,12 @@
                                 {{ __('Demands') }}
                             </span>
 
-                             <div class="float-right">
-                                <a href="{{ route('demands.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
+                            <div class="float-right">
+                                <a href="{{ route('demands.create') }}" class="btn btn-primary btn-sm float-right"
+                                    data-placement="left">
+                                    {{ __('Create New') }}
                                 </a>
-                              </div>
+                            </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -34,36 +35,37 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-                                        <th>No</th>
-                                        
-									<th >Year</th>
-									<th >Month</th>
-									<th >Fte</th>
-									<th >Status</th>
-									<th >Projects Id</th>
-
+                                        <th>Full Name</th>
+                                        <!-- Dynamically add columns for the next twelve months -->
+                                        @foreach ($nextTwelveMonths as $month)
+                                            <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
+                                        @endforeach
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($demands as $demand)
+                                    @foreach ($projects as $project)
                                         <tr>
-                                            <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $demand->year }}</td>
-										<td >{{ $demand->month }}</td>
-										<td >{{ $demand->fte }}</td>
-										<td >{{ $demand->status }}</td>
-										<td >{{ $demand->projects_id }}</td>
-
+                                            <td>{{ $project->name }}</td>
+                                            <!-- Populate availability for each month -->
+                                            @foreach ($nextTwelveMonths as $month)
+                                                @php
+                                                    $monthKey =
+                                                        $month['year'] .
+                                                        '-' .
+                                                        str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                                                    $demandFTE =
+                                                        $demandArray[$project['id']]['demand'][$monthKey] ?? '-';
+                                                @endphp
+                                                <td>{{ $demandFTE }}</td>
+                                            @endforeach
                                             <td>
-                                                <form action="{{ route('demands.destroy', $demand->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('demands.show', $demand->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('demands.edit', $demand->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
-                                                </form>
+                                                <a class="btn btn-sm btn-primary "
+                                                    href="{{ route('demands.show', $project->id) }}"><i
+                                                        class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                <a class="btn btn-sm btn-success"
+                                                    href="{{ route('demands.edit', $project->id) }}"><i
+                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -72,7 +74,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $demands->withQueryString()->links() !!}
+                {!! $projects->withQueryString()->links() !!}
             </div>
         </div>
     </div>

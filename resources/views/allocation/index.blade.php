@@ -65,14 +65,14 @@
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
-                                    <t>
+                                    <tr>
                                         <th>Full Name</th>
                                         <!-- Dynamically add columns for the next twelve months -->
                                         @foreach ($nextTwelveMonths as $month)
                                             <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
                                         @endforeach
                                         <th></th>
-                                        </tr>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($resources as $resource)
@@ -86,9 +86,8 @@
                                                         '-' .
                                                         str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                                                     $availability =
-                                                        $resourceAllocation[$resource['id']]['allocation'][
-                                                            $monthKey
-                                                        ] ?? '-';
+                                                        $resourceAllocation[$resource['id']]['allocation'][$monthKey] ??
+                                                        '-';
                                                 @endphp
                                                 <td>{{ $availability }}</td>
                                             @endforeach
