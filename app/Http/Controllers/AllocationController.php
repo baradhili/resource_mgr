@@ -240,7 +240,7 @@ class AllocationController extends Controller
 
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(68 + $i); // 'D' + i
-                            $fte = is_double($rowData[$columnLetter]) ? (double) $rowData[$columnLetter] : 0.00;
+                            $fte = (double) $rowData[$columnLetter];
                             $monthDate = Carbon::parse($columnValue)->format('Y-m-01');
 
                             if ($fte > 0) {
