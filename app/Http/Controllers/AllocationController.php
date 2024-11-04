@@ -49,7 +49,7 @@ class AllocationController extends Controller
         // For each resource - find teh allocations for the period
         foreach ($resources as $resource) {
 
-            $resourceAvailability[$resource->id] = [
+            $resourceAllocation[$resource->id] = [
                 'name' => $resource->full_name,
             ];
 
@@ -68,7 +68,7 @@ class AllocationController extends Controller
                 }
             }
         }
-// Log::info("Return: " . json_encode($resourceAllocation));
+ 
         return view('allocation.index', compact('resources', 'resourceAllocation','nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
@@ -169,6 +169,9 @@ class AllocationController extends Controller
                     foreach ($rowData as $columnLetter => $columnValue) {
                         if ($columnLetter >= 'D' && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
+                            $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
+                            Allocation::where('allocation_date', '=',$monthDate)->delete();
+                            Demand::where('demand_date', '=',$monthDate)->delete();
                         }
                     }
                     // Log::info("months " . print_r($monthYear, true));
@@ -200,7 +203,9 @@ class AllocationController extends Controller
 
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(68 + $i); // 'D' + i
-                            $fte = is_double($rowData[$columnLetter]) ? (double) $rowData[$columnLetter] : 0.00;
+                            $fte = (double) $rowData[$columnLetter] ;
+                            // Log::info("fte " . $monthYear[$i] . " " . $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
+
                             if ($fte > 0) {
                                 // Log::info("fte " . $monthYear[$i] . " " . $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
 
@@ -208,7 +213,7 @@ class AllocationController extends Controller
                                     [
                                         'resources_id' => $resourceID,
                                         'projects_id' => $projectID,
-                                        'allocation_date' => \Carbon\Carbon::createFromFormat('Y-m', $monthYear[$i])->format('Y-m-d')
+                                        'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
                                     ],
                                     [
                                         'fte' => $fte
@@ -236,9 +241,20 @@ class AllocationController extends Controller
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(68 + $i); // 'D' + i
                             $fte = is_double($rowData[$columnLetter]) ? (double) $rowData[$columnLetter] : 0.00;
-                            if ($fte > 0) {
-                                Log::info("fte " . $monthYear[$i] . " " . $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
+                            $monthDate = Carbon::parse($columnValue)->format('Y-m-01');
 
+                            if ($fte > 0) {
+                                Log::info("fte " . $monthYear[$i] . " " . Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d') . " ". $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
+                                $demand = Demand::updateOrCreate(
+                                    [
+                                        'projects_id' => $projectID,
+                                        'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
+                                    ],
+                                    [
+                                        'fte' => $fte,
+                                        'status' => 'Proposed' // or any other default status you want to set
+                                    ]
+                                );
 
                             }
 

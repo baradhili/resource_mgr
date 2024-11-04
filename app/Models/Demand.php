@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * Class Demand
  *
  * @property $id
- * @property $year
- * @property $month
+ * @property $demand_date
  * @property $fte
  * @property $status
  * @property $projects_id
@@ -30,7 +29,7 @@ class Demand extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['year', 'month', 'fte', 'status', 'projects_id'];
+    protected $fillable = ['demand_date', 'fte', 'status', 'projects_id'];
 
 
     /**

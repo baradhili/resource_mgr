@@ -22,7 +22,7 @@ class DemandRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'year' => 'string',
+			'demand_date' => 'required',
 			'projects_id' => 'required',
         ];
     }
