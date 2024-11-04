@@ -244,7 +244,7 @@ class AllocationController extends Controller
                             $monthDate = Carbon::parse($columnValue)->format('Y-m-01');
 
                             if ($fte > 0) {
-                                Log::info("fte " . $monthYear[$i] . " " . Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d') . " ". $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
+                                // Log::info("fte " . $monthYear[$i] . " " . Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d') . " ". $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
                                 $demand = Demand::updateOrCreate(
                                     [
                                         'projects_id' => $projectID,

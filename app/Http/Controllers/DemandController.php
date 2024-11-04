@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Demand;
+use App\Models\Resource;
+use App\Models\Project;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\DemandRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class DemandController extends Controller
 {
@@ -16,10 +20,64 @@ class DemandController extends Controller
      */
     public function index(Request $request): View
     {
-        $demands = Demand::paginate();
+        // Build our next twelve month array
+        $nextTwelveMonths = [];
 
-        return view('demand.index', compact('demands'))
-            ->with('i', ($request->input('page', 1) - 1) * $demands->perPage());
+        for ($i = 0; $i < 12; $i++) {
+            $date = Carbon::now()->addMonthsNoOverflow($i);
+            $nextTwelveMonths[] = [
+                'year' => $date->year,
+                'month' => $date->month,
+                'monthName' => $date->format('M'),
+                'monthFullName' => $date->format('F')
+            ];
+        }
+        //  Start and end dates for the period
+        $startDate = Carbon::now()->startOfMonth();
+        $endDate = Carbon::now()->addYear()->startOfMonth();
+
+        // Collect the projects_id from demands in our window
+        $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
+            ->pluck('projects_id')
+            ->unique()
+            ->values()
+            ->all();
+
+        // Eager load the projects with their names
+        $projects = Project::whereIn('id', $demandIDs)
+            ->with('demands') // Eager load the demands relationship
+            ->paginate();
+
+
+            foreach ($projects as $project) {
+                Log::info("Project ID: {$project->id}, Project Name: {$project->name}");
+            }
+        
+
+        // For each project - find the allocations for the period
+
+        foreach ($projects as $project) {
+
+            $demandArray[$project->id] = [
+                'name' => $project->name,
+            ];
+
+            foreach ($nextTwelveMonths as $month) {
+                $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
+                $totalAllocation = Demand::where('demand_date', '=', $monthStartDate)
+                    ->sum('fte');
+                // Use year-month as the key
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+
+                // Add the calculated base availability to the resource availability array - only if not zero
+                if ($totalAllocation > 0) {
+                    $resourceAllocation[$project->id]['demand'][$key] = $totalAllocation;
+                }
+            }
+        }
+ 
+        return view('demand.index', compact('projects', 'demandArray','nextTwelveMonths'))
+            ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }
 
     /**
