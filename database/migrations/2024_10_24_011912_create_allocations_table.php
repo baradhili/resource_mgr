@@ -15,7 +15,7 @@ return new class extends Migration
             $table->integer('id', true);
             $table->string('year', 4)->nullable();
             $table->integer('month')->nullable();
-            $table->decimal('fte', 2, 0)->nullable();
+            $table->decimal('fte', 3, 2)->nullable();
             $table->integer('resources_id')->index('fk_allocations_resources1_idx');
             $table->integer('projects_id')->index('fk_allocations_projects1_idx');
             $table->enum('status', ['Proposed', 'Committed'])->nullable();

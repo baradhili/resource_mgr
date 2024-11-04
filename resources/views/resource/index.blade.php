@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    Resources
+    Resources and Availability
 @endsection
 
 @section('content')
@@ -13,14 +13,15 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
                             <span id="card_title">
-                                {{ __('Resources') }}
+                                {{ __('Resources and Availability') }}
                             </span>
 
-                             <div class="float-right">
-                                <a href="{{ route('resources.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
+                            <div class="float-right">
+                                <a href="{{ route('resources.create') }}" class="btn btn-primary btn-sm float-right"
+                                    data-placement="left">
+                                    {{ __('Create New') }}
                                 </a>
-                              </div>
+                            </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -33,11 +34,10 @@
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
-                                    <tr>                                       
-									<th >Full Name</th>
+                                    <tr>
+                                        <th>Full Name</th>
                                         <!-- Dynamically add columns for the next twelve months -->
                                         @foreach ($nextTwelveMonths as $month)
-
                                             <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
                                         @endforeach
                                         <th></th>
@@ -46,25 +46,36 @@
                                 <tbody>
                                     @foreach ($resources as $resource)
                                         <tr>
-                                            
-										<td >{{ $resource->full_name }}</td>
 
+                                            <td>{{ $resource->full_name }}</td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
-
                                                 @php
-                                                    $monthKey = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                                                    $availability = $resourceAvailability[$resource['id']]['availability'][$monthKey] ?? '-';
+                                                    $monthKey =
+                                                        $month['year'] .
+                                                        '-' .
+                                                        str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                                                    $availability =
+                                                        $resourceAvailability[$resource['id']]['availability'][
+                                                            $monthKey
+                                                        ] ?? '-';
                                                 @endphp
                                                 <td>{{ $availability }}</td>
                                             @endforeach
                                             <td>
-                                                <form action="{{ route('resources.destroy', $resource->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('resources.show', $resource->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('resources.edit', $resource->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form action="{{ route('resources.destroy', $resource->id) }}"
+                                                    method="POST">
+                                                    <a class="btn btn-sm btn-primary "
+                                                        href="{{ route('resources.show', $resource->id) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success"
+                                                        href="{{ route('resources.edit', $resource->id) }}"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
                                                 </form>
                                             </td>
                                         </tr>

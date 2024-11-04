@@ -22,7 +22,7 @@ class AllocationRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'year' => 'string',
+			'allocation_date' => 'required',
 			'resources_id' => 'required',
 			'projects_id' => 'required',
         ];

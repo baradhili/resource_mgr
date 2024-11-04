@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use \avadim\FastExcelReader\Excel;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class AllocationController extends Controller
 {
@@ -23,10 +24,53 @@ class AllocationController extends Controller
      */
     public function index(Request $request): View
     {
-        $allocations = Allocation::paginate();
+        // Build our next twelve month array
+        $nextTwelveMonths = [];
 
-        return view('allocation.index', compact('allocations'))
-            ->with('i', ($request->input('page', 1) - 1) * $allocations->perPage());
+        for ($i = 0; $i < 12; $i++) {
+            $date = Carbon::now()->addMonthsNoOverflow($i);
+            $nextTwelveMonths[] = [
+                'year' => $date->year,
+                'month' => $date->month,
+                'monthName' => $date->format('M'),
+                'monthFullName' => $date->format('F')
+            ];
+        }
+        //  Start and end dates for the period
+        $startDate = Carbon::now()->startOfMonth();
+        $endDate = Carbon::now()->addYear()->startOfMonth();
+
+        // Collect our resources who have a current contract
+        $resources = Resource::whereHas('contracts', function ($query) {
+            $query->where('start_date', '<=', now())
+                ->where('end_date', '>=', now());
+        })->paginate();
+
+        // For each resource - find teh allocations for the period
+        foreach ($resources as $resource) {
+
+            $resourceAllocation[$resource->id] = [
+                'name' => $resource->full_name,
+            ];
+
+            foreach ($nextTwelveMonths as $month) {
+                $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
+                // $monthEndDate = $monthStartDate->copy()->endOfMonth();
+                $totalAllocation = Allocation::where('allocation_date', '=', $monthStartDate)
+                    ->where('resources_id', '=', $resource->id)
+                    ->sum('fte');
+                // Use year-month as the key
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+
+                // Add the calculated base availability to the resource availability array - only if not zero
+                if ($totalAllocation > 0) {
+                    $resourceAllocation[$resource->id]['allocation'][$key] = $totalAllocation;
+                }
+            }
+        }
+ 
+        return view('allocation.index', compact('resources', 'resourceAllocation','nextTwelveMonths'))
+            ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
 
     /**
@@ -116,8 +160,7 @@ class AllocationController extends Controller
 
             $sheet = $excel->getSheet('Dataset_Empower');
 
-            //collect up teh dates in row 5
-
+            //collect up the dates in row 5
 
             foreach ($sheet->nextRow() as $rowNum => $rowData) {
                 if ($rowNum == 5) { //grab header row
@@ -126,6 +169,9 @@ class AllocationController extends Controller
                     foreach ($rowData as $columnLetter => $columnValue) {
                         if ($columnLetter >= 'D' && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
+                            $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
+                            Allocation::where('allocation_date', '=',$monthDate)->delete();
+                            Demand::where('demand_date', '=',$monthDate)->delete();
                         }
                     }
                     // Log::info("months " . print_r($monthYear, true));
@@ -139,7 +185,7 @@ class AllocationController extends Controller
                         $resource = Resource::where('empowerID', $resourceName)->first();
                         $resourceID = $resource->id ?? null;
                         if (is_null($resourceID)) {
-                            return redirect()->back()->with('failure', 'Missing resource: '.$resourceName);
+                            return redirect()->back()->with('failure', 'Missing resource: ' . $resourceName);
                         }
                         $empowerID = $rowData['B'];
                         $projectName = preg_replace('/[^\x00-\x7F]/', '', $rowData['C']);
@@ -152,12 +198,14 @@ class AllocationController extends Controller
                             );
                             $projectID = $project->id;
                         }
-                        
+
                         // Log::info(message: $resourceName." " . $rowNum ." ". $projectID." ". $projectName);
 
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(68 + $i); // 'D' + i
-                            $fte = is_double($rowData[$columnLetter]) ? (double) $rowData[$columnLetter] : 0.00;
+                            $fte = (double) $rowData[$columnLetter] ;
+                            // Log::info("fte " . $monthYear[$i] . " " . $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
+
                             if ($fte > 0) {
                                 // Log::info("fte " . $monthYear[$i] . " " . $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
 
@@ -165,8 +213,7 @@ class AllocationController extends Controller
                                     [
                                         'resources_id' => $resourceID,
                                         'projects_id' => $projectID,
-                                        'year' => substr($monthYear[$i], 0, 4),
-                                        'month' => substr($monthYear[$i], 5, 2)
+                                        'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
                                     ],
                                     [
                                         'fte' => $fte
@@ -188,16 +235,27 @@ class AllocationController extends Controller
                             );
                             $projectID = $project->id;
                         }
-                        
+
                         // Log::info(message: $resourceName." " . $rowNum ." ". $projectID." ". $projectName);
 
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(68 + $i); // 'D' + i
-                            $fte = is_double($rowData[$columnLetter]) ? (double) $rowData[$columnLetter] : 0.00;
-                            if ($fte > 0) {
-                                Log::info("fte " . $monthYear[$i] . " " . $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
+                            $fte = (double) $rowData[$columnLetter];
+                            $monthDate = Carbon::parse($columnValue)->format('Y-m-01');
 
-                                
+                            if ($fte > 0) {
+                                // Log::info("fte " . $monthYear[$i] . " " . Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d') . " ". $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
+                                $demand = Demand::updateOrCreate(
+                                    [
+                                        'projects_id' => $projectID,
+                                        'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
+                                    ],
+                                    [
+                                        'fte' => $fte,
+                                        'status' => 'Proposed' // or any other default status you want to set
+                                    ]
+                                );
+
                             }
 
                         }
@@ -205,45 +263,7 @@ class AllocationController extends Controller
 
                 }
             }
-            // Read XLSX-file
-            // $result['#1'] = $excel
-            //     // select sheet by name
-            //     ->selectSheet('Dataset_Empower') 
-            //     ->readCells();
-            //     // select area with data where the first row contains column keys
-            //     // ->setReadArea('B4:D11', true)  
-            //     // set date format
-            //     // ->setDateFormat('Y-m-d') 
-            //     // set key for column 'C' to 'Birthday'
-            //     // ->readRows(['C' => 'Birthday']); 
-            // Log::info("read" . print_r($result, true));
         }
-        // $startYear = $request->input('start_year');
-        // $startMonth = $request->input('start_month');
-        // $endYear = $request->input('end_year');
-        // $endMonth = $request->input('end_month');
-        // $resourceId = $request->input('resource_id');
-        // $projectId = $request->input('project_id');
-        // $fte = $request->input('fte');
-
-        // $startDateTime = new \DateTime($startYear . '-' . $startMonth . '-01');
-        // $endDateTime = new \DateTime($endYear . '-' . $endMonth . '-01');
-
-        // while ($startDateTime <= $endDateTime) {
-        //     $year = $startDateTime->format('Y');
-        //     $month = $startDateTime->format('m');
-
-        //     $allocation = new Allocation();
-        //     $allocation->year = $year;
-        //     $allocation->month = $month;
-        //     $allocation->fte = $fte;
-        //     $allocation->resources_id = $resourceId;
-        //     $allocation->projects_id = $projectId;
-        //     $allocation->status = 'pending'; // or any default status you prefer
-        //     $allocation->save();
-
-        //     $startDateTime->modify('first day of next month');
-        // }
 
         return redirect()->back()->with('success', 'Allocations populated successfully.');
     }

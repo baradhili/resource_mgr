@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Resource;
+use App\Http\Requests\ResourceRequest;
 use App\Models\Contract;
 use App\Models\Leave;
+use App\Models\Resource;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\ResourceRequest;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Carbon\Carbon;
-
-use Illuminate\Support\Facades\Log;
 
 class ResourceController extends Controller
 {
@@ -115,7 +115,10 @@ class ResourceController extends Controller
             }
 
         }
+        // Cache the resourceAvailability data
+        Cache::put('resourceAvailability', $resourceAvailability, now()->addDays(1));
 
+        //return to the view
         return view('resource.index', compact('resources', 'resourceAvailability','nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
