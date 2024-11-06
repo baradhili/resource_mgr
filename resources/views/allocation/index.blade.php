@@ -93,11 +93,11 @@
                                             @endforeach
                                             <td>
                                                 <a class="btn btn-sm btn-primary "
-                                                    href="{{ route('resources.show', $resource->id) }}"><i
+                                                    href="{{ route('resources.allocations', $resource->id) }}"><i
                                                         class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                <a class="btn btn-sm btn-success"
+                                                <!-- <a class="btn btn-sm btn-success"
                                                     href="{{ route('resources.edit', $resource->id) }}"><i
-                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a> -->
                                             </td>
                                         </tr>
                                     @endforeach

@@ -12,7 +12,7 @@ Its early stages right now, we are looking for help in:
 
 ## Next steps
 
-- [ ] Allocation view per resource
+- [X] Allocation view per resource
 - [ ] Demand view to see if there are multiple resource requests
 - [ ] Split out some hard coded things into env or a settings table
 - [ ] Assign demand to a resource
