@@ -48,12 +48,7 @@ class DemandController extends Controller
             ->with('demands') // Eager load the demands relationship
             ->paginate();
 
-
-            foreach ($projects as $project) {
-                Log::info("Project ID: {$project->id}, Project Name: {$project->name}");
-            }
-        
-
+        $demandArray = [];
         // For each project - find the allocations for the period
 
         foreach ($projects as $project) {
@@ -76,7 +71,7 @@ class DemandController extends Controller
                 }
             }
         }
-Log::info("return: " . print_r($demandArray, true));
+Log::info("return: " . print_r($projects, true));
         return view('demand.index', compact('projects', 'demandArray','nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }

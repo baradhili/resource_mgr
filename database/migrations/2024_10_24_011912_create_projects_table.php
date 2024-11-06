@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('empowerID', 10)->nullable();
             $table->string('name')->nullable();
             $table->string('projectManager', 45)->nullable();
+            $table->enum('status', ['Proposed', 'Active', 'Cancelled', 'Completed', 'On Hold', 'Prioritised'])->nullable();
             $table->timestamps();
         });
     }

@@ -29,7 +29,7 @@ class Project extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['empowerID', 'name', 'projectManager'];
+    protected $fillable = ['empowerID', 'name', 'projectManager', 'status'];
 
 
     /**
