@@ -36,4 +36,5 @@ Route::resource('demands', DemandController::class);
 Route::resource('leaves', LeaveController::class);
 Route::resource('projects', ProjectController::class);
 Route::resource('resources', ResourceController::class);
+Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
 

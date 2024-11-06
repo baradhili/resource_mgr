@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ResourceRequest;
 use App\Models\Contract;
+use App\Models\Demand;
+use App\Models\Allocation;
+use App\Models\Project;
 use App\Models\Leave;
 use App\Models\Resource;
 use Carbon\Carbon;
@@ -152,6 +155,62 @@ class ResourceController extends Controller
         $resource = Resource::find($id);
 
         return view('resource.show', compact('resource'));
+    }
+
+    /**
+     * Display the projects allocated to a resource with start dates from now.
+     */
+    public function allocations($id): View
+    {
+        $nextTwelveMonths = [];
+
+        for ($i = 0; $i < 12; $i++) {
+            $date = Carbon::now()->addMonthsNoOverflow($i);
+            $nextTwelveMonths[] = [
+                'year' => $date->year,
+                'month' => $date->month,
+                'monthName' => $date->format('M'),
+                'monthFullName' => $date->format('F')
+            ];
+        }
+
+        $resource = Resource::find($id);
+        $allocations = $resource->allocations()->get();
+
+        $projects = $allocations->map(function ($allocation) {
+            return $allocation->project;
+        })->unique();
+
+        foreach ($projects as $project) {
+
+            // $allocationArray[$project->id] = [
+            //     'name' => $project->name,
+            // ];
+
+            foreach ($nextTwelveMonths as $month) {
+                $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
+                $totalAllocation = Allocation::where('resources_id', '=', $resource->id)
+                    ->where('allocation_date', '=', $monthStartDate)
+                    ->where('projects_id', '=', $project->id)
+                    ->pluck('fte')
+                    ->first();
+                // if ($totalAllocation !== null) Log::info(print_r($totalAllocation,true) . "Resource: {$resource->id} Date: {$monthStartDate} Project: {$project->id}");
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+
+                // Add the calculated base availability to the resource availability array - only if not zero
+                if ($totalAllocation > 0) {
+                    $allocationArray[$project->id]['allocation'][$key] = $totalAllocation;
+                }
+            }
+            
+        }
+
+        $projectIds = array_keys($allocationArray);
+        $projects = Project::whereIn('id', $projectIds)->get();
+
+Log::info("resource: {$resource->name} has allocated projects: " . print_r($allocationArray,true));
+
+        return view('resource.allocations', compact('resource', 'allocationArray','projects', 'nextTwelveMonths'));
     }
 
     /**
