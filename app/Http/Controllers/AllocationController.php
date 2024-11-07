@@ -109,14 +109,25 @@ class AllocationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id): View
+    public function edit($project_id, Request $request): RedirectResponse
     {
-        $allocation = Allocation::find($id);
-        $allocation = new Allocation();
-        $resources = Resource::all(); // Retrieve all resources
-        $projects = Project::all(); // Retrieve all projects
+        $allocationArray = Allocation::where('projects_id', $project_id)
+            ->whereBetween('allocation_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
+            ->where('resources_id', '=', $request->resource_id)
+            ->get();
 
-        return view('allocation.edit', compact('allocation', 'resources', 'projects'));
+            foreach ($allocationArray as $allocation) {
+                $demand = new Demand();
+                $demand->demand_date = $allocation->allocation_date;
+                $demand->fte = $allocation->fte;
+                $demand->projects_id = $allocation->projects_id;
+                $demand->resource_type = "Solution Architect";
+                $demand->save();
+
+                $allocation->delete();
+            }
+
+        return Redirect::route('allocations.index');
     }
 
     /**
