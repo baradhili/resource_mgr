@@ -252,7 +252,8 @@ class AllocationController extends Controller
                                     ],
                                     [
                                         'fte' => $fte,
-                                        'status' => 'Proposed' // or any other default status you want to set
+                                        'status' => 'Proposed', // or any other default status you want to set
+                                        'resource_type' => $resourceName
                                     ]
                                 );
 

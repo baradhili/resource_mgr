@@ -48,18 +48,25 @@ class DemandController extends Controller
             ->with('demands') // Eager load the demands relationship
             ->paginate();
 
-
-            foreach ($projects as $project) {
-                Log::info("Project ID: {$project->id}, Project Name: {$project->name}");
-            }
-        
-
+        $demandArray = [];
         // For each project - find the allocations for the period
 
         foreach ($projects as $project) {
 
+            $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
+            if ($resource_type) {
+                $words = explode(' ', trim($resource_type));
+                $acronym = '';
+                for ($i = 0; $i < min(2, count($words)); $i++) {
+                    $acronym .= strtoupper(substr($words[$i], 0, 1));
+                }
+            } else {
+                $acronym = '';
+            }
+
             $demandArray[$project->id] = [
                 'name' => $project->name,
+                'type' => $acronym,
             ];
 
             foreach ($nextTwelveMonths as $month) {
@@ -76,8 +83,8 @@ class DemandController extends Controller
                 }
             }
         }
-Log::info("return: " . print_r($demandArray, true));
-        return view('demand.index', compact('projects', 'demandArray','nextTwelveMonths'))
+        // Log::info("return: " . print_r($demandArray, true));
+        return view('demand.index', compact('projects', 'demandArray', 'nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }
 
@@ -140,4 +147,6 @@ Log::info("return: " . print_r($demandArray, true));
         return Redirect::route('demands.index')
             ->with('success', 'Demand deleted successfully');
     }
+
+
 }

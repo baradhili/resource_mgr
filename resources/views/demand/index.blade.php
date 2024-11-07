@@ -35,7 +35,8 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-                                        <th>Full Name</th>
+                                        <th>Project</th>
+                                        <th>Type</th>
                                         <!-- Dynamically add columns for the next twelve months -->
                                         @foreach ($nextTwelveMonths as $month)
                                             <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
@@ -47,6 +48,7 @@
                                     @foreach ($projects as $project)
                                         <tr>
                                             <td>{{ $project->name }}</td>
+                                            <td>{{ $demandArray[$project['id']]['type'] ?? '-'}} </td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php
@@ -60,12 +62,12 @@
                                                 <td>{{ $demandFTE }}</td>
                                             @endforeach
                                             <td>
-                                                <a class="btn btn-sm btn-primary "
+                                                <!-- <a class="btn btn-sm btn-primary "
                                                     href="{{ route('demands.show', $project->id) }}"><i
                                                         class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
                                                 <a class="btn btn-sm btn-success"
                                                     href="{{ route('demands.edit', $project->id) }}"><i
-                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a> -->
                                             </td>
                                         </tr>
                                     @endforeach
