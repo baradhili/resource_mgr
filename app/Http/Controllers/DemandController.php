@@ -53,8 +53,20 @@ class DemandController extends Controller
 
         foreach ($projects as $project) {
 
+            $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
+            if ($resource_type) {
+                $words = explode(' ', trim($resource_type));
+                $acronym = '';
+                for ($i = 0; $i < min(2, count($words)); $i++) {
+                    $acronym .= strtoupper(substr($words[$i], 0, 1));
+                }
+            } else {
+                $acronym = '';
+            }
+            
             $demandArray[$project->id] = [
                 'name' => $project->name,
+                'type' => $acronym,
             ];
 
             foreach ($nextTwelveMonths as $month) {
@@ -71,7 +83,7 @@ class DemandController extends Controller
                 }
             }
         }
-Log::info("return: " . print_r($projects, true));
+Log::info("return: " . print_r($demandArray, true));
         return view('demand.index', compact('projects', 'demandArray','nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }
@@ -136,5 +148,5 @@ Log::info("return: " . print_r($projects, true));
             ->with('success', 'Demand deleted successfully');
     }
 
-    
+
 }

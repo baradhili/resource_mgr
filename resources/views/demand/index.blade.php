@@ -35,7 +35,8 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-                                        <th>Full Name</th>
+                                        <th>Project</th>
+                                        <th>Type</th>
                                         <!-- Dynamically add columns for the next twelve months -->
                                         @foreach ($nextTwelveMonths as $month)
                                             <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
@@ -47,6 +48,7 @@
                                     @foreach ($projects as $project)
                                         <tr>
                                             <td>{{ $project->name }}</td>
+                                            <td>{{ $demandArray[$project['id']]['type'] ?? '-'}} </td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php
