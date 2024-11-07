@@ -37,6 +37,7 @@
                                         @foreach ($nextTwelveMonths as $month)
                                             <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>
                                         @endforeach
+                                        <th></th>
 
                                     </tr>
                                 </thead>
@@ -52,11 +53,21 @@
                                                         '-' .
                                                         str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                                                     $demandFTE =
-                                                        $allocationArray[$project['id']]['allocation'][$monthKey] ?? '-';
+                                                        $allocationArray[$project['id']]['allocation'][$monthKey] ??
+                                                        '-';
                                                 @endphp
                                                 <td>{{ $demandFTE }}</td>
                                             @endforeach
-
+                                            <td>
+                                                <form
+                                                    action="{{ route('allocations.edit', $project->id) }}"
+                                                    method="GET">
+                                                    @csrf
+                                                    <input type="hidden" name="resource_id" value="{{ $resource->id }}">
+                                                    <button type="submit" class="btn btn-sm btn-danger"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Return') }}</button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
 
@@ -71,7 +82,9 @@
                                                             $month['year'] .
                                                             '-' .
                                                             str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                                                        $sum += $allocationArray[$project['id']]['allocation'][$monthKey] ?? 0;
+                                                        $sum +=
+                                                            $allocationArray[$project['id']]['allocation'][$monthKey] ??
+                                                            0;
                                                     }
                                                 @endphp
                                                 <strong>{{ $sum }}</strong>
