@@ -62,12 +62,15 @@
                                                 <td>{{ $demandFTE }}</td>
                                             @endforeach
                                             <td>
-                                                <!-- <a class="btn btn-sm btn-primary "
-                                                    href="{{ route('demands.show', $project->id) }}"><i
-                                                        class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                <a class="btn btn-sm btn-success"
-                                                    href="{{ route('demands.edit', $project->id) }}"><i
-                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a> -->
+                                                <form action="{{ route('demands.edit', $project->id) }}" method="GET">
+                                                    <select name="resource_id" class="form-control @error('resource_id') is-invalid @enderror" id="resource_id">
+                                                        <option value="">Select Resource</option>
+                                                        @foreach ($resources as $resource)
+                                                            <option value="{{ $resource->id }}">{{ $resource->full_name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-fw fa-edit"></i> {{ __('Assign') }}</button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach

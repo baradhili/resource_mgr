@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Demand;
 use App\Models\Resource;
+use App\Models\Contract;
 use App\Models\Project;
+use App\Models\Allocation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\DemandRequest;
@@ -35,6 +37,16 @@ class DemandController extends Controller
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addYear()->startOfMonth();
+
+        // Collect resources with contracts in the next 12 months
+        $resources = Resource::whereIn(
+            'id',
+            Contract::whereBetween('start_date', [$startDate, $endDate])
+                ->orWhereBetween('end_date', [$startDate, $endDate])
+                ->pluck('resources_id')
+                ->unique()
+                ->values()
+        )->get();
 
         // Collect the projects_id from demands in our window
         $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
@@ -84,7 +96,7 @@ class DemandController extends Controller
             }
         }
         // Log::info("return: " . print_r($demandArray, true));
-        return view('demand.index', compact('projects', 'demandArray', 'nextTwelveMonths'))
+        return view('demand.index', compact('projects', 'demandArray', 'nextTwelveMonths', 'resources'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }
 
@@ -120,13 +132,30 @@ class DemandController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource. 
+     * - TODO we need to make sure we don't wipe out other demands
+     * - TODO we should run to the end of the demand, or deal with each month by itself
      */
-    public function edit($id): View
+    public function edit($project_id, Request $request): RedirectResponse
     {
-        $demand = Demand::find($id);
+        $demandArray = Demand::where('projects_id', $project_id)
+            ->whereBetween('demand_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
+            ->get();
+        
+        foreach ($demandArray as $demand) {
+            $allocation = new Allocation();
+            $allocation->allocation_date = $demand->demand_date;
+            $allocation->resources_id = $request->resource_id;
+            $allocation->fte = $demand->fte;
+            $allocation->projects_id = $demand->projects_id;
+            $allocation->status = "Proposed";
+            $allocation->save();
 
-        return view('demand.edit', compact('demand'));
+            $demand->delete();
+        }
+
+        return Redirect::route('demands.index')
+            ->with('success', 'Resource assigned to project successfully.');
     }
 
     /**
