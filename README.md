@@ -15,7 +15,7 @@ Its early stages right now, we are looking for help in:
 - [X] Allocation view per resource
 - [X] Demand view to see if there are multiple resource requests
 - [ ] Split out some hard coded things into env or a settings table
-- [ ] Assign demand to a resource
+- [X] Assign demand to a resource
 - [ ] De-assign a project back to demand
 - [ ] Collect skill list
 - [ ] Add skills to a resource
