@@ -63,7 +63,7 @@ class DemandController extends Controller
             } else {
                 $acronym = '';
             }
-            
+
             $demandArray[$project->id] = [
                 'name' => $project->name,
                 'type' => $acronym,
@@ -83,8 +83,8 @@ class DemandController extends Controller
                 }
             }
         }
-Log::info("return: " . print_r($demandArray, true));
-        return view('demand.index', compact('projects', 'demandArray','nextTwelveMonths'))
+        // Log::info("return: " . print_r($demandArray, true));
+        return view('demand.index', compact('projects', 'demandArray', 'nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }
 
