@@ -13,6 +13,7 @@
                                         <span class="align-middle">AdminKit</span>
                                     </a>
 
+{!! $sidebarMenu !!}
                                     <ul class="sidebar-nav">
                                         <li class="sidebar-header">
                                             Pages
