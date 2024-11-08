@@ -10,11 +10,12 @@
                                 aria-label="scrollable content" style="height: 100%; overflow: hidden scroll;">
                                 <div class="simplebar-content" style="padding: 0px;">
                                     <a class="sidebar-brand" href="/">
-                                        <span class="align-middle">AdminKit</span>
+                                        <span class="align-middle white">Resource Manager</span>
                                     </a>
 
-{!! $sidebarMenu !!}
-                                    <ul class="sidebar-nav">
+                                    {!! $sidebarMenu !!}
+
+                                    <!-- <ul class="sidebar-nav">
                                         <li class="sidebar-header">
                                             Pages
                                         </li>
@@ -32,7 +33,7 @@
                                         </li>
 
                                         
-                                    </ul>
+                                    </ul> -->
 
                                     
                                 </div>
