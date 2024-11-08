@@ -17,6 +17,7 @@ Its early stages right now, we are looking for help in:
 - [ ] Split out some hard coded things into env or a settings table
 - [X] Assign demand to a resource
 - [X] De-assign a project back to demand
+- [ ] Some kind of nicer dashboard
 - [ ] Collect skill list
 - [ ] Add skills to a resource
 - [ ] Manual Demand collection (inc business need, funding etc)

@@ -48,7 +48,7 @@
                                     @foreach ($projects as $project)
                                         <tr>
                                             <td>{{ $project->name }}</td>
-                                            <td>{{ $demandArray[$project['id']]['type'] ?? '-'}} </td>
+                                            <td>{{ $demandArray[$project['id']]['type'] ?? '-' }} </td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php
@@ -62,14 +62,17 @@
                                                 <td>{{ $demandFTE }}</td>
                                             @endforeach
                                             <td>
-                                                <form action="{{ route('demands.edit', $project->id) }}" method="GET">
-                                                    <select name="resource_id" class="form-control @error('resource_id') is-invalid @enderror" id="resource_id">
+                                                <form action="{{ route('demands.edit', $project->id) }}" method="GET"
+                                                    style="display: flex;"><select name="resource_id"
+                                                        class="form-control @error('resource_id') is-invalid @enderror"
+                                                        id="resource_id">
                                                         <option value="">Select Resource</option>
                                                         @foreach ($resources as $resource)
-                                                            <option value="{{ $resource->id }}">{{ $resource->full_name }}</option>
+                                                            <option value="{{ $resource->id }}">{{ $resource->full_name }}
+                                                            </option>
                                                         @endforeach
-                                                    </select>
-                                                    <button type="submit" class="btn btn-sm btn-success"><i class="fa fa-fw fa-edit"></i> {{ __('Assign') }}</button>
+                                                    </select><button type="submit" class="btn btn-sm btn-success"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Assign') }}</button>
                                                 </form>
                                             </td>
                                         </tr>
