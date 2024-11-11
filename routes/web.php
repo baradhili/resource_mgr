@@ -8,6 +8,7 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SkillController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,3 +39,4 @@ Route::resource('projects', ProjectController::class);
 Route::resource('resources', ResourceController::class);
 Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
 
+Route::resource('skills', SkillController::class);

@@ -9,6 +9,8 @@ use App\Models\Allocation;
 use App\Models\Project;
 use App\Models\Leave;
 use App\Models\Resource;
+use App\Models\ResourceSkill;
+use App\Models\Skill;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -154,7 +156,11 @@ class ResourceController extends Controller
     {
         $resource = Resource::find($id);
 
-        return view('resource.show', compact('resource'));
+        // Get the skills for the resource
+        $skills = ResourceSkill::where('resources_id', $id)->pluck('skills_id');
+        $skills = Skill::whereIn('id', $skills)->get();
+
+        return view('resource.show', compact('resource', 'skills'));
     }
 
     /**
@@ -213,15 +219,7 @@ class ResourceController extends Controller
         return view('resource.allocations', compact('resource', 'allocationArray','projects', 'nextTwelveMonths'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id): View
-    {
-        $resource = Resource::find($id);
-
-        return view('resource.edit', compact('resource'));
-    }
+  
 
     /**
      * Update the specified resource in storage.
