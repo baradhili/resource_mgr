@@ -31,7 +31,6 @@
         "kitloong/laravel-migrations-generator": "^7.0",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
-        "laravel/ui": "^4.5",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^7.0",
         "orangehill/iseed": "^3.0",

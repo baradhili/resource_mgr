@@ -3,54 +3,114 @@
 namespace App\Http\Controllers;
 
 use App\Models\ResourceSkill;
+use App\Models\Skill;
+use App\Models\Resource;
+use App\Models\Contract;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\ResourceSkillRequest;
-use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\ResourceSkillResource;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class ResourceSkillController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $resourceSkills = ResourceSkill::paginate();
 
-        return ResourceSkillResource::collection($resourceSkills);
+        return view('resource-skill.index', compact('resourceSkills'))
+            ->with('i', ($request->input('page', 1) - 1) * $resourceSkills->perPage());
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create(Request $request): View
+    {
+        Log::info("in create");
+        $resourceId = $request->query('resource_id');
+        $resource = null;
+        if ($resourceId) {
+            $resource = Resource::findOrFail($resourceId);
+            Log::info("resource id = " . $resource->full_name);
+
+            $skills = ResourceSkill::where('resources_id', $resource->id)->get();
+
+            $allSkills = Skill::all();
+            $unassignedSkills = $allSkills->diff($skills->toArray());
+
+            $resources = null;
+
+        } else {
+            $resource = new Resource();
+            $resource->id = 0;
+
+            $currentContracts = Contract::where('end_date', '>=', Carbon::today())->pluck('resources_id');
+            $resources = Resource::whereIn('id', $currentContracts)->get();
+
+            $allSkills = Skill::all();
+            $unassignedSkills = $allSkills;
+        }
+
+
+
+        $resourceSkill = new ResourceSkill();
+
+        return view('resource-skill.create', compact('resourceSkill', 'resource', 'unassignedSkills','resources'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ResourceSkillRequest $request): ResourceSkill
+    public function store(ResourceSkillRequest $request): RedirectResponse
     {
-        return ResourceSkill::create($request->validated());
+        ResourceSkill::create($request->validated());
+
+        return Redirect::route('resource-skills.index')
+            ->with('success', 'ResourceSkill created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(ResourceSkill $resourceSkill): ResourceSkill
+    public function show($id): View
     {
-        return $resourceSkill;
+        $resourceSkill = ResourceSkill::find($id);
+
+        return view('resource-skill.show', compact('resourceSkill'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id): View
+    {
+        $resourceSkill = ResourceSkill::find($id);
+
+        return view('resource-skill.edit', compact('resourceSkill'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(ResourceSkillRequest $request, ResourceSkill $resourceSkill): ResourceSkill
+    public function update(ResourceSkillRequest $request, ResourceSkill $resourceSkill): RedirectResponse
     {
         $resourceSkill->update($request->validated());
 
-        return $resourceSkill;
+        return Redirect::route('resource-skills.index')
+            ->with('success', 'ResourceSkill updated successfully');
     }
 
-    public function destroy(ResourceSkill $resourceSkill): Response
+    public function destroy($id): RedirectResponse
     {
-        $resourceSkill->delete();
+        ResourceSkill::find($id)->delete();
 
-        return response()->noContent();
+        return Redirect::route('resource-skills.index')
+            ->with('success', 'ResourceSkill deleted successfully');
     }
 }

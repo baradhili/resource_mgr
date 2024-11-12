@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class ResourceSkill
  *
- * @property $resource_id
- * @property $skill_id
+ * @property $resources_id
+ * @property $skills_id
  * @property $proficiency_levels
  * @property $created_at
  * @property $updated_at
@@ -29,7 +29,7 @@ class ResourceSkill extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['resource_id', 'skill_id', 'proficiency_levels'];
+    protected $fillable = ['resources_id', 'skills_id', 'proficiency_levels'];
 
 
     /**
@@ -37,7 +37,7 @@ class ResourceSkill extends Model
      */
     public function resource()
     {
-        return $this->belongsTo(\App\Models\Resource::class, 'resource_id', 'id');
+        return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
     }
     
     /**
@@ -45,7 +45,7 @@ class ResourceSkill extends Model
      */
     public function skill()
     {
-        return $this->belongsTo(\App\Models\Skill::class, 'skill_id', 'id');
+        return $this->belongsTo(\App\Models\Skill::class, 'skills_id', 'id');
     }
     
 }

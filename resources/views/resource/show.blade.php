@@ -35,6 +35,31 @@
 
                     </div>
                 </div>
+                <div class="card mt-4">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="float-left">
+                            <span class="card-title">{{ __('Skills and Proficiencies') }}</span>
+                        </div>
+                        <div class="float-right">
+                            <a class="btn btn-primary btn-sm" href="{{ route('resource-skills.create', $resource->id) }}"> {{ __('Add Skill') }}</a>
+                        </div>
+                    </div>
+
+                    <div class="card-body bg-white">
+                        @if ($skills->isNotEmpty())
+                            <ul class="list-group">
+                                @foreach ($skills as $skill)
+                                    <li class="list-group-item">
+                                        <strong>{{ $skill->name }}</strong>: {{ $skill->proficiency_level }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p>{{ __('No skills allocated.') }}</p>
+                        @endif
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
