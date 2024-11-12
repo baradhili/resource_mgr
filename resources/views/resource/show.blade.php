@@ -41,16 +41,16 @@
                             <span class="card-title">{{ __('Skills and Proficiencies') }}</span>
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('resource-skills.create', $resource->id) }}"> {{ __('Add Skill') }}</a>
+                            <a class="btn btn-primary btn-sm" href="{{ route('resource-skills.create', ['id' => $resource->id]) }}"> {{ __('Add Skill') }}</a>
                         </div>
                     </div>
 
                     <div class="card-body bg-white">
-                        @if ($skills->isNotEmpty())
+                        @if (count($skills) > 0)
                             <ul class="list-group">
                                 @foreach ($skills as $skill)
                                     <li class="list-group-item">
-                                        <strong>{{ $skill->name }}</strong>: {{ $skill->proficiency_level }}
+                                        <strong>{{ $skill['skill_name'] }}</strong>: {{ $skill['proficiency_level'] }}
                                     </li>
                                 @endforeach
                             </ul>

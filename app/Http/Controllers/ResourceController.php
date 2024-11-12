@@ -157,9 +157,20 @@ class ResourceController extends Controller
         $resource = Resource::find($id);
 
         // Get the skills for the resource
-        $skills = ResourceSkill::where('resources_id', $id)->pluck('skills_id');
-        $skills = Skill::whereIn('id', $skills)->get();
+        $resourceSkills = ResourceSkill::where('resources_id', $id)
+            ->select('skills_id', 'proficiency_levels')
+            ->pluck( 'proficiency_levels', 'skills_id')
+            ->toArray();
 
+        $skills = Skill::whereIn('id', array_keys($resourceSkills))->get(['id', 'skill_name']);
+        foreach ($resourceSkills as $skillId => $proficiencyLevel) {
+            $resourceSkills[$skillId] = [
+                'proficiency_level' => $proficiencyLevel,
+                'skill_name' => $skills->firstWhere('id', $skillId)->skill_name,
+            ];
+        }
+        $skills = $resourceSkills;
+        
         return view('resource.show', compact('resource', 'skills'));
     }
 

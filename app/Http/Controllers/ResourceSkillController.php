@@ -32,18 +32,17 @@ class ResourceSkillController extends Controller
      */
     public function create(Request $request): View
     {
-        Log::info("in create");
-        $resourceId = $request->query('resource_id');
+        $resourceId = $request->query('id');
         $resource = null;
         if ($resourceId) {
             $resource = Resource::findOrFail($resourceId);
-            Log::info("resource id = " . $resource->full_name);
+            // Log::info("resource id = " . $resource->full_name);
 
             $skills = ResourceSkill::where('resources_id', $resource->id)->get();
 
             $allSkills = Skill::all();
-            $unassignedSkills = $allSkills->diff($skills->toArray());
-
+            $unassignedSkills = $allSkills->diff($skills);
+            // Log::info("unassigned skills = " . print_r($unassignedSkills, true));
             $resources = null;
 
         } else {
