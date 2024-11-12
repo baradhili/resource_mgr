@@ -8960,12 +8960,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/baradhili/laravel-dashboard.git",
-                "reference": "800091af9885bc6585a90f432b8578b7cadeec50"
+                "reference": "310a75c84ce9154f9f8faa23c6f7bff0aa23c13c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/baradhili/laravel-dashboard/zipball/800091af9885bc6585a90f432b8578b7cadeec50",
-                "reference": "800091af9885bc6585a90f432b8578b7cadeec50",
+                "url": "https://api.github.com/repos/baradhili/laravel-dashboard/zipball/310a75c84ce9154f9f8faa23c6f7bff0aa23c13c",
+                "reference": "310a75c84ce9154f9f8faa23c6f7bff0aa23c13c",
                 "shasum": ""
             },
             "require": {
@@ -9043,7 +9043,7 @@
                     "url": "https://spatie.be/open-source/support-us"
                 }
             ],
-            "time": "2024-11-12T05:44:10+00:00"
+            "time": "2024-11-12T06:35:55+00:00"
         },
         {
             "name": "spatie/laravel-ignition",
