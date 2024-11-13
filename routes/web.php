@@ -12,6 +12,12 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\ResourceSkillController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\CapabilityController;
+use App\Http\Controllers\AbilityController;
 
 
 /*
@@ -49,5 +55,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('skills', SkillController::class);
     Route::resource('resource-skills', ResourceSkillController::class);
     Route::resource('users', UserController::class);
+    Route::resource('groups', GroupController::class);
+    Route::resource('permissions', PermissionController::class);
+    Route::resource('abilities', AbilityController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('capabilities', CapabilityController::class);
+    Route::resource('teams', TeamController::class);
 });
 
