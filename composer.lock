@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b3b4e006567200c65914d06a41f5ddd6",
+    "content-hash": "f82685aecb5bb2ff9f32614bebea335f",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2460,6 +2460,67 @@
                 }
             ],
             "time": "2023-12-03T19:50:20+00:00"
+        },
+        {
+            "name": "jurager/teams",
+            "version": "2.4.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Jurager/teams.git",
+                "reference": "a43f3c07829ca9ddc10720c6da2afb13d376a0bb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Jurager/teams/zipball/a43f3c07829ca9ddc10720c6da2afb13d376a0bb",
+                "reference": "a43f3c07829ca9ddc10720c6da2afb13d376a0bb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "illuminate/bus": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/http": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/mail": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/queue": "^8.0|^9.0|^10.0|^11.0",
+                "illuminate/support": "^8.0|^9.0|^10.0|^11.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Jurager\\Teams\\TeamsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Jurager\\Teams\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yuri Gerassimov",
+                    "email": "jurager01@gmail.com"
+                }
+            ],
+            "description": "Laravel package to manage team functionality and operate with user permissions.",
+            "keywords": [
+                "Teams",
+                "abilities",
+                "auth",
+                "gropus",
+                "laravel",
+                "permissions"
+            ],
+            "support": {
+                "issues": "https://github.com/Jurager/teams/issues",
+                "source": "https://github.com/Jurager/teams/tree/2.4.5"
+            },
+            "time": "2024-10-30T12:15:09+00:00"
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",

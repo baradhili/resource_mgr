@@ -19,6 +19,7 @@
         "filament/filament": "*",
         "glorand/laravel-model-settings": "^7.0",
         "guzzlehttp/guzzle": "^7.2",
+        "jurager/teams": "^2.4",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",

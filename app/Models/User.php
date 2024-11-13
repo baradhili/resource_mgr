@@ -8,10 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Glorand\Model\Settings\Traits\HasSettingsField;
+use Jurager\Teams\Traits\HasTeams;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasSettingsField;
+    use HasApiTokens, HasFactory, Notifiable, HasSettingsField, HasTeams;
 
     /**
      * The attributes that are mass assignable.
