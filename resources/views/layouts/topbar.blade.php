@@ -195,7 +195,7 @@
 
                 <a class="nav-link dropdown-toggle d-none d-sm-inline-block show" href="#"
                     data-bs-toggle="dropdown" aria-expanded="true">
-                    <img src="img/avatars/avatar.jpg" class="avatar img-fluid rounded me-1" alt="{{ auth()->user()->name }}"> <span
+                    <img src="{{ auth()->user()->settings()->get('avatar', 'img/avatars/default.jpg') }}" class="avatar img-fluid rounded me-1" alt="{{ auth()->user()->name }}"> <span
                         class="text-dark">{{ auth()->user()->name }}</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end show" data-bs-popper="static">
