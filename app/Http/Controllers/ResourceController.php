@@ -9,6 +9,8 @@ use App\Models\Allocation;
 use App\Models\Project;
 use App\Models\Leave;
 use App\Models\Resource;
+use App\Models\ResourceSkill;
+use App\Models\Skill;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -154,7 +156,22 @@ class ResourceController extends Controller
     {
         $resource = Resource::find($id);
 
-        return view('resource.show', compact('resource'));
+        // Get the skills for the resource
+        $resourceSkills = ResourceSkill::where('resources_id', $id)
+            ->select('skills_id', 'proficiency_levels')
+            ->pluck( 'proficiency_levels', 'skills_id')
+            ->toArray();
+
+        $skills = Skill::whereIn('id', array_keys($resourceSkills))->get(['id', 'skill_name']);
+        foreach ($resourceSkills as $skillId => $proficiencyLevel) {
+            $resourceSkills[$skillId] = [
+                'proficiency_level' => $proficiencyLevel,
+                'skill_name' => $skills->firstWhere('id', $skillId)->skill_name,
+            ];
+        }
+        $skills = $resourceSkills;
+        
+        return view('resource.show', compact('resource', 'skills'));
     }
 
     /**
@@ -213,15 +230,7 @@ class ResourceController extends Controller
         return view('resource.allocations', compact('resource', 'allocationArray','projects', 'nextTwelveMonths'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id): View
-    {
-        $resource = Resource::find($id);
-
-        return view('resource.edit', compact('resource'));
-    }
+  
 
     /**
      * Update the specified resource in storage.

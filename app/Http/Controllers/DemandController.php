@@ -41,8 +41,13 @@ class DemandController extends Controller
         // Collect resources with contracts in the next 12 months
         $resources = Resource::whereIn(
             'id',
-            Contract::whereBetween('start_date', [$startDate, $endDate])
-                ->orWhereBetween('end_date', [$startDate, $endDate])
+            Contract::where(function ($q) use ($startDate, $endDate) {
+                $q->where('start_date', '<=', $endDate)
+                    ->where(function ($q) use ($startDate) {
+                        $q->where('end_date', '>=', $startDate)
+                            ->orWhereNull('end_date');
+                    });
+            })
                 ->pluck('resources_id')
                 ->unique()
                 ->values()

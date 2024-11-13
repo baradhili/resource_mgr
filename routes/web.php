@@ -8,6 +8,8 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\SkillController;
+use App\Http\Controllers\ResourceSkillController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,7 +26,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+// Auth::routes();
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::resource('allocations', AllocationController::class);
@@ -37,4 +39,7 @@ Route::resource('leaves', LeaveController::class);
 Route::resource('projects', ProjectController::class);
 Route::resource('resources', ResourceController::class);
 Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
+
+Route::resource('skills', SkillController::class);
+Route::resource('resource-skills', ResourceSkillController::class);
 
