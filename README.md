@@ -17,11 +17,14 @@ Its early stages right now, we are looking for help in:
 - [ ] Split out some hard coded things into env or a settings table
 - [X] Assign demand to a resource
 - [X] De-assign a project back to demand
-- [ ] Some kind of nicer dashboard
-- [ ] Collect skill list
-- [ ] Add skills to a resource
+- [X] Some kind of nicer dashboard
+- [X] Collect skill list
+- [X] Add skills to a resource
 - [ ] Manual Demand collection (inc business need, funding etc)
 - [ ] Differentiate manual demand from uploads so we don't delete the wrong stuff
 - [ ] Allow editing of manual demand, but not uploaded
+- [ ] Provide rest of skills allocation crud
+- [ ] Surely there is a decent dashboard with tile system that works easily (spatie/laravel-dashboard seems to have a very specific use case)
+- [ ] Do something with top nave bar
 
 Yes it is currently Laravel 10 based, not 11. Bleading edge, especially for major changes is not my thing.
