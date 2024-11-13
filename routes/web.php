@@ -11,6 +11,8 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\ResourceSkillController;
+use App\Http\Controllers\UserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -44,8 +46,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('projects', ProjectController::class);
     Route::resource('resources', ResourceController::class);
     Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
-
     Route::resource('skills', SkillController::class);
     Route::resource('resource-skills', ResourceSkillController::class);
+    Route::resource('users', UserController::class);
 });
 
