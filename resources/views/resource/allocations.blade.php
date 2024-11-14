@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ $resource->name ?? __('Show') . ' ' . __('Resource') }}
+    {{ $resource->name ?? __('Resource Allocation') }}
 @endsection
 
 @section('content')
@@ -9,15 +9,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Resource</span>
-                        </div>
-                        <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('resources.index') }}"> {{ __('Back') }}</a>
-                        </div>
-                    </div>
-                    <h2>Resource Allocations</h2>
+                    
                     <div class="card-body bg-white">
 
                         <div class="form-group mb-2 mb20">
@@ -32,7 +24,7 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-                                        <th>Full Name</th>
+                                        <th>Project Name</th>
                                         <!-- Dynamically add columns for the next twelve months -->
                                         @foreach ($nextTwelveMonths as $month)
                                             <th>{{ $month['monthName'] }} {{ $month['year'] }}</th>

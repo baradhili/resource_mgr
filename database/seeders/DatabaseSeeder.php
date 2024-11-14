@@ -8,6 +8,7 @@ use Database\Seeders\ProjectSeeder;
 use Database\Seeders\ResourceSeeder;
 use Database\Seeders\ContractSeeder;
 use Database\Seeders\LeavesSeeder;
+use Database\Seeders\UserSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -17,6 +18,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            UserSeeder::class,
             ResourceSeeder::class,
             ProjectSeeder::class,
             ContractSeeder::class,

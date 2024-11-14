@@ -25,10 +25,14 @@
 </head>
 
 <body>
-    <div class="wrapper">
-        @include('layouts.sidebar')
-        @include('layouts.main')
-    </div>
+    @auth
+        <div class="wrapper">
+            @include('layouts.sidebar')
+            @include('layouts.main')
+        </div>
+    @else
+        @include('layouts.login')
+    @endauth
 
 </body>
 
