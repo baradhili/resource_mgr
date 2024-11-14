@@ -193,12 +193,12 @@
                     </svg>
                 </a>
 
-                <a class="nav-link dropdown-toggle d-none d-sm-inline-block show" href="#"
-                    data-bs-toggle="dropdown" aria-expanded="true">
-                    <img src="{{ auth()->user()->settings()->get('avatar', 'img/avatars/default.jpg') }}" class="avatar img-fluid rounded me-1" alt="{{ auth()->user()->name }}"> <span
+                <a class="nav-link dropdown-toggle d-none d-sm-inline-block" href="#"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ auth()->user()->settings()->get('avatar', '/img/avatar/default.jpg') }}" class="avatar img-fluid rounded me-1" alt="{{ auth()->user()->name }}"> <span
                         class="text-dark">{{ auth()->user()->name }}</span>
                 </a>
-                <div class="dropdown-menu dropdown-menu-end show" data-bs-popper="static">
+                <div class="dropdown-menu dropdown-menu-end " data-bs-popper="static">
                     <a class="dropdown-item" href="/pages-profile"><svg xmlns="http://www.w3.org/2000/svg"
                             width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
