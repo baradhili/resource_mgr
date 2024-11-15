@@ -50,7 +50,7 @@
                                             <td>{{ ++$i }}</td>
                                             
 										<td >{{ $service->service_name }}</td>
-										<td >{{ $service->description }}</td>
+										<td >@markdown($service->description)</td>
 										<td >{{ $service->required_skills }}</td>
 										<td >{{ $service->hours_cost }}</td>
 

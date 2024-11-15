@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ServiceRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class ServiceController extends Controller
 {
@@ -37,7 +38,30 @@ class ServiceController extends Controller
      */
     public function store(ServiceRequest $request): RedirectResponse
     {
-        Service::create($request->validated());
+
+        // Service::create($request->validated());
+        $validatedData = $request->validate([
+            'service_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'required_skills' => 'nullable|string',
+            'hours_cost' => 'nullable|numeric|min:0',
+        ]);
+
+        // Convert the skills string to an array
+        $skillsArray = explode(',', $validatedData['required_skills']);
+        $skillsArray = array_map('trim', $skillsArray); // Trim whitespace from each skill
+        $skills=json_encode($skillsArray);
+
+        // Convert the description field so that all new lines are converted to correct markdown
+        $description = str_replace(["\r\n", "\r", "\n"], "  \n", $validatedData['description']);
+
+        // Create the service catalogue entry
+        $serviceCatalogue = Service::create([
+            'service_name' => $validatedData['service_name'],
+            'description' => $description,
+            'required_skills' => $skills, 
+            'hours_cost' => $validatedData['hours_cost'],
+        ]);
 
         return Redirect::route('services.index')
             ->with('success', 'Service created successfully.');
@@ -58,7 +82,9 @@ class ServiceController extends Controller
      */
     public function edit($id): View
     {
+  
         $service = Service::find($id);
+
 
         return view('service.edit', compact('service'));
     }
@@ -68,7 +94,31 @@ class ServiceController extends Controller
      */
     public function update(ServiceRequest $request, Service $service): RedirectResponse
     {
-        $service->update($request->validated());
+        // $service->update($request->validated());
+
+        // Validate the request
+        $validatedData = $request->validate([
+            'service_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'required_skills' => 'nullable|string',
+            'hours_cost' => 'nullable|numeric|min:0',
+        ]);
+
+        // Convert the skills string to an array
+        $skillsArray = explode(',', $validatedData['required_skills']);
+        $skillsArray = array_map('trim', $skillsArray); // Trim whitespace from each skill
+        $skills=json_encode($skillsArray);
+
+        // Convert the description field so that all new lines are converted to correct markdown
+        $description = str_replace(["\r\n", "\r", "\n"], "  \n", $validatedData['description']);
+
+        // Update the service catalogue entry
+        $service->update([
+            'service_name' => $validatedData['service_name'],
+            'description' => $description,
+            'required_skills' => $skills, 
+            'hours_cost' => $validatedData['hours_cost'],
+        ]);
 
         return Redirect::route('services.index')
             ->with('success', 'Service updated successfully');

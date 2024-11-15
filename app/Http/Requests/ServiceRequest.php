@@ -24,8 +24,8 @@ class ServiceRequest extends FormRequest
         return [
 			'service_name' => 'required|string',
 			'description' => 'string',
-			'required_skills' => 'required',
-			'hours_cost' => 'required',
+			'required_skills' => 'nullable',
+            'hours_cost' => 'nullable|numeric|regex:/^\d+(\.\d{1,2})?$/',
         ];
     }
 }
