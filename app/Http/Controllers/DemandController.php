@@ -197,7 +197,8 @@ class DemandController extends Controller
 
         $sheet->setCellValue('A1', 'Project Name');
         $sheet->setCellValue('B1', 'Resource Type');
-        $sheet->setCellValue('C1', 'Month');
+        $sheet->setCellValue('C1', 'Status');
+        $sheet->setCellValue('D1', 'Month');
 
         for ($i = 0; $i < 12; $i++) {
             $date = Carbon::now()->addMonthsNoOverflow($i);
@@ -207,7 +208,7 @@ class DemandController extends Controller
                 'monthName' => $date->format('M'),
                 'monthFullName' => $date->format('F')
             ];
-            $sheet->setCellValue([$i + 3, 1], $date->format('M') . ' ' . $date->year);
+            $sheet->setCellValue([$i + 4, 1], $date->format('M') . ' ' . $date->year);
         }
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
@@ -217,17 +218,20 @@ class DemandController extends Controller
         $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
             ->pluck('projects_id')
             ->unique()
-            ->values()
-            ->all();
+            ->toArray();
 
-        // Eager load the projects with their names
         $projects = Project::whereIn('id', $demandIDs)
-            ->with('demands') // Eager load the demands relationship
+            ->select('id', 'name')
+            ->addSelect([
+                'status' => Demand::select('status')
+                    ->whereColumn('projects_id', 'projects.id')
+                    ->orderBy('demand_date')
+                    ->limit(1)
+            ])
             ->get();
-
         $i = 2;
         foreach ($projects as $project) {
-            Log::info("project name = " . $project->name);
+
             $sheet->setCellValue([1, $i], $project->name);
 
             $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
@@ -241,8 +245,9 @@ class DemandController extends Controller
                 $acronym = '';
             }
             $sheet->setCellValue([2, $i], $acronym);
+            $sheet->setCellValue([3, $i], $project->status);
 
-            $j = 3;
+            $j = 4;
             foreach ($nextTwelveMonths as $month) {
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 $demand = Demand::where('demand_date', '=', $monthStartDate)
