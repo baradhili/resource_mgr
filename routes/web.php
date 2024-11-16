@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('contracts', ContractController::class);
     Route::resource('demands', DemandController::class);
+    Route::get('/demands-export', [DemandController::class, 'exportDemands'])->name('demands.export');
     Route::resource('leaves', LeaveController::class);
     Route::resource('projects', ProjectController::class);
     Route::resource('resources', ResourceController::class);
