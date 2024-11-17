@@ -20,6 +20,12 @@ class ServiceController extends Controller
     {
         $services = Service::paginate();
 
+        // Decode the JSON data for required_skills and extract the values
+        foreach ($services as $service) {
+            $decodedSkills = json_decode($service->required_skills, true) ?? [];
+            $service->required_skills = array_column($decodedSkills, 'value');
+        }
+
         return view('service.index', compact('services'))
             ->with('i', ($request->input('page', 1) - 1) * $services->perPage());
     }
@@ -87,7 +93,7 @@ class ServiceController extends Controller
         $service = Service::find($id);
         // Decode the JSON data for required_skills
         $service->required_skills = json_decode($service->required_skills, true) ?? [];
-Log::info("skills: ".json_encode($service->required_skills));
+        Log::info("skills: " . json_encode($service->required_skills));
         // Fetch all skill names for the whitelist
         $skills = Skill::pluck('skill_name')->toArray();
 

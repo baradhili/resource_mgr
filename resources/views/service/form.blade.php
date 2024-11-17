@@ -21,7 +21,7 @@
             <div class="form-group mb-2 mb20">
                 <label for="required_skills" class="form-label">{{ __('Required Skills') }}</label>
                 <input name="required_skills"
-                    value="{{ old('required_skills', implode(',', $service->required_skills ?? [])) }}"
+                    value="{{ old('required_skills', json_encode(array_map(fn($skill) => ['value' => $skill], $service->required_skills ?? []))) }}"
                     class="form-control @error('required_skills') is-invalid @enderror" id="required_skills"
                     placeholder="Required Skills">
                 {!! $errors->first(
@@ -45,7 +45,7 @@
 
     <script>
         var input = document.querySelector('input[name="required_skills"]');
-        new Tagify(input, {
+        var tagify = new Tagify(input, {
             whitelist: {!! json_encode($skills) !!},
             enforceWhitelist: true,
             dropdown: {
@@ -56,10 +56,20 @@
         });
 
         // Ensure the form sends the tag values as an array
-            var form = document.querySelector('form');
-            form.addEventListener('submit', function(e) {
-                var skills = tagify.value.map(item => item.value);
-                input.value = JSON.stringify(skills);
-            });
+        var form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            var skills = tagify.value.map(item => item.value);
+            input.value = JSON.stringify(skills);
+        });
+
+        // Parse initial value if in JSON format
+        try {
+            var initialSkills = JSON.parse(input.value);
+            if (Array.isArray(initialSkills)) {
+                tagify.addTags(initialSkills.map(item => item.value));
+            }
+        } catch (e) {
+            console.error('Failed to parse initial skills:', e);
+        }
     </script>
 </div>
