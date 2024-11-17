@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use App\Models\Skill;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\ServiceRequest;
@@ -18,6 +19,12 @@ class ServiceController extends Controller
     public function index(Request $request): View
     {
         $services = Service::paginate();
+
+        // Decode the JSON data for required_skills and extract the values
+        foreach ($services as $service) {
+            $decodedSkills = json_decode($service->required_skills, true) ?? [];
+            $service->required_skills = array_column($decodedSkills, 'value');
+        }
 
         return view('service.index', compact('services'))
             ->with('i', ($request->input('page', 1) - 1) * $services->perPage());
@@ -50,7 +57,7 @@ class ServiceController extends Controller
         // Convert the skills string to an array
         $skillsArray = explode(',', $validatedData['required_skills']);
         $skillsArray = array_map('trim', $skillsArray); // Trim whitespace from each skill
-        $skills=json_encode($skillsArray);
+        $skills = json_encode($skillsArray);
 
         // Convert the description field so that all new lines are converted to correct markdown
         $description = str_replace(["\r\n", "\r", "\n"], "  \n", $validatedData['description']);
@@ -59,7 +66,7 @@ class ServiceController extends Controller
         $serviceCatalogue = Service::create([
             'service_name' => $validatedData['service_name'],
             'description' => $description,
-            'required_skills' => $skills, 
+            'required_skills' => $skills,
             'hours_cost' => $validatedData['hours_cost'],
         ]);
 
@@ -82,11 +89,15 @@ class ServiceController extends Controller
      */
     public function edit($id): View
     {
-  
+
         $service = Service::find($id);
+        // Decode the JSON data for required_skills
+        $service->required_skills = json_decode($service->required_skills, true) ?? [];
+        Log::info("skills: " . json_encode($service->required_skills));
+        // Fetch all skill names for the whitelist
+        $skills = Skill::pluck('skill_name')->toArray();
 
-
-        return view('service.edit', compact('service'));
+        return view('service.edit', compact('service', 'skills'));
     }
 
     /**
@@ -94,20 +105,11 @@ class ServiceController extends Controller
      */
     public function update(ServiceRequest $request, Service $service): RedirectResponse
     {
-        // $service->update($request->validated());
-
         // Validate the request
-        $validatedData = $request->validate([
-            'service_name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'required_skills' => 'nullable|string',
-            'hours_cost' => 'nullable|numeric|min:0',
-        ]);
+        $validatedData = $request->validated();
 
-        // Convert the skills string to an array
-        $skillsArray = explode(',', $validatedData['required_skills']);
-        $skillsArray = array_map('trim', $skillsArray); // Trim whitespace from each skill
-        $skills=json_encode($skillsArray);
+        // Decode the required_skills JSON string to an array
+        $requiredSkills = json_decode($request->required_skills, true) ?? [];
 
         // Convert the description field so that all new lines are converted to correct markdown
         $description = str_replace(["\r\n", "\r", "\n"], "  \n", $validatedData['description']);
@@ -116,7 +118,7 @@ class ServiceController extends Controller
         $service->update([
             'service_name' => $validatedData['service_name'],
             'description' => $description,
-            'required_skills' => $skills, 
+            'required_skills' => $requiredSkills,
             'hours_cost' => $validatedData['hours_cost'],
         ]);
 
