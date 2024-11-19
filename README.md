@@ -26,6 +26,6 @@ Its early stages right now, we are looking for help in:
 - [ ] Allow editing of manual demand, but not uploaded
 - [ ] Provide rest of skills allocation crud
 - [ ] Surely there is a decent dashboard with tile system that works easily (spatie/laravel-dashboard seems to have a very specific use case)
-- [ ] Do something with top nav bar
+- [X] Do something with top nav bar
 
 Yes it is currently Laravel 10 based, not 11. Bleading edge, especially for major changes is not my thing.
