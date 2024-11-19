@@ -18,6 +18,7 @@
         "avadim/fast-excel-laravel": "^2.7",
         "filament/filament": "*",
         "glorand/laravel-model-settings": "^7.0",
+        "graham-campbell/markdown": "^15.2",
         "guzzlehttp/guzzle": "^7.2",
         "jurager/teams": "^2.4",
         "laravel/framework": "^10.10",
@@ -25,6 +26,7 @@
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.5",
         "livewire/livewire": "^3.5",
+        "phpoffice/phpspreadsheet": "^3.4",
         "spatie/laravel-menu": "^4.2"
     },
     "require-dev": {

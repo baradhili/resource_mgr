@@ -31,6 +31,7 @@ class AppServiceProvider extends ServiceProvider
                 ->add(Link::to(route('skills.index'), $this->wrapInSpan('Skills'))->addClass('sidebar-link')->addParentClass('sidebar-item'))
                 ->add(Link::to(route('projects.index'), $this->wrapInSpan('Projects'))->addClass('sidebar-link')->addParentClass('sidebar-item'))
                 ->add(Link::to(route('allocations.index'), $this->wrapInSpan('Allocations'))->addClass('sidebar-link')->addParentClass('sidebar-item'))
+                ->add(Link::to(route('services.index'), $this->wrapInSpan('Services'))->addClass('sidebar-link')->addParentClass('sidebar-item'))               
                 ->add(Link::to(route('demands.index'), $this->wrapInSpan('Demands'))->addClass('sidebar-link')->addParentClass('sidebar-item'))
                 ->setActiveFromRequest();
 

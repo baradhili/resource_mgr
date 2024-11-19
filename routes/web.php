@@ -1,23 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\AbilityController;
 use App\Http\Controllers\AllocationController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CapabilityController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
-use App\Http\Controllers\LeaveController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\SkillController;
-use App\Http\Controllers\ResourceSkillController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\TeamController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\ResourceSkillController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\CapabilityController;
-use App\Http\Controllers\AbilityController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SkillController;
+use App\Http\Controllers\TeamController;
+use App\Http\Controllers\UserController;
 
 
 /*
@@ -48,6 +49,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('contracts', ContractController::class);
     Route::resource('demands', DemandController::class);
+    Route::get('/demands-export', [DemandController::class, 'exportDemands'])->name('demands.export');
     Route::resource('leaves', LeaveController::class);
     Route::resource('projects', ProjectController::class);
     Route::resource('resources', ResourceController::class);
@@ -61,5 +63,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('roles', RoleController::class);
     Route::resource('capabilities', CapabilityController::class);
     Route::resource('teams', TeamController::class);
+    Route::resource('services', ServiceController::class);
 });
 

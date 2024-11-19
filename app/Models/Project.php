@@ -47,5 +47,15 @@ class Project extends Model
     {
         return $this->hasMany(\App\Models\Demand::class, 'id', 'projects_id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function services()
+    {
+        return $this->belongsToMany(\App\Models\ServiceCatalogue::class, 'project_service')
+                    ->withPivot('quantity', 'total_cost')
+                    ->withTimestamps();
+    }
     
 }

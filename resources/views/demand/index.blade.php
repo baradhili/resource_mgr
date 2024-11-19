@@ -21,6 +21,10 @@
                                     data-placement="left">
                                     {{ __('Create New') }}
                                 </a>
+                                <a href="{{ route('demands.export') }}" class="btn btn-success btn-sm float-right"
+                                    data-placement="left">
+                                    {{ __('Export') }}
+                                </a>
                             </div>
                         </div>
                     </div>
