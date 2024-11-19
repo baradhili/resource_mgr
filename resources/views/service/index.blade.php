@@ -35,7 +35,7 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-                                        <th>No</th>
+                                  
 
                                         <th>Service Name</th>
                                         <th>Description</th>
@@ -48,7 +48,7 @@
                                 <tbody>
                                     @foreach ($services as $service)
                                         <tr>
-                                            <td>{{ ++$i }}</td>
+                                            
 
                                             <td>{{ $service->service_name }}</td>
                                             <td>@markdown($service->description)</td>
