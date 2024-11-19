@@ -48,14 +48,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/allocations-upload', [AllocationController::class, 'populateAllocations'])->name('allocations.upload');
 
     Route::resource('contracts', ContractController::class);
-    Route::resource('demands', DemandController::class);
     Route::get('/demands-export', [DemandController::class, 'exportDemands'])->name('demands.export');
+    Route::resource('demands', DemandController::class);
     Route::resource('leaves', LeaveController::class);
     Route::resource('projects', ProjectController::class);
-    Route::resource('resources', ResourceController::class);
     Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
+    Route::resource('resources', ResourceController::class);
     Route::resource('skills', SkillController::class);
     Route::resource('resource-skills', ResourceSkillController::class);
+    Route::get('/users/profile', [UserController::class, 'profile'])->name('users.profile');
     Route::resource('users', UserController::class);
     Route::resource('groups', GroupController::class);
     Route::resource('permissions', PermissionController::class);
