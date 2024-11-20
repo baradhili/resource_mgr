@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('skills', SkillController::class);
     Route::resource('resource-skills', ResourceSkillController::class);
     Route::get('/users/profile', [UserController::class, 'profile'])->name('users.profile');
+    Route::get('/users/settings', [UserController::class, 'settings'])->name('users.settings');
     Route::resource('users', UserController::class);
     Route::resource('groups', GroupController::class);
     Route::resource('permissions', PermissionController::class);

@@ -88,4 +88,11 @@ class UserController extends Controller
 
         return view('user.profile', compact('user'));
     }
+
+    public function settings(): View
+    {
+        $user = auth()->user();
+
+        return view('user.settings', compact('user'));
+    }
 }

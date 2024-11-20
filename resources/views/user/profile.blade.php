@@ -1,13 +1,10 @@
 @extends('layouts.app')
 
 @section('template_title')
-    Services
+    Profile
 @endsection
 
 @section('content')
-    <div class="container-fluid p-0">
-
-        <h1 class="h3 mb-3">Profile</h1>
 
         <div class="row">
             <div class="col-md-4 col-xl-3">
@@ -240,5 +237,4 @@
             </div>
         </div>
 
-    </div>
 @endsection
