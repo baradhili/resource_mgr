@@ -21,24 +21,12 @@
                     <div class="card-body bg-white">
                         
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Team Id:</strong>
-                                    {{ $permission->team_id }}
+                                    <strong>Name:</strong>
+                                    {{ $permission->name }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Ability Id:</strong>
-                                    {{ $permission->ability_id }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Entity Type:</strong>
-                                    {{ $permission->entity_type }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Entity Id:</strong>
-                                    {{ $permission->entity_id }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Forbidden:</strong>
-                                    {{ $permission->forbidden }}
+                                    <strong>Guard Name:</strong>
+                                    {{ $permission->guard_name }}
                                 </div>
 
                     </div>

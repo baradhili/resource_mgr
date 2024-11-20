@@ -22,11 +22,8 @@ class PermissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'team_id' => 'required',
-			'ability_id' => 'required',
-			'entity_type' => 'required|string',
-			'entity_id' => 'required',
-			'forbidden' => 'required',
+			'name' => 'required|string',
+			'guard_name' => 'required|string',
         ];
     }
 }

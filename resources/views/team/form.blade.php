@@ -2,14 +2,9 @@
     <div class="col-md-12">
         
         <div class="form-group mb-2 mb20">
-            <label for="user_id" class="form-label">{{ __('User') }}</label>
-            <select name="user_id" class="form-control @error('user_id') is-invalid @enderror" id="user_id">
-                <option value="">{{ __('Select a User') }}</option>
-                @foreach ($users as $user)
-                    <option value="{{ $user->id }}" {{ old('user_id', $team?->user_id) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                @endforeach
-            </select>
-            {!! $errors->first('user_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+            <label for="owner_id" class="form-label">{{ __('Owner Id') }}</label>
+            <input type="text" name="owner_id" class="form-control @error('owner_id') is-invalid @enderror" value="{{ old('owner_id', $team?->owner_id) }}" id="owner_id" placeholder="Owner Id">
+            {!! $errors->first('owner_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
             <label for="name" class="form-label">{{ __('Name') }}</label>
