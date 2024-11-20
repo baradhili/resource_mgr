@@ -26,3 +26,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+document.querySelectorAll('.sidebar-link[data-bs-toggle="collapse"]').forEach(function(link) {
+    link.addEventListener('click', function(event) {
+        event.preventDefault();
+        var target = document.querySelector(this.getAttribute('data-bs-target'));
+        if (target.classList.contains('show')) {
+            target.classList.remove('show');
+            this.classList.add('collapsed');
+            this.setAttribute('aria-expanded', 'false');
+        } else {
+            target.classList.add('show');
+            this.classList.remove('collapsed');
+            this.setAttribute('aria-expanded', 'true');
+        }
+    });
+});

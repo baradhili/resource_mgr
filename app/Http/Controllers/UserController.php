@@ -81,4 +81,18 @@ class UserController extends Controller
         return Redirect::route('users.index')
             ->with('success', 'User deleted successfully');
     }
+
+    public function profile(): View
+    {
+        $user = auth()->user();
+
+        return view('user.profile', compact('user'));
+    }
+
+    public function settings(): View
+    {
+        $user = auth()->user();
+
+        return view('user.settings', compact('user'));
+    }
 }

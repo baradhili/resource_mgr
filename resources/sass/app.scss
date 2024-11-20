@@ -1,11 +1,17 @@
 // Fonts
-@import url('https://fonts.bunny.net/css?family=Nunito');
+@font-face {
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/nunito-latin-400-normal.woff2') format('woff2');
+}
 
 // Variables
 @import 'variables';
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+@import './light.css';
 
 //tailwind
 @import "tailwindcss/base";
