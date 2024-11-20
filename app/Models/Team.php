@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 /**
  * Class Team
@@ -46,5 +47,19 @@ class Team extends Model
     {
         return $this->hasMany(\App\Models\TeamUser::class, 'id', 'team_id');
     }
+
     
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function owner()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'owner_id', 'id');
+    }
+
 }
+
+
+
+
+

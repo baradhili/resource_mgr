@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\TeamRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class TeamController extends Controller
 {
@@ -16,8 +18,9 @@ class TeamController extends Controller
      */
     public function index(Request $request): View
     {
-        $teams = Team::paginate();
-
+        // $teams = Team::paginate();
+        $teams = Team::with('owner')->paginate();
+Log::info("teams: " . print_r($teams, true));
         return view('team.index', compact('teams'))
             ->with('i', ($request->input('page', 1) - 1) * $teams->perPage());
     }

@@ -34,9 +34,8 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-                                        <th>No</th>
-                                        
-									<th >Owner Id</th>
+
+									<th >Owner</th>
 									<th >Name</th>
 
                                         <th></th>
@@ -45,9 +44,8 @@
                                 <tbody>
                                     @foreach ($teams as $team)
                                         <tr>
-                                            <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $team->owner_id }}</td>
+
+										<td >{{ $team->owner->name }}</td>
 										<td >{{ $team->name }}</td>
 
                                             <td>
