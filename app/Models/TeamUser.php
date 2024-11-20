@@ -24,7 +24,7 @@ class TeamUser extends Model
      */
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
     }
 
     /**
@@ -32,6 +32,6 @@ class TeamUser extends Model
      */
     public function team()
     {
-        return $this->belongsTo(\App\Models\Team::class);
+        return $this->belongsTo(\App\Models\Team::class, 'team_id', 'id');
     }
 }

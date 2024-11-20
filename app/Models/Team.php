@@ -62,10 +62,10 @@ class Team extends Model
      *
      * @return \Illuminate\Support\Collection|\App\Models\User[]
      */
-    public function members()
-    {
-        return $this->teamUsers()->with('user')->get()->pluck('user');
-    }
+    // public function members()
+    // {
+    //     return $this->teamUsers()->with('user')->get()->pluck('user');
+    // }
 }
 
 
