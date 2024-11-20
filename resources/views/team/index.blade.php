@@ -16,11 +16,12 @@
                                 {{ __('Teams') }}
                             </span>
 
-                             <div class="float-right">
-                                <a href="{{ route('teams.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
+                            <div class="float-right">
+                                <a href="{{ route('teams.create') }}" class="btn btn-primary btn-sm float-right"
+                                    data-placement="left">
+                                    {{ __('Create New') }}
                                 </a>
-                              </div>
+                            </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -34,10 +35,10 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-                                        <th>No</th>
-                                        
-									<th >User Id</th>
-									<th >Name</th>
+                                       
+
+                                        <th>Owner</th>
+                                        <th>Name</th>
 
                                         <th></th>
                                     </tr>
@@ -45,18 +46,24 @@
                                 <tbody>
                                     @foreach ($teams as $team)
                                         <tr>
-                                            <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $team->user_id }}</td>
-										<td >{{ $team->name }}</td>
+                                          
+
+                                            <td>{{ $team->owner->name ?? 'No owner' }}</td>
+                                            <td>{{ $team->name }}</td>
 
                                             <td>
                                                 <form action="{{ route('teams.destroy', $team->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('teams.show', $team->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('teams.edit', $team->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                    <a class="btn btn-sm btn-primary "
+                                                        href="{{ route('teams.show', $team->id) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success"
+                                                        href="{{ route('teams.edit', $team->id) }}"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
                                                 </form>
                                             </td>
                                         </tr>

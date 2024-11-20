@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ $team->name ?? __('Show') . " " . __('Team') }}
+    {{ $team->name ?? __('Show') . ' ' . __('Team') }}
 @endsection
 
 @section('content')
@@ -19,15 +19,19 @@
                     </div>
 
                     <div class="card-body bg-white">
-                        
-                                <div class="form-group mb-2 mb20">
-                                    <strong>User Id:</strong>
-                                    {{ $team->user_id }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Name:</strong>
-                                    {{ $team->name }}
-                                </div>
+
+                        <div class="form-group mb-2 mb20">
+                            <strong>User Id:</strong>
+                            {{ $team->user_id }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Name:</strong>
+                            {{ $team->name }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Members:</strong>
+                            {{ $members->pluck('name')->join(', ') }}
+                        </div>
 
                     </div>
                 </div>

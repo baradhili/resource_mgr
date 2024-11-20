@@ -20,10 +20,10 @@
 
                     <div class="card-body bg-white">
                         
-                                <div class="form-group mb-2 mb20">
+                                <!-- <div class="form-group mb-2 mb20">
                                     <strong>Team Id:</strong>
                                     {{ $group->team_id }}
-                                </div>
+                                </div> -->
                                 <div class="form-group mb-2 mb20">
                                     <strong>Code:</strong>
                                     {{ $group->code }}

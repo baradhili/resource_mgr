@@ -34,9 +34,7 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-                                        <th>No</th>
                                         
-									<th >Team Id</th>
 									<th >Code</th>
 									<th >Name</th>
 
@@ -46,9 +44,7 @@
                                 <tbody>
                                     @foreach ($groups as $group)
                                         <tr>
-                                            <td>{{ ++$i }}</td>
                                             
-										<td >{{ $group->team_id }}</td>
 										<td >{{ $group->code }}</td>
 										<td >{{ $group->name }}</td>
 

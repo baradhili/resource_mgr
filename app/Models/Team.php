@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Team extends Model
 {
-    
+
     protected $perPage = 20;
 
     /**
@@ -41,7 +41,7 @@ class Team extends Model
     {
         return $this->hasMany(\App\Models\Ability::class, 'id', 'team_id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -49,7 +49,7 @@ class Team extends Model
     {
         return $this->hasMany(\App\Models\Group::class, 'id', 'team_id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -57,7 +57,7 @@ class Team extends Model
     {
         return $this->hasMany(\App\Models\Invitation::class, 'id', 'team_id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -65,7 +65,7 @@ class Team extends Model
     {
         return $this->hasMany(\App\Models\Permission::class, 'id', 'team_id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -73,5 +73,37 @@ class Team extends Model
     {
         return $this->hasMany(\App\Models\Role::class, 'id', 'team_id');
     }
-    
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function owner()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     */
+    public function teamUsers()
+    {
+        return $this->hasManyThrough(User::class, TeamUser::class, 'team_id', 'id', 'id', 'user_id');
+    }
+
+    /**
+     * Get all users associated with the team, including the team owner.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAllUsers()
+    {
+        // Get the team owner
+        $users = collect([$this->owner]);
+
+        // Get all users from the team_user pivot table
+        $teamUsers = $this->teamUsers()->with('user')->get()->pluck('user');
+
+        // Merge the collections and remove duplicates
+        return $users->merge($teamUsers)->unique();
+    }
 }
