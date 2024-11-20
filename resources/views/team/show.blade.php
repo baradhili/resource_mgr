@@ -21,14 +21,17 @@
                     <div class="card-body bg-white">
                         
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Owner Id:</strong>
-                                    {{ $team->owner_id }}
+                                    <strong>Owner:</strong>
+                                    {{ $team->owner->name }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Name:</strong>
                                     {{ $team->name }}
                                 </div>
-
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Members:</strong>
+                                    {{ $team->members->pluck('name')->implode(', ') }}
+                                </div>
                     </div>
                 </div>
             </div>

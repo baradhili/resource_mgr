@@ -2,8 +2,15 @@
     <div class="col-md-12">
         
         <div class="form-group mb-2 mb20">
-            <label for="owner_id" class="form-label">{{ __('Owner Id') }}</label>
-            <input type="text" name="owner_id" class="form-control @error('owner_id') is-invalid @enderror" value="{{ old('owner_id', $team?->owner_id) }}" id="owner_id" placeholder="Owner Id">
+            <label for="owner_id" class="form-label">{{ __('Owner') }}</label>
+            <select name="owner_id" class="form-control @error('owner_id') is-invalid @enderror" id="owner_id">
+                <option value="">{{ __('Select an Owner') }}</option>
+                @foreach ($users as $user)
+                    <option value="{{ $user->id }}" @if(old('owner_id', $team?->owner_id) == $user->id) selected @endif>
+                        {{ $user->name }}
+                    </option>
+                @endforeach
+            </select>
             {!! $errors->first('owner_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">

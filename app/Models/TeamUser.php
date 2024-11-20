@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 class TeamUser extends Model
 {
     protected $fillable = ['user_id', 'team_id'];
+    protected $table = 'team_user';
 
     /**
      * Get the user associated with the team user.

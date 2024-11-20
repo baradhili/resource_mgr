@@ -57,6 +57,15 @@ class Team extends Model
         return $this->belongsTo(\App\Models\User::class, 'owner_id', 'id');
     }
 
+    /**
+     * Returns a collection of User models representing the members of the team.
+     *
+     * @return \Illuminate\Support\Collection|\App\Models\User[]
+     */
+    public function members()
+    {
+        return $this->teamUsers()->with('user')->get()->pluck('user');
+    }
 }
 
 

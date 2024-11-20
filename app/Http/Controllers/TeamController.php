@@ -20,7 +20,7 @@ class TeamController extends Controller
     {
         // $teams = Team::paginate();
         $teams = Team::with('owner')->paginate();
-Log::info("teams: " . print_r($teams, true));
+
         return view('team.index', compact('teams'))
             ->with('i', ($request->input('page', 1) - 1) * $teams->perPage());
     }
@@ -51,19 +51,27 @@ Log::info("teams: " . print_r($teams, true));
      */
     public function show($id): View
     {
-        $team = Team::find($id);
+        $team = Team::with(['owner'])->find($id);
+        $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
+            ->where('team_user.team_id', $team->id) 
+            ->get();
 
         return view('team.show', compact('team'));
     }
 
-    /**
+    /** 
      * Show the form for editing the specified resource.
      */
     public function edit($id): View
     {
-        $team = Team::find($id);
+        $team = Team::with(['owner'])->find($id);
+        $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
+            ->where('team_user.team_id', $team->id) 
+            ->get();
 
-        return view('team.edit', compact('team'));
+        $users = User::all();
+        Log::info("users: " . print_r($users, true));
+        return view('team.edit', compact('team','users'));
     }
 
     /**
