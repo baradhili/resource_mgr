@@ -13,10 +13,10 @@ class PermissionController extends Controller
 {
     public function __construct() //TODO change once perms seeded
     {
-        // $this->middleware('permission:view permission', ['only' => ['index']]);
-        // $this->middleware('permission:create permission', ['only' => ['create','store']]);
-        // $this->middleware('permission:update permission', ['only' => ['update','edit']]);
-        // $this->middleware('permission:delete permission', ['only' => ['destroy']]);
+        // $this->middleware('permission:view', ['only' => ['index']]);
+        // $this->middleware('permission:create', ['only' => ['create','store']]);
+        // $this->middleware('permission:update', ['only' => ['update','edit']]);
+        // $this->middleware('permission:delete', ['only' => ['destroy']]);
     }
 
     /**
@@ -24,7 +24,7 @@ class PermissionController extends Controller
      */
     public function index(Request $request): View
     {
-        $permissions = Permission::paginate();
+        $permissions = Permission::orderBy('name')->paginate();
 
         return view('permission.index', compact('permissions'))
             ->with('i', ($request->input('page', 1) - 1) * $permissions->perPage());

@@ -20,7 +20,7 @@ Its early stages right now, we are looking for help in:
 - [X] Some kind of nicer dashboard
 - [X] Collect skill list
 - [X] Add skills to a resource
-- [ ] Add teams and privileges etc
+- [X] Add teams and privileges etc
 - [ ] Manual Demand collection (inc business need, funding etc)
 - [ ] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
 - [ ] Differentiate manual demand from uploads so we don't delete the wrong stuff

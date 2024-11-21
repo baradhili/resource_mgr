@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use Mpociot\Teamwork\TeamworkTeam;
 
 /**
  * Class Team
@@ -19,7 +20,7 @@ use App\Models\User;
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-class Team extends Model
+class Team extends TeamworkTeam
 {
     
     protected $perPage = 20;
