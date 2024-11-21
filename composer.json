@@ -15,6 +15,7 @@
     ],
     "require": {
         "php": "^8.1",
+        "arrilot/laravel-widgets": "^3.14",
         "avadim/fast-excel-laravel": "^2.7",
         "filament/filament": "*",
         "glorand/laravel-model-settings": "^7.0",
