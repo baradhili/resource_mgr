@@ -14,6 +14,22 @@ use Illuminate\Support\Facades\Log;
 class ContractController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * TODO: change these once allocation perms are seeded
+     * The middleware configured here will be assigned to this controller's
+     * routes.
+     */
+    public function __construct() 
+    {
+        $this->middleware('teamowner', ['only' => ['create','store','update','edit','destroy']]);  
+        // $this->middleware('contract:view', ['only' => ['index']]);
+        // $this->middleware('contract:create', ['only' => ['create','store']]);
+        // $this->middleware('contract:update', ['only' => ['update','edit']]);
+        // $this->middleware('contract:delete', ['only' => ['destroy']]);
+    }
+    
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View

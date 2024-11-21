@@ -20,6 +20,21 @@ class AllocationController extends Controller
 {
 
     /**
+     * Create a new controller instance.
+     *
+     * TODO: change these once allocation perms are seeded
+     * The middleware configured here will be assigned to this controller's
+     * routes.
+     */
+    public function __construct() 
+    {
+        // $this->middleware('allocation:view', ['only' => ['index']]);
+        // $this->middleware('allocation:create', ['only' => ['create','store']]);
+        // $this->middleware('allocation:update', ['only' => ['update','edit']]);
+        // $this->middleware('allocation:delete', ['only' => ['destroy']]);
+    }
+
+    /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View

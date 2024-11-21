@@ -9,10 +9,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Glorand\Model\Settings\Traits\HasSettingsField;
 use Spatie\Permission\Traits\HasRoles;
+use Mpociot\Teamwork\Traits\UserHasTeams;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasSettingsField, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasSettingsField, HasRoles, UserHasTeams;
 
     /**
      * The attributes that are mass assignable.
