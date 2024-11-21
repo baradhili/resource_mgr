@@ -29,6 +29,18 @@
         </div>
 
     </div>
+    <script>
+        // Initialize Flatpickr with DateTime functionality
+        flatpickr("#start_date", {
+            enableTime: false, // Enable time selection
+            dateFormat: "Y-m-d", // Customize the date and time format as needed
+        });
+        flatpickr("#end_date", {
+            enableTime: false, // Enable time selection
+            dateFormat: "Y-m-d", // Customize the date and time format as needed
+        });
+
+    </script>
     <div class="col-md-12 mt20 mt-2">
         <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
     </div>

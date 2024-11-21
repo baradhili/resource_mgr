@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ $service->name ?? __('Show') . " " . __('Service') }}
+    {{ $service->service_name ?? __('Show') . " " . __('Service') }}
 @endsection
 
 @section('content')
@@ -9,14 +9,14 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <!-- <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <div class="float-left">
                             <span class="card-title">{{ __('Show') }} Service</span>
                         </div>
                         <div class="float-right">
                             <a class="btn btn-primary btn-sm" href="{{ route('services.index') }}"> {{ __('Back') }}</a>
-                        </div>
-                    </div>
+                        </div> 
+                    </div> -->
 
                     <div class="card-body bg-white">
                         
@@ -26,11 +26,11 @@
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Description:</strong>
-                                    {{ $service->description }}
+                                    @markdown($service->description)
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Required Skills:</strong>
-                                    {{ $service->required_skills }}
+                                    {{ implode(', ', array_column(json_decode($service->required_skills), 'value')) }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Hours Cost:</strong>

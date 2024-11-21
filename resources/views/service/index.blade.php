@@ -37,7 +37,7 @@
                                     <tr>
 
                                         <th>Service Name</th>
-                                        <th>Description</th>
+                                        
                                         <th>Required Skills</th>
                                         <th>Hours Cost</th>
 
@@ -49,8 +49,6 @@
                                         <tr>
 
                                             <td>{{ $service->service_name }}</td>
-                                            <td>@markdown($service->description)</td>
-
                                             <td>{{ implode(', ',$service->required_skills) }}</td>
 
                                             <td>{{ $service->hours_cost }}</td>

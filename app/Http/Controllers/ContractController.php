@@ -22,7 +22,7 @@ class ContractController extends Controller
      */
     public function __construct() 
     {
-        $this->middleware('teamowner', ['only' => ['create','store','update','edit','destroy']]);  
+        // $this->middleware('teamowner', ['only' => ['create','store','update','edit','destroy']]);  
         // $this->middleware('contract:view', ['only' => ['index']]);
         // $this->middleware('contract:create', ['only' => ['create','store']]);
         // $this->middleware('contract:update', ['only' => ['update','edit']]);
