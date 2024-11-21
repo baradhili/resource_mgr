@@ -3,21 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 /**
  * Class Team
  *
  * @property $id
- * @property $user_id
+ * @property $owner_id
  * @property $name
  * @property $created_at
  * @property $updated_at
  *
- * @property Ability[] $abilities
- * @property Group[] $groups
- * @property Invitation[] $invitations
- * @property Permission[] $permissions
- * @property Role[] $roles
+ * @property TeamInvite[] $teamInvites
+ * @property TeamUser[] $teamUsers
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
@@ -31,47 +29,46 @@ class Team extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['user_id', 'name'];
+    protected $fillable = ['owner_id', 'name'];
 
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function abilities()
+    public function teamInvites()
     {
-        return $this->hasMany(\App\Models\Ability::class, 'id', 'team_id');
+        return $this->hasMany(\App\Models\TeamInvite::class, 'id', 'team_id');
     }
     
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function groups()
+    public function teamUsers()
     {
-        return $this->hasMany(\App\Models\Group::class, 'id', 'team_id');
+        return $this->hasMany(\App\Models\TeamUser::class, 'id', 'team_id');
     }
+
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function invitations()
+    public function owner()
     {
-        return $this->hasMany(\App\Models\Invitation::class, 'id', 'team_id');
+        return $this->belongsTo(\App\Models\User::class, 'owner_id', 'id');
     }
-    
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * Returns a collection of User models representing the members of the team.
+     *
+     * @return \Illuminate\Support\Collection|\App\Models\User[]
      */
-    public function permissions()
-    {
-        return $this->hasMany(\App\Models\Permission::class, 'id', 'team_id');
-    }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function roles()
-    {
-        return $this->hasMany(\App\Models\Role::class, 'id', 'team_id');
-    }
-    
+    // public function members()
+    // {
+    //     return $this->teamUsers()->with('user')->get()->pluck('user');
+    // }
 }
+
+
+
+
+

@@ -22,9 +22,8 @@ class RoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'team_id' => 'required',
 			'name' => 'required|string',
-			'description' => 'string',
+			'guard_name' => 'required|string',
         ];
     }
 }

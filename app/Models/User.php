@@ -8,11 +8,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Glorand\Model\Settings\Traits\HasSettingsField;
-use Jurager\Teams\Traits\HasTeams;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasSettingsField, HasTeams;
+    use HasApiTokens, HasFactory, Notifiable, HasSettingsField, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -44,4 +44,24 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Get the team users associated with the user.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function teamUsers()
+    {
+        return $this->hasMany(TeamUser::class, 'user_id');
+    }
+
+    /**
+     * Get the teams the user belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function teams()
+    {
+        return $this->belongsToMany(Team::class, 'team_users', 'user_id', 'team_id');
+    }
 }

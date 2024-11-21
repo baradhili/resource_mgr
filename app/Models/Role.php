@@ -8,14 +8,13 @@ use Illuminate\Database\Eloquent\Model;
  * Class Role
  *
  * @property $id
- * @property $team_id
  * @property $name
- * @property $description
+ * @property $guard_name
+ * @property $created_at
+ * @property $updated_at
  *
- * @property Team $team
- * @property GroupCapability[] $groupCapabilities
- * @property RoleCapability[] $roleCapabilities
- * @property TeamUser[] $teamUsers
+ * @property ModelHasRole[] $modelHasRoles
+ * @property RoleHasPermission[] $roleHasPermissions
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
@@ -29,39 +28,23 @@ class Role extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['team_id', 'name', 'description'];
+    protected $fillable = ['name', 'guard_name'];
 
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function team()
+    public function modelHasRoles()
     {
-        return $this->belongsTo(\App\Models\Team::class, 'team_id', 'id');
+        return $this->hasMany(\App\Models\ModelHasRole::class, 'id', 'role_id');
     }
     
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function groupCapabilities()
+    public function roleHasPermissions()
     {
-        return $this->hasMany(\App\Models\GroupCapability::class, 'id', 'role_id');
-    }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function roleCapabilities()
-    {
-        return $this->hasMany(\App\Models\RoleCapability::class, 'id', 'role_id');
-    }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function teamUsers()
-    {
-        return $this->hasMany(\App\Models\TeamUser::class, 'id', 'role_id');
+        return $this->hasMany(\App\Models\RoleHasPermission::class, 'id', 'role_id');
     }
     
 }

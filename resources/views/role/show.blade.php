@@ -21,18 +21,18 @@
                     <div class="card-body bg-white">
                         
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Team Id:</strong>
-                                    {{ $role->team_id }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
                                     <strong>Name:</strong>
                                     {{ $role->name }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Description:</strong>
-                                    {{ $role->description }}
+                                    <strong>Guard Name:</strong>
+                                    {{ $role->guard_name }}
                                 </div>
-
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Permissions:</strong>
+                                    {{ $role->permissions->pluck('name')->implode(', ') }}
+                                </div>
+                                
                     </div>
                 </div>
             </div>

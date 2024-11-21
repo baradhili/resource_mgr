@@ -8,16 +8,13 @@ use Illuminate\Database\Eloquent\Model;
  * Class Permission
  *
  * @property $id
- * @property $team_id
- * @property $ability_id
- * @property $entity_type
- * @property $entity_id
- * @property $forbidden
+ * @property $name
+ * @property $guard_name
  * @property $created_at
  * @property $updated_at
  *
- * @property Ability $ability
- * @property Team $team
+ * @property ModelHasPermission[] $modelHasPermissions
+ * @property RoleHasPermission[] $roleHasPermissions
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
@@ -31,23 +28,23 @@ class Permission extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['team_id', 'ability_id', 'entity_type', 'entity_id', 'forbidden'];
+    protected $fillable = ['name', 'guard_name'];
 
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function ability()
+    public function modelHasPermissions()
     {
-        return $this->belongsTo(\App\Models\Ability::class, 'ability_id', 'id');
+        return $this->hasMany(\App\Models\ModelHasPermission::class, 'id', 'permission_id');
     }
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function team()
+    public function roleHasPermissions()
     {
-        return $this->belongsTo(\App\Models\Team::class, 'team_id', 'id');
+        return $this->hasMany(\App\Models\RoleHasPermission::class, 'id', 'permission_id');
     }
     
 }

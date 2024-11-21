@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Permission;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\PermissionRequest;
@@ -11,6 +11,14 @@ use Illuminate\View\View;
 
 class PermissionController extends Controller
 {
+    public function __construct() //TODO change once perms seeded
+    {
+        // $this->middleware('permission:view permission', ['only' => ['index']]);
+        // $this->middleware('permission:create permission', ['only' => ['create','store']]);
+        // $this->middleware('permission:update permission', ['only' => ['update','edit']]);
+        // $this->middleware('permission:delete permission', ['only' => ['destroy']]);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -35,9 +43,22 @@ class PermissionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(PermissionRequest $request): RedirectResponse
+    public function store(Request $request)
     {
-        Permission::create($request->validated());
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'unique:permissions,name'
+            ]
+        ]);
+
+        Permission::create([
+            'name' => $request->name
+        ]);
+    // public function store(PermissionRequest $request): RedirectResponse
+    // {
+    //     Permission::create($request->validated());
 
         return Redirect::route('permissions.index')
             ->with('success', 'Permission created successfully.');
@@ -66,17 +87,34 @@ class PermissionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PermissionRequest $request, Permission $permission): RedirectResponse
+    public function update(Request $request, Permission $permission)
     {
-        $permission->update($request->validated());
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'unique:permissions,name,'.$permission->id
+            ]
+        ]);
+
+        $permission->update([
+            'name' => $request->name
+        ]);
+    // public function update(PermissionRequest $request, Permission $permission): RedirectResponse
+    // {
+    //     $permission->update($request->validated());
 
         return Redirect::route('permissions.index')
             ->with('success', 'Permission updated successfully');
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy($permissionId)
     {
-        Permission::find($id)->delete();
+        $permission = Permission::find($permissionId);
+        $permission->delete();
+    // public function destroy($id): RedirectResponse
+    // {
+    //     Permission::find($id)->delete();
 
         return Redirect::route('permissions.index')
             ->with('success', 'Permission deleted successfully');

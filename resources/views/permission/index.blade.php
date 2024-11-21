@@ -36,11 +36,8 @@
                                     <tr>
                                         <th>No</th>
                                         
-									<th >Team Id</th>
-									<th >Ability Id</th>
-									<th >Entity Type</th>
-									<th >Entity Id</th>
-									<th >Forbidden</th>
+									<th >Name</th>
+									<th >Guard Name</th>
 
                                         <th></th>
                                     </tr>
@@ -50,11 +47,8 @@
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
-										<td >{{ $permission->team_id }}</td>
-										<td >{{ $permission->ability_id }}</td>
-										<td >{{ $permission->entity_type }}</td>
-										<td >{{ $permission->entity_id }}</td>
-										<td >{{ $permission->forbidden }}</td>
+										<td >{{ $permission->name }}</td>
+										<td >{{ $permission->guard_name }}</td>
 
                                             <td>
                                                 <form action="{{ route('permissions.destroy', $permission->id) }}" method="POST">
