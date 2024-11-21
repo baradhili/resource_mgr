@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
  * Class Role
  *
  * @property $id
- * @property $team_id
  * @property $name
  * @property $guard_name
  * @property $created_at
@@ -29,7 +28,7 @@ class Role extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['team_id', 'name', 'guard_name'];
+    protected $fillable = ['name', 'guard_name'];
 
 
     /**

@@ -36,7 +36,6 @@
                                     <tr>
                                         <th>No</th>
                                         
-									<th >Team Id</th>
 									<th >Name</th>
 									<th >Guard Name</th>
 
@@ -48,7 +47,6 @@
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
-										<td >{{ $role->team_id }}</td>
 										<td >{{ $role->name }}</td>
 										<td >{{ $role->guard_name }}</td>
 
