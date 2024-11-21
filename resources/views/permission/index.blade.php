@@ -35,21 +35,14 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                     <tr>
-
-
                                         <th>Name</th>
-
-
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($permissions as $permission)
                                         <tr>
-
-
                                             <td>{{ $permission->name }}</td>
-
                                             <td>
                                                 <form action="{{ route('permissions.destroy', $permission->id) }}"
                                                     method="POST">
