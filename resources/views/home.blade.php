@@ -42,16 +42,11 @@
                             </div>
                             <div class="card">
                                 <div class="card-body">
-                                    {{ Widget::DemandFunnel() }}
+                                    {{ Widget::ResourceAvailability() }}
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    {{ Widget::ResourceAvailability() }}
-                                </div>
-                            </div>
                             <div class="card">
                                 <div class="card-body">
                                     {{ Widget::DemandFunnel() }}

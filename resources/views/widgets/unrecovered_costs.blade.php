@@ -10,7 +10,7 @@
             </div>
         </div>
     </div>
-    <h1 class="mt-1 mb-3">64</h1>
+    <h1 class="mt-1 mb-3">5%</h1>
     <div class="mb-0">
         <span class="text-danger">-2.25%</span>
         <span class="text-muted">Since last week</span>
