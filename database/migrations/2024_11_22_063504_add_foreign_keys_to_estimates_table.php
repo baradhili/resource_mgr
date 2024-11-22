@@ -11,8 +11,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('estimates', function (Blueprint $table) {
-            $table->unsignedBigInteger('created_by')->nullable()->constrained()->onDelete('cascade');
-            $table->unsignedBigInteger('updated_by')->nullable()->constrained()->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('estimate_owner')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('partner')->references('id')->on('users')->onDelete('cascade');
+   
         });
     }
 
@@ -24,6 +27,8 @@ return new class extends Migration {
         Schema::table('estimates', function (Blueprint $table) {
             $table->dropForeign('estimates_created_by_foreign');
             $table->dropForeign('estimates_updated_by_foreign');
+            $table->dropForeign('estimate_estimate_owner_foreign');
+            $table->dropForeign('estimate_partner_foreign');
         });
     }
 };

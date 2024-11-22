@@ -1,13 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AbilityController;
 use App\Http\Controllers\AllocationController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CapabilityController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
-use App\Http\Controllers\GroupController;
+use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PermissionController;
@@ -18,7 +16,9 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\TeamController;
+use App\Http\Controllers\TermsAndConditionController;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 
 /*
@@ -60,21 +60,22 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
     Route::resource('teams', TeamController::class);
     Route::resource('services', ServiceController::class);
-    // Route::resource('roles', RoleController::class);
-    // Route::resource('permissions', PermissionController::class);
-    Route::group(['middleware' => ['role:super-admin|admin']], function() {
+    Route::resource('estimates', EstimateController::class);
+    Route::resource('clients', ClientController::class);
+    Route::resource('terms-and-conditions', TermsAndConditionController::class);
+    Route::group(['middleware' => ['role:super-admin|admin']], function () {
 
         Route::resource('permissions', App\Http\Controllers\PermissionController::class);
         Route::get('permissions/{permissionId}/delete', [App\Http\Controllers\PermissionController::class, 'destroy']);
-    
+
         Route::resource('roles', App\Http\Controllers\RoleController::class);
         Route::get('roles/{roleId}/delete', [App\Http\Controllers\RoleController::class, 'destroy']);
         Route::get('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'addPermissionToRole']);
         Route::put('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'givePermissionToRole']);
-    
+
         Route::resource('users', App\Http\Controllers\UserController::class);
         Route::get('users/{userId}/delete', [App\Http\Controllers\UserController::class, 'destroy']);
-    
+
     });
 });
 
