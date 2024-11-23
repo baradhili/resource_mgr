@@ -40,7 +40,7 @@ class EstimateController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(EstimateRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse //EstimateRequest
     {
         Estimate::create($request->validated());
 
@@ -54,6 +54,7 @@ class EstimateController extends Controller
     public function show($id): View
     {
         $estimate = Estimate::find($id);
+        
 
         return view('estimate.show', compact('estimate'));
     }

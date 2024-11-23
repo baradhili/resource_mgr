@@ -20,11 +20,7 @@ return new class extends Migration {
             $table->string('currency_thousands_separator');
             $table->boolean('allows_to_select_items');
             $table->string('tags');
-            $table->unsignedBigInteger('estimate_owner');
-            $table->unsignedBigInteger('partner');
             $table->float('total_cost');
-            $table->unsignedBigInteger('created_by')->nullable();
-            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
         });
     }

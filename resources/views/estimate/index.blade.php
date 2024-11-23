@@ -37,18 +37,11 @@
                                         <th>No</th>
                                         
 									<th >Name</th>
-									<th >Use Name As Title</th>
 									<th >Expiration Date</th>
-									<th >Currency Symbol</th>
-									<th >Currency Decimal Separator</th>
-									<th >Currency Thousands Separator</th>
-									<th >Allows To Select Items</th>
 									<th >Tags</th>
 									<th >Estimate Owner</th>
 									<th >Partner</th>
 									<th >Total Cost</th>
-									<th >Created By</th>
-									<th >Updated By</th>
 
                                         <th></th>
                                     </tr>
@@ -59,19 +52,11 @@
                                             <td>{{ ++$i }}</td>
                                             
 										<td >{{ $estimate->name }}</td>
-										<td >{{ $estimate->use_name_as_title }}</td>
 										<td >{{ $estimate->expiration_date }}</td>
-										<td >{{ $estimate->currency_symbol }}</td>
-										<td >{{ $estimate->currency_decimal_separator }}</td>
-										<td >{{ $estimate->currency_thousands_separator }}</td>
-										<td >{{ $estimate->allows_to_select_items }}</td>
 										<td >{{ $estimate->tags }}</td>
 										<td >{{ $estimate->estimate_owner }}</td>
 										<td >{{ $estimate->partner }}</td>
 										<td >{{ $estimate->total_cost }}</td>
-										<td >{{ $estimate->created_by }}</td>
-										<td >{{ $estimate->updated_by }}</td>
-
                                             <td>
                                                 <form action="{{ route('estimates.destroy', $estimate->id) }}" method="POST">
                                                     <a class="btn btn-sm btn-primary " href="{{ route('estimates.show', $estimate->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>

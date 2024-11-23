@@ -11,11 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('estimates', function (Blueprint $table) {
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('estimate_owner')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('partner')->references('id')->on('users')->onDelete('cascade');
-   
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('updated_by')->constrained('users')->onDelete('cascade');
+            $table->foreignId('estimate_owner')->constrained('users')->onDelete('cascade');
+            $table->foreignId('partner')->constrained('users')->onDelete('cascade');
+            $table->foreignId('terms_and_conditions_id')->unique()->constrained('terms_and_conditions')->onDelete('cascade');
+            $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
+            
         });
     }
 
@@ -25,10 +27,12 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::table('estimates', function (Blueprint $table) {
-            $table->dropForeign('estimates_created_by_foreign');
-            $table->dropForeign('estimates_updated_by_foreign');
-            $table->dropForeign('estimate_estimate_owner_foreign');
-            $table->dropForeign('estimate_partner_foreign');
+            $table->dropConstrainedForeignId('created_by');
+            $table->dropConstrainedForeignId('updated_by');
+            $table->dropConstrainedForeignId('estimate_owner');
+            $table->dropConstrainedForeignId('partner');
+            $table->dropConstrainedForeignId('terms_and_conditions_id');
+            $table->dropConstrainedForeignId('client_id');
         });
     }
 };
