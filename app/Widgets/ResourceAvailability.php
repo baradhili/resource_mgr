@@ -116,7 +116,7 @@ class ResourceAvailability extends AbstractWidget
             }
 
         }
-        Log::info("resourceAvailability: " . json_encode($resourceAvailability));
+
         // Initialize the array with all year-months and 1.00 as default availability
         $yearMonthSums = [];
 
@@ -131,7 +131,7 @@ class ResourceAvailability extends AbstractWidget
                 $yearMonthSums[$yearMonthShortName] += $availability;
             }
         }
-            Log::info("Year-Month:  " . json_encode($yearMonthSums));
+
 
         return view('widgets.resource_availability', [
             'config' => $this->config,
