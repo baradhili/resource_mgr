@@ -1,4 +1,4 @@
-<div>
+<div class="bg-secondary">
     <div class="row">
         <div class="col mt-0">
             <h5 class="card-title">Unrecovered Resource Cost</h5>
