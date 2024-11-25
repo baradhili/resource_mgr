@@ -1,4 +1,4 @@
-<div>
+<div class="bg-secondary">
 <style>
     .funnel .funnel-level {
         background-color: #f8f9fa;
