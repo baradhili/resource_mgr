@@ -1,7 +1,7 @@
-<div class="bg-secondary">
+<div >
     <div class="row">
         <div class="col mt-0">
-            <h5 class="card-title">Upcoming Demands</h5>
+            <h5 class="card-title">Upcoming Unresolved Demands</h5>
         </div>
 
         <div class="col-auto">
@@ -10,9 +10,25 @@
             </div>
         </div>
     </div>
-    <h1 class="mt-1 mb-3">2.382 FTE</h1>
-    <div class="mb-0">
-        <span class="text-danger">-3.65%</span>
-        <span class="text-muted">Since last month</span>
+    <div class="row">
+        @foreach ($yearMonthSums as $month => $sum)
+            <div class="col">
+                <div style="margin-bottom: 0; padding-bottom: 0" class="row justify-content-center align-items-end">
+                    <div class="col text-center">
+                        <h1 style="margin-bottom: 0; padding-bottom: 0">{{ number_format(round($sum, 1), 1) }}</h1>
+                    </div>
+                </div>
+                <div class="row justify-content-center align-items-start" style="margin-top: 0; padding-top: 0">
+                    <div class="col text-center" style="margin-top: 0; padding-top: 0">
+                        <span style="font-size: smaller; margin-top: 0; padding-top: 0;">{{ $month }}</span>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <div class="mb-0" style="margin-bottom: 0; padding-bottom: 0">
+        <span class="text-danger" style="font-size: smaller; margin-top: 0; padding-top: 0;">{{ number_format(($yearMonthSums[array_key_last($yearMonthSums)] / $yearMonthSums[array_key_first($yearMonthSums)] - 1) * 100, 2) }}%</span>
+        <span class="text-muted" style="font-size: smaller; margin-top: 0; padding-top: 0;">next month</span>
     </div>
 </div>
