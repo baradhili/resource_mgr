@@ -112,17 +112,44 @@ class DemandController extends Controller
      */
     public function create(): View
     {
-        $demand = new Demand();
+        $demand = new \stdClass();
+        $demand->name = "";
+        $demand->start_date = '';
+        $demand->end_date = '';
+        $demand->status = '';
+        $demand->resource_type = '';
+        $demand->fte = 0.00; 
+        $demand->projects_id = null;
 
-        return view('demand.create', compact('demand'));
+        $projects = Project::all();
+
+        return view('demand.create', compact('demand', 'projects'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(DemandRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        Demand::create($request->validated());
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'));
+        $endDate = Carbon::createFromFormat('Y-m-d', $request->input('end_date'));
+        $projectID = $request->input('projects_id');
+
+        $monthStartDate = Carbon::create($startDate->year, $startDate->month, 1);
+        $monthEndDate = Carbon::create($endDate->year, $endDate->month, 1)->endOfMonth();
+
+        while ($monthStartDate->lte($monthEndDate)) {
+            $demandLength = min($monthEndDate, $monthStartDate->copy()->endOfMonth())->diffInDays($monthStartDate);
+            $fte = $request->input('fte') * $demandLength / $monthStartDate->diffInDays($monthStartDate->copy()->endOfMonth());
+            Demand::create([
+                'demand_date' => $monthStartDate,
+                'fte' => $fte,
+                'status' => $request->input('status'),
+                'resource_type' => $request->input('resource_type'),
+                'projects_id' => $projectID,
+            ]);
+            $monthStartDate->addMonth();
+        }
 
         return Redirect::route('demands.index')
             ->with('success', 'Demand created successfully.');
@@ -133,9 +160,20 @@ class DemandController extends Controller
      */
     public function show($id): View
     {
-        Log::info("in show");
-        $demand = Demand::find($id);
 
+        $demand_raw = Demand::where('projects_id', $id)->get();
+        $project = Project::findOrFail($id);
+        $demand = new \stdClass();
+        $demand->name = $project->name;
+        $demand->start_date = $demand_raw->min('demand_date');
+        $demand->end_date = $demand_raw->max('demand_date');
+        $demand->status = $demand_raw->first()->status;
+        $demand->resource_type = $demand_raw->first()->resource_type;
+        $demand->total_fte = $demand_raw->sum('fte');
+        $demand->fte = $demand_raw->first()->fte;
+
+
+        Log::info("demand: " . print_r($demand, true));
         return view('demand.show', compact('demand'));
     }
 
@@ -177,15 +215,21 @@ class DemandController extends Controller
             ->with('success', 'Demand updated successfully');
     }
 
+    /**
+     * Destroy all demands for a given project that are in the next year
+     *
+     * @param int $id The ID of the project
+     * @return RedirectResponse To the demands index page
+     */
     public function destroy($id): RedirectResponse
     {
-        Demand::find($id)->delete();
+        Demand::where('projects_id', $id)
+            ->whereBetween('demand_date', [now()->startOfMonth(), now()->endOfMonth()->addYear()])
+            ->delete();
 
         return Redirect::route('demands.index')
-            ->with('success', 'Demand deleted successfully');
+            ->with('success', 'Demands deleted successfully');
     }
-
-
     public function exportDemands()
     {
         // Build our next twelve month array
