@@ -47,10 +47,11 @@ Route::middleware('auth')->group(function () {
     //additional functions
     Route::post('/allocations-upload', [AllocationController::class, 'populateAllocations'])->name('allocations.upload');
     Route::resource('contracts', ContractController::class);
-    Route::get('/demands-export', [DemandController::class, 'exportDemands'])->name('demands.export');
+    Route::get('/demands/export', [DemandController::class, 'exportDemands'])->name('demands.export');
+    Route::get('/demands/{project}/editFullDemand', [DemandController::class, 'editFullDemand'])->name('demands.editFullDemand');
     Route::resource('demands', DemandController::class);
     Route::resource('leaves', LeaveController::class);
-    Route::resource('projects', ProjectController::class);
+    Route::resource('projects', ProjectController::class); 
     Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
     Route::resource('resources', ResourceController::class);
     Route::resource('skills', SkillController::class);

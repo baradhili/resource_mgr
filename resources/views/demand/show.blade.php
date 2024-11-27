@@ -21,24 +21,29 @@
                     <div class="card-body bg-white">
                         
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Year:</strong>
-                                    {{ $demand->year }}
+                                    <strong>Demand Start Date:</strong>
+                                    {{ $demand->start_date }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Month:</strong>
-                                    {{ $demand->month }}
+                                    <strong>Demand End Date:</strong>
+                                    {{ $demand->end_date }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Fte:</strong>
+                                    <strong> Fte:</strong>
                                     {{ $demand->fte }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Total Fte:</strong>
+                                    {{ $demand->total_fte }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Status:</strong>
                                     {{ $demand->status }}
                                 </div>
+                                
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Projects Id:</strong>
-                                    {{ $demand->projects_id }}
+                                    <strong>Resource Type:</strong>
+                                    {{ $demand->resource_type }}
                                 </div>
 
                     </div>

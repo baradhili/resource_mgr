@@ -19,6 +19,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class DemandController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -112,17 +113,44 @@ class DemandController extends Controller
      */
     public function create(): View
     {
-        $demand = new Demand();
+        $demand = new \stdClass();
+        $demand->name = "";
+        $demand->start_date = '';
+        $demand->end_date = '';
+        $demand->status = '';
+        $demand->resource_type = '';
+        $demand->fte = 0.00;
+        $demand->projects_id = null;
 
-        return view('demand.create', compact('demand'));
+        $projects = Project::all();
+
+        return view('demand.create', compact('demand', 'projects'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(DemandRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        Demand::create($request->validated());
+        $startDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'));
+        $endDate = Carbon::createFromFormat('Y-m-d', $request->input('end_date'));
+        $projectID = $request->input('projects_id');
+
+        $monthStartDate = Carbon::create($startDate->year, $startDate->month, 1);
+        $monthEndDate = Carbon::create($endDate->year, $endDate->month, 1)->endOfMonth();
+
+        while ($monthStartDate->lte($monthEndDate)) {
+            $demandLength = min($monthEndDate, $monthStartDate->copy()->endOfMonth())->diffInDays($monthStartDate);
+            $fte = $request->input('fte') * $demandLength / $monthStartDate->diffInDays($monthStartDate->copy()->endOfMonth());
+            Demand::create([
+                'demand_date' => $monthStartDate,
+                'fte' => $fte,
+                'status' => $request->input('status'),
+                'resource_type' => $request->input('resource_type'),
+                'projects_id' => $projectID,
+            ]);
+            $monthStartDate->addMonth();
+        }
 
         return Redirect::route('demands.index')
             ->with('success', 'Demand created successfully.');
@@ -133,8 +161,18 @@ class DemandController extends Controller
      */
     public function show($id): View
     {
-        Log::info("in show");
-        $demand = Demand::find($id);
+
+        $demand_raw = Demand::where('projects_id', $id)->get();
+        $project = Project::findOrFail($id);
+        $demand = new \stdClass();
+        $demand->name = $project->name;
+        $demand->start_date = $demand_raw->min('demand_date');
+        $demand->end_date = $demand_raw->max('demand_date');
+        $demand->status = $demand_raw->first()->status;
+        $demand->resource_type = $demand_raw->first()->resource_type;
+        $demand->total_fte = $demand_raw->sum('fte');
+        $demand->fte = $demand_raw->first()->fte;
+
 
         return view('demand.show', compact('demand'));
     }
@@ -166,26 +204,121 @@ class DemandController extends Controller
             ->with('success', 'Resource assigned to project successfully.');
     }
 
+
+    /**
+     * Edit the overall demand of a project
+     *
+     * @param int $project_id The id of the project
+     * @return \Illuminate\View\View
+     */
+    public function editFullDemand($project_id): View
+    {
+        $demandArray = Demand::where('projects_id', $project_id)
+            ->whereBetween('demand_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
+            ->get();
+
+        $demand = new \stdClass();
+        $demand->name = $demandArray->first()->project->name;
+        $demand->start_date = Carbon::parse($demandArray->min('demand_date'))->format('Y-m-d');
+        $demand->end_date = Carbon::parse($demandArray->max('demand_date'))->format('Y-m-d');
+        $demand->status = $demandArray->first()->status;
+        $demand->resource_type = $demandArray->first()->resource_type;
+        $demand->fte = $demandArray->first()->fte;
+        $demand->projects_id = $project_id;
+        $demand->demand_id = $demandArray->first()->id;
+
+
+        $projects = Project::all();
+
+        return view('demand.edit', compact('demand', 'projects'));
+    }
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(DemandRequest $request, Demand $demand): RedirectResponse
+    public function update(Request $request, $projects_id): RedirectResponse
     {
-        $demand->update($request->validated());
+        if (!is_numeric($request->input('projects_id'))) {
+            $project = Project::where('name', $request->input('projects_id'))->first();
+            $projectID = $project->id ?? null;
+            if (is_null($projectID)) {
+                $project = Project::updateOrCreate(
+                    ['name' => $request->input('projects_id')]
+                );
+                $projects_id = $project->id;
+            }
+        } else {
+            $projects_id = $request->input('projects_id');
+        }
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'status' => 'required|string',
+            'resource_type' => 'required|string',
+            'fte' => 'required|numeric',
+            'demand_id' => 'required|numeric',
+        ]);
+
+        $demand = Demand::findOrFail($request->input('demand_id'));
+        $oldProjects_id = $demand->projects_id;
+        $storedDemand = Demand::where('projects_id', $demand->oldProjects_id)
+            ->get()
+            ->keyBy('demand_date')
+            ->toArray();
+
+        $startDate = Carbon::parse($request->input('start_date'));
+        $endDate = Carbon::parse($request->input('end_date'));
+        $minDemandDate = array_key_first($storedDemand);
+        $maxDemandDate = array_key_last($storedDemand);
+
+        if ($startDate->lt($minDemandDate) || $endDate->gt($maxDemandDate)) {
+            Demand::where('projects_id', $oldProjects_id)->delete();
+
+            $monthStartDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'))->startOfMonth();
+            $monthEndDate = Carbon::createFromFormat('Y-m-d', $request->input('end_date'));
+
+            while ($monthStartDate->lte($monthEndDate)) {
+                $demandLength = min($monthEndDate, $monthStartDate->copy()->endOfMonth())->diffInDays($monthStartDate);
+                $fte = $request->input('fte') * $demandLength / $monthStartDate->diffInDays($monthStartDate->copy()->endOfMonth());
+                Demand::create([
+                    'demand_date' => $monthStartDate,
+                    'fte' => $fte,
+                    'status' => $request->input('status'),
+                    'resource_type' => $request->input('resource_type'),
+                    'projects_id' => $projects_id,
+                ]);
+                $monthStartDate->addMonth();
+            }
+
+        }
+
+        Demand::where('projects_id', $oldProjects_id)
+            ->update([
+                'status' => $request->input('status'),
+                'resource_type' => $request->input('resource_type'),
+                'fte' => $request->input('fte'),
+                'projects_id' => $projects_id,
+            ]);
 
         return Redirect::route('demands.index')
             ->with('success', 'Demand updated successfully');
     }
 
+    /**
+     * Destroy all demands for a given project that are in the next year
+     *
+     * @param int $id The ID of the project
+     * @return RedirectResponse To the demands index page
+     */
     public function destroy($id): RedirectResponse
     {
-        Demand::find($id)->delete();
+        Demand::where('projects_id', $id)
+            ->whereBetween('demand_date', [now()->startOfMonth(), now()->endOfMonth()->addYear()])
+            ->delete();
 
         return Redirect::route('demands.index')
-            ->with('success', 'Demand deleted successfully');
+            ->with('success', 'Demands deleted successfully');
     }
-
-
     public function exportDemands()
     {
         // Build our next twelve month array

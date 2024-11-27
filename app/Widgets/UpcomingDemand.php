@@ -34,7 +34,7 @@ class UpcomingDemand extends AbstractWidget
                 'monthName' => $date->format('F'),
             ];
         }
-
+        
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addMonths(3)->startOfMonth();
@@ -74,9 +74,11 @@ class UpcomingDemand extends AbstractWidget
             }
         }
 
-        // Initialize the array with all year-months and 1.00 as default availability
         $yearMonthSums = [];
-
+        foreach ($nextThreeMonths as $month) {
+            $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+            $yearMonthSums[$key] = 0;
+        }
         foreach ($demandArray as $projectId => $projectInfo) {
 
             foreach ($projectInfo['demand'] ?? [] as $yearMonth => $demand) {
@@ -90,6 +92,7 @@ class UpcomingDemand extends AbstractWidget
             }
         }
 
+        //sort by month and then convert to month short name
         ksort($yearMonthSums);
         foreach ($yearMonthSums as $yearMonth => $sum) {
             $date = Carbon::createFromFormat('Y-m', $yearMonth);
@@ -98,6 +101,9 @@ class UpcomingDemand extends AbstractWidget
             $yearMonthSums[$yearMonthShortName] = $sum;
             unset($yearMonthSums[$yearMonth]);
         }
+
+        Log::info('yearMonthSums'.json_encode($yearMonthSums));
+
 
         return view('widgets.upcoming_demand', [
             'config' => $this->config,

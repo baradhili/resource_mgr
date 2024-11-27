@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\ProjectRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -25,9 +26,13 @@ class ProjectController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
         $project = new Project();
+  
+        if ($request->has('name')) {
+            $project->name = $request->query('name');
+        }
 
         return view('project.create', compact('project'));
     }
