@@ -3,14 +3,29 @@
 
         <div class="form-group mb-2 mb20">
             <label for="projects_id" class="form-label">{{ __('Projects') }}</label>
-            <select name="projects_id" class="form-control @error('projects_id') is-invalid @enderror" id="projects_id">
-                <option value="">{{ __('Select a Project') }}</option>
+            <div class="input-group">
+                <input list="projects" name="projects_id" class="form-control @error('projects_id') is-invalid @enderror"
+                    id="projects_id" value="{{ old('projects_id', $demand?->projects_id) }}"
+                    placeholder="Search for a project">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"
+                        onclick="document.getElementById('projects_id').value = '';">
+                        <i class="fa fa-times-circle"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-plus"
+                        onclick="
+                        window.open('{{ route('projects.create') }}?name='+document.getElementById('projects_id').value, '_blank')">
+                        <i class="fa fa-plus-circle fa-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <datalist id="projects">
                 @foreach ($projects as $project)
-                    <option value="{{ $project->id }}" {{ old('projects_id') == $project->id ? 'selected' : '' }}>
-                        {{ $project->name }} ({{ $project->empowerID }})
+                    <option value="{{ $project->id }}">
+                        {{ $project->empowerID }} {{ $project->name }}
                     </option>
-                @endforeach 
-            </select>
+                @endforeach
+            </datalist>
             {!! $errors->first('projects_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
 

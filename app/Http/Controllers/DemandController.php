@@ -173,7 +173,6 @@ class DemandController extends Controller
         $demand->fte = $demand_raw->first()->fte;
 
 
-        Log::info("demand: " . print_r($demand, true));
         return view('demand.show', compact('demand'));
     }
 
@@ -202,6 +201,23 @@ class DemandController extends Controller
 
         return Redirect::route('demands.index')
             ->with('success', 'Resource assigned to project successfully.');
+    }
+
+    
+    /**
+     * Show the form for editing the specified resource. 
+     * - TODO we need to make sure we don't wipe out other demands
+     * - TODO we should run to the end of the demand, or deal with each month by itself
+     */
+    public function editFullDemand($project_id): View
+    {
+        $demandArray = Demand::where('projects_id', $project_id)
+            ->whereBetween('demand_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
+            ->get();
+
+        $resources = Resource::all();
+
+        return view('demand.editFullDemand', compact('demandArray', 'resources'));
     }
 
     /**
