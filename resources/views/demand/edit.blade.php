@@ -14,10 +14,11 @@
                         <span class="card-title">{{ __('Update') }} Demand</span>
                     </div>
                     <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('demands.update', $demand->id) }}"  role="form" enctype="multipart/form-data">
-                            {{ method_field('PATCH') }}
+                        <form method="POST" action="{{ route('demands.update', $demand->projects_id) }}"  role="form" enctype="multipart/form-data">
+                            {{ method_field('PUT') }}
                             @csrf
-
+                            <input type="hidden" name="demand_id" value="{{ $demand->demand_id }}">
+                            
                             @include('demand.form')
 
                         </form>

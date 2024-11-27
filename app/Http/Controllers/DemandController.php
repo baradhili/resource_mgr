@@ -19,6 +19,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class DemandController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -118,7 +119,7 @@ class DemandController extends Controller
         $demand->end_date = '';
         $demand->status = '';
         $demand->resource_type = '';
-        $demand->fte = 0.00; 
+        $demand->fte = 0.00;
         $demand->projects_id = null;
 
         $projects = Project::all();
@@ -203,11 +204,12 @@ class DemandController extends Controller
             ->with('success', 'Resource assigned to project successfully.');
     }
 
-    
+
     /**
-     * Show the form for editing the specified resource. 
-     * - TODO we need to make sure we don't wipe out other demands
-     * - TODO we should run to the end of the demand, or deal with each month by itself
+     * Edit the overall demand of a project
+     *
+     * @param int $project_id The id of the project
+     * @return \Illuminate\View\View
      */
     public function editFullDemand($project_id): View
     {
@@ -215,17 +217,88 @@ class DemandController extends Controller
             ->whereBetween('demand_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
             ->get();
 
-        $resources = Resource::all();
+        $demand = new \stdClass();
+        $demand->name = $demandArray->first()->project->name;
+        $demand->start_date = Carbon::parse($demandArray->min('demand_date'))->format('Y-m-d');
+        $demand->end_date = Carbon::parse($demandArray->max('demand_date'))->format('Y-m-d');
+        $demand->status = $demandArray->first()->status;
+        $demand->resource_type = $demandArray->first()->resource_type;
+        $demand->fte = $demandArray->first()->fte;
+        $demand->projects_id = $project_id;
+        $demand->demand_id = $demandArray->first()->id;
 
-        return view('demand.editFullDemand', compact('demandArray', 'resources'));
+
+        $projects = Project::all();
+
+        return view('demand.edit', compact('demand', 'projects'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(DemandRequest $request, Demand $demand): RedirectResponse
+    public function update(Request $request, $projects_id): RedirectResponse
     {
-        $demand->update($request->validated());
+        if (!is_numeric($request->input('projects_id'))) {
+            $project = Project::where('name', $request->input('projects_id'))->first();
+            $projectID = $project->id ?? null;
+            if (is_null($projectID)) {
+                $project = Project::updateOrCreate(
+                    ['name' => $request->input('projects_id')]
+                );
+                $projects_id = $project->id;
+            }
+        } else {
+            $projects_id = $request->input('projects_id');
+        }
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'status' => 'required|string',
+            'resource_type' => 'required|string',
+            'fte' => 'required|numeric',
+            'demand_id' => 'required|numeric',
+        ]);
+
+        $demand = Demand::findOrFail($request->input('demand_id'));
+        $oldProjects_id = $demand->projects_id;
+        $storedDemand = Demand::where('projects_id', $demand->oldProjects_id)
+            ->get()
+            ->keyBy('demand_date')
+            ->toArray();
+
+        $startDate = Carbon::parse($request->input('start_date'));
+        $endDate = Carbon::parse($request->input('end_date'));
+        $minDemandDate = array_key_first($storedDemand);
+        $maxDemandDate = array_key_last($storedDemand);
+
+        if ($startDate->lt($minDemandDate) || $endDate->gt($maxDemandDate)) {
+            Demand::where('projects_id', $oldProjects_id)->delete();
+
+            $monthStartDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'))->startOfMonth();
+            $monthEndDate = Carbon::createFromFormat('Y-m-d', $request->input('end_date'));
+
+            while ($monthStartDate->lte($monthEndDate)) {
+                $demandLength = min($monthEndDate, $monthStartDate->copy()->endOfMonth())->diffInDays($monthStartDate);
+                $fte = $request->input('fte') * $demandLength / $monthStartDate->diffInDays($monthStartDate->copy()->endOfMonth());
+                Demand::create([
+                    'demand_date' => $monthStartDate,
+                    'fte' => $fte,
+                    'status' => $request->input('status'),
+                    'resource_type' => $request->input('resource_type'),
+                    'projects_id' => $projects_id,
+                ]);
+                $monthStartDate->addMonth();
+            }
+
+        }
+
+        Demand::where('projects_id', $oldProjects_id)
+            ->update([
+                'status' => $request->input('status'),
+                'resource_type' => $request->input('resource_type'),
+                'fte' => $request->input('fte'),
+                'projects_id' => $projects_id,
+            ]);
 
         return Redirect::route('demands.index')
             ->with('success', 'Demand updated successfully');

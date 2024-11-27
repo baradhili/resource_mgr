@@ -33,8 +33,7 @@ class ProjectController extends Controller
         if ($request->has('name')) {
             $project->name = $request->query('name');
         }
-        Log::info("project: ". json_encode($project));
-        
+
         return view('project.create', compact('project'));
     }
 

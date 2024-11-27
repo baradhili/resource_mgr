@@ -5,7 +5,7 @@
             <label for="projects_id" class="form-label">{{ __('Projects') }}</label>
             <div class="input-group">
                 <input list="projects" name="projects_id" class="form-control @error('projects_id') is-invalid @enderror"
-                    id="projects_id" value="{{ old('projects_id', $demand?->projects_id) }}"
+                    id="projects_id" value="{{ old('projects_id', $demand?->projects_id) ? $demand->name ?? $projects->where('id', $demand->projects_id)->first()->name : '' }}"
                     placeholder="Search for a project">
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="button"

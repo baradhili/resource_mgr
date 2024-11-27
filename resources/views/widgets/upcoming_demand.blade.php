@@ -28,7 +28,14 @@
     </div>
 
     <div class="mb-0" style="margin-bottom: 0; padding-bottom: 0">
-        <span class="text-danger" style="font-size: smaller; margin-top: 0; padding-top: 0;">{{ number_format(($yearMonthSums[array_key_last($yearMonthSums)] / $yearMonthSums[array_key_first($yearMonthSums)] - 1) * 100, 2) }}%</span>
+        <span class="text-danger" style="font-size: smaller; margin-top: 0; padding-top: 0;">
+            @php
+                $firstMonthSum = $yearMonthSums[array_key_first($yearMonthSums)];
+                $lastMonthSum = $yearMonthSums[array_key_last($yearMonthSums)];
+                $percentageChange = $firstMonthSum != 0 ? (($lastMonthSum / $firstMonthSum - 1) * 100) : 0.0;
+            @endphp
+            {{ number_format($percentageChange, 2) }}%
+        </span>
         <span class="text-muted" style="font-size: smaller; margin-top: 0; padding-top: 0;">next month</span>
     </div>
 </div>

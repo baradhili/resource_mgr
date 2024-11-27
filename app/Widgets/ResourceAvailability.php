@@ -131,7 +131,7 @@ class ResourceAvailability extends AbstractWidget
                 $yearMonthSums[$yearMonthShortName] += $availability;
             }
         }
-
+       
 
         return view('widgets.resource_availability', [
             'config' => $this->config,
