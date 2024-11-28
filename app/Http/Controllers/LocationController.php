@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
+use App\Models\Region;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\LocationRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
+
 
 class LocationController extends Controller
 {
@@ -16,7 +19,7 @@ class LocationController extends Controller
      */
     public function index(Request $request): View
     {
-        $locations = Location::paginate();
+        $locations = Location::with('region')->paginate();
 
         return view('location.index', compact('locations'))
             ->with('i', ($request->input('page', 1) - 1) * $locations->perPage());
@@ -28,8 +31,9 @@ class LocationController extends Controller
     public function create(): View
     {
         $location = new Location();
+        $regions = Region::all();
 
-        return view('location.create', compact('location'));
+        return view('location.create', compact('location', 'regions'));
     }
 
     /**
@@ -48,7 +52,7 @@ class LocationController extends Controller
      */
     public function show($id): View
     {
-        $location = Location::find($id);
+        $location = Location::with('region')->find($id);
 
         return view('location.show', compact('location'));
     }
@@ -58,9 +62,10 @@ class LocationController extends Controller
      */
     public function edit($id): View
     {
-        $location = Location::find($id);
+        $location = Location::with('region')->find($id);
+        $regions = Region::all();
 
-        return view('location.edit', compact('location'));
+        return view('location.edit', compact('location', 'regions'));
     }
 
     /**

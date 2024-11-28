@@ -25,8 +25,8 @@
                                     {{ $location->name }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Region Id:</strong>
-                                    {{ $location->region_id }}
+                                    <strong>Region:</strong>
+                                    {{ $location->region->name }}
                                 </div>
 
                     </div>

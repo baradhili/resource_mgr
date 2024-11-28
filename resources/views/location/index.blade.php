@@ -37,7 +37,7 @@
                                         <th>No</th>
                                         
 									<th >Name</th>
-									<th >Region Id</th>
+									<th >Region</th>
 
                                         <th></th>
                                     </tr>
@@ -48,7 +48,7 @@
                                             <td>{{ ++$i }}</td>
                                             
 										<td >{{ $location->name }}</td>
-										<td >{{ $location->region_id }}</td>
+										<td >{{ $location->region->name}}</td>
 
                                             <td>
                                                 <form action="{{ route('locations.destroy', $location->id) }}" method="POST">
