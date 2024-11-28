@@ -22,9 +22,10 @@ class ResourceRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'full_name' => 'string',
-			'empowerID' => 'string',
-			'adID' => 'string',
+            'full_name' => 'string',
+            'empowerID' => 'string',
+            'adID' => 'string',
+            'location_id' => 'required|integer',
         ];
     }
 }

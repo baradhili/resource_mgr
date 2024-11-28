@@ -11,6 +11,7 @@ use App\Models\Leave;
 use App\Models\Resource;
 use App\Models\ResourceSkill;
 use App\Models\Skill;
+use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -134,8 +135,21 @@ class ResourceController extends Controller
     public function create(): View
     {
         $resource = new Resource();
+        $locations = Location::all();
+        return view('resource.create', compact('resource','locations'));
+    }
 
-        return view('resource.create', compact('resource'));
+    
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id): View
+    {
+        $resource = Resource::with('location')->find($id);
+        $locations = Location::all();
+        $skills = Skill::all();
+        $resourceSkills = $resource->skills;
+        return view('resource.edit', compact('resource','locations','skills','resourceSkills'));
     }
 
     /**
@@ -154,7 +168,7 @@ class ResourceController extends Controller
      */
     public function show($id): View
     {
-        $resource = Resource::find($id);
+        $resource = Resource::with('location')->find($id);
 
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resources_id', $id)
@@ -236,8 +250,15 @@ class ResourceController extends Controller
      * Update the specified resource in storage.
      */
     public function update(ResourceRequest $request, Resource $resource): RedirectResponse
-    {
-        $resource->update($request->validated());
+    {     
+        $resource->full_name = $request->validated()['full_name'];
+        $resource->empowerID = $request->validated()['empowerID'];
+        $resource->adID = $request->validated()['adID'];
+        $resource->location_id = $request->validated()['location_id'];
+        $location = Location::find($request->validated()['location_id']);
+        $resource->region_id = $location->region_id;
+        
+        $resource->save();
 
         return Redirect::route('resources.index')
             ->with('success', 'Resource updated successfully');
