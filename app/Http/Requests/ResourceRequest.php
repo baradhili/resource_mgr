@@ -26,6 +26,7 @@ class ResourceRequest extends FormRequest
             'empowerID' => 'string',
             'adID' => 'string',
             'location_id' => 'required|integer',
+            'skills' => 'required|json',
         ];
     }
 }

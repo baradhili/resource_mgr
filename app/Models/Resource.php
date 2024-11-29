@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Allocation[] $allocations
  * @property Contract[] $contracts
  * @property Leave[] $leaves
+ * @property ResourceSkill[] $skills
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
@@ -56,6 +57,14 @@ class Resource extends Model
     public function leaves()
     {
         return $this->hasMany(\App\Models\Leave::class, 'resources_id', 'id');
+    }
+    
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function skills()
+    {
+        return $this->hasMany(\App\Models\ResourceSkill::class, 'resources_id', 'id');
     }
     
     /**

@@ -29,7 +29,8 @@
         "mpociot/teamwork": "^9.0",
         "phpoffice/phpspreadsheet": "^3.4",
         "spatie/laravel-menu": "^4.2",
-        "spatie/laravel-permission": "^6.10"
+        "spatie/laravel-permission": "^6.10",
+        "yajra/laravel-datatables": "^10.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
