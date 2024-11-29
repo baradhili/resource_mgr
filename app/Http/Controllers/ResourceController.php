@@ -150,10 +150,9 @@ class ResourceController extends Controller
         $skills = Skill::all();
         $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
             ->with('skill')
-            ->get()
-            ->pluck('skill');
-
-        Log::info("skills: " . json_encode($resourceSkills));
+            ->get();
+        Log::info("resource: " . json_encode($resource));
+        Log::info("resourceSkills: " . json_encode($resourceSkills));
         Log::info("all skills: " . json_encode($skills));
         return view('resource.edit', compact('resource', 'locations', 'skills', 'resourceSkills'));
     }

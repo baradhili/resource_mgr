@@ -1,6 +1,5 @@
 <div class="row padding-1 p-1">
     <div class="col-md-12">
-
         <div class="form-group mb-2 mb20">
             <label for="full_name" class="form-label">{{ __('Full Name') }}</label>
             <input type="text" name="full_name" class="form-control @error('full_name') is-invalid @enderror"
@@ -31,107 +30,122 @@
             </select>
             {!! $errors->first('location_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
-
         <div class="form-group mb-2 mb20">
-            <table id="skills_table" class="table table-striped table-hover" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Skill Name</th>
-                        <th>Proficiency</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($resourceSkills as $skill)
-                        <tr>
-                            <td>
-                                <select class="form-control" name="skills[{{ $skill['id'] }}]" disabled>
-                                    @foreach ($skills as $s)
-                                        <option value="{{ $s->id }}" {{ $s->id == $skill['id'] ? 'selected' : '' }}>
-                                            {{ $s->skill_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <select class="form-control" name="proficiencies[{{ $skill['id'] }}]" disabled>
-                                    <option value="Beginner"
-                                        {{ $skill['proficiency_levels'] == 'Beginner' ? 'selected' : '' }}>Beginner
-                                    </option>
-                                    <option value="Intermediate"
-                                        {{ $skill['proficiency_levels'] == 'Intermediate' ? 'selected' : '' }}>
-                                        Intermediate</option>
-                                    <option value="Advanced"
-                                        {{ $skill['proficiency_levels'] == 'Advanced' ? 'selected' : '' }}>Advanced
-                                    </option>
-                                </select>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-sm btn-secondary edit-skills-btn" data-id="{{ $skill['id'] }}">
-                                    <i data-feather="edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-primary d-none save-skills-btn" data-id="{{ $skill['id'] }}">
-                                    <i data-feather="save"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-danger d-none cancel-skills-btn" data-id="{{ $skill['id'] }}">
-                                    <i data-feather="x"></i>
-                                </button>
-                                <button type="button" class="btn btn-sm btn-danger delete-skills-btn" data-id="{{ $skill['id'] }}">
-                                    <i data-feather="trash-2"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <label for="skills" class="form-label">{{ __('Skills') }}</label>
+            <input name="skills" class="form-control @error('skills') is-invalid @enderror" value=""
+                id="skills" placeholder="Add skills">
+            {!! $errors->first('skills', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
-
-        <div class="col-md-12 mt20 mt-2">
-            <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
-        </div>
-        <script>
-            $(document).ready(function() {
-                $('#skills_table').DataTable({
-                    // You can add DataTables options here, such as column definitions, searching, pagination, etc.
-                    // For example:
-                    // "paging": true,
-                    // "searching": true,
-                    // "ordering": true,
-                    // "info": true,
-                    "columnDefs": [{ "targets": [2], "orderable": false }]
-                });
-                $('.edit-skills-btn').on('click', function() {
-                    var id = $(this).data('id');
-                    $(`#skills_table tbody tr input[name="skills[${id}]"]`).prop('disabled', false);
-                    $(`#skills_table tbody tr select[name="proficiencies[${id}]"]`).prop('disabled', false);
-                    $(`.edit-skills-btn[data-id="${id}"]`).addClass('d-none');
-                    $(`.save-skills-btn[data-id="${id}"]`).removeClass('d-none');
-                    $(`.cancel-skills-btn[data-id="${id}"]`).removeClass('d-none');
-                });
-                $('.save-skills-btn').on('click', function() {
-                    var id = $(this).data('id');
-                    $(`#skills_table tbody tr input[name="skills[${id}]"]`).prop('disabled', true);
-                    $(`#skills_table tbody tr select[name="proficiencies[${id}]"]`).prop('disabled', true);
-                    $(`.edit-skills-btn[data-id="${id}"]`).removeClass('d-none');
-                    $(`.save-skills-btn[data-id="${id}"]`).addClass('d-none');
-                    $(`.cancel-skills-btn[data-id="${id}"]`).addClass('d-none');
-                });
-                $('.cancel-skills-btn').on('click', function() {
-                    var id = $(this).data('id');
-                    $(`#skills_table tbody tr input[name="skills[${id}]"]`).prop('disabled', true);
-                    $(`#skills_table tbody tr select[name="proficiencies[${id}]"]`).prop('disabled', true);
-                    $(`.edit-skills-btn[data-id="${id}"]`).removeClass('d-none');
-                    $(`.save-skills-btn[data-id="${id}"]`).addClass('d-none');
-                    $(`.cancel-skills-btn[data-id="${id}"]`).addClass('d-none');
-                });
-                $('.delete-skills-btn').on('click', function() {
-                    var id = $(this).data('id');
-                    if (confirm('Are you sure you want to delete this skill?')) {
-                        // Perform the delete action, e.g., sending an AJAX request to the server
-                        $(`#skills_table tbody tr:has(button[data-id="${id}"])`).remove();
-                    }
-                });
-            });
-        </script>
-
     </div>
 
+    <div class="col-md-12 mt20 mt-2">
+        <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
+    </div>
+    <!-- Dialog for editing proficiency -->
+    <dialog id="editProficiencyDialog" style="width:33vw;min-width:300px;">
+        <h3>Edit Proficiency</h3>
+        <div>
+            <label for="proficiency">Proficiency:</label>
+            <select id="proficiency">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select>
+        </div>
+        <button id="saveProficiency">Save</button>
+        <button id="cancelProficiency">Cancel</button>
+    </dialog>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize Tagify
+            var input = document.querySelector('#skills');
+            var tagify = new Tagify(input, {
+                whitelist: [
+                    @foreach ($skills as $skill)
+                        {
+                            value: "{{ $skill->id }}",
+                            name: "{{ $skill->skill_name }}"
+                        },
+                    @endforeach
+                ],
+                editTags: {
+                    clicks: 2, // single click to edit a tag
+                    keepInvalid: false // if after editing, tag is invalid, auto-revert
+                },
+                enforceWhitelist: true,
+                dropdown: {
+                    enabled: 2, 
+                    maxItems: 20,
+                    closeOnSelect: true, 
+                    highlightFirst: true,
+                    searchKeys: ["name"]
+                },
+                templates: {
+                    tag: function(tagData, tagify) {
+                        return `<tag title="${tagData.name}" contenteditable='false' spellcheck="false" class='tagify__tag ${tagData.class ? tagData.class : ""}' ${this.getAttributes(tagData)}>
+                                <x title='' class='tagify__tag__removeBtn' role='button' aria-label='remove tag'></x>
+                                <div>
+                                    <span class='tagify__tag-text'>${tagData.name} - ${tagData.proficiency}</span>
+                                </div>
+                            </tag>`;
+                    },
+                    dropdownItem: function(tagData, tagify) {
+                        return `<div ${this.getAttributes(tagData)} class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'>
+                                ${tagData.name}
+                            </div>`;
+                    }
+                }
+            });
+
+            // Pre-fill the Tagify input with existing skills and proficiency
+            tagify.addTags([
+                @foreach ($resourceSkills as $skill)
+                    {
+                        value: "{{ $skill['skill']['id'] }}",
+                        name: "{{ $skill['skill']['skill_name'] }}",
+                        proficiency: "{{ $skill['proficiency_levels'] }}"
+                    },
+                @endforeach
+            ]);
+
+            var clickDebounce;
+
+            tagify.on('click', function(e) {
+                const {
+                    tag: tagElm,
+                    data: tagData
+                } = e.detail;
+
+                // a delay is needed to distinguish between regular click and double-click.
+                // this allows enough time for a possible double-click, and noly fires if such
+                // did not occur.
+                clearTimeout(clickDebounce);
+                clickDebounce = setTimeout(() => {
+                    const dialog = document.getElementById('editProficiencyDialog');
+                    dialog.querySelector('h3').innerText = `Edit ${tagData.name}`;
+                    dialog.querySelector('select').value = tagData.proficiency;
+                    dialog.showModal();
+
+                    document.getElementById('saveProficiency').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const dialog = document.getElementById('editProficiencyDialog');
+                        const selectedProficiency = dialog.querySelector('select').value;
+                        tagData.proficiency = selectedProficiency;
+                        tagElm.querySelector('.tagify__tag-text').innerText = `${tagData.name} - ${selectedProficiency}`;
+                        dialog.close();
+                    })
+
+                    document.getElementById('cancelProficiency').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const dialog = document.getElementById('editProficiencyDialog');
+                        dialog.close();
+                    })
+                    
+                }, 200);
+            })
+
+        });
+    </script>
+</div>
+</div>

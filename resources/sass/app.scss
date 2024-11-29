@@ -6,6 +6,29 @@
   src: url('../fonts/nunito-latin-400-normal.woff2') format('woff2');
 }
 
+//dialogs and tagify
+dialog {
+  border: none;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 33vw;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: auto;
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.tagify__tag {
+  cursor: pointer;
+}
+
+
 // Variables
 @import 'variables';
 
