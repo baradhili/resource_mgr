@@ -29,8 +29,12 @@
                                     {{ $resource->empowerID }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Adid:</strong>
+                                    <strong>AD id:</strong>
                                     {{ $resource->adID }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Location:</strong>
+                                    {{ $resource->location ? $resource->location->name : 'N/A' }}
                                 </div>
 
                     </div>
@@ -40,9 +44,9 @@
                         <div class="float-left">
                             <span class="card-title">{{ __('Skills and Proficiencies') }}</span>
                         </div>
-                        <div class="float-right">
+                        <!-- <div class="float-right">
                             <a class="btn btn-primary btn-sm" href="{{ route('resource-skills.create', ['id' => $resource->id]) }}"> {{ __('Add Skill') }}</a>
-                        </div>
+                        </div> -->
                     </div>
 
                     <div class="card-body bg-white">

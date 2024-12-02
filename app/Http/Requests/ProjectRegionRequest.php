@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ResourceRequest extends FormRequest
+class ProjectRegionRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,8 @@ class ResourceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'full_name' => 'string',
-            'empowerID' => 'string',
-            'adID' => 'string',
-            'location_id' => 'required|integer',
-            'skills' => 'required|json',
+			'project_id' => 'required',
+			'region_id' => 'required',
         ];
     }
 }

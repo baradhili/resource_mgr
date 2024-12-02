@@ -11,10 +11,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property $full_name
  * @property $empowerID
  * @property $adID
+ * @property $resource_type
+ * @property $baseAvailability
+ * @property $region_id
+ * @property $location_id
  *
  * @property Allocation[] $allocations
  * @property Contract[] $contracts
  * @property Leave[] $leaves
+ * @property ResourceSkill[] $skills
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
@@ -29,7 +34,6 @@ class Resource extends Model
      * @var array<int, string>
      */
     protected $fillable = ['full_name', 'empowerID', 'adID'];
-
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -55,4 +59,29 @@ class Resource extends Model
         return $this->hasMany(\App\Models\Leave::class, 'resources_id', 'id');
     }
     
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function skills()
+    {
+        return $this->belongsToMany(\App\Models\Skill::class, 'resource_skill', 'resources_id', 'skills_id');
+    }
+    
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function region()
+    {
+        return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id')->withDefault();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function location()
+    {
+        return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id')->withDefault();
+    }
+    
 }
+

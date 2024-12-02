@@ -11,6 +11,7 @@ use App\Models\Leave;
 use App\Models\Resource;
 use App\Models\ResourceSkill;
 use App\Models\Skill;
+use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -124,7 +125,7 @@ class ResourceController extends Controller
         Cache::put('resourceAvailability', $resourceAvailability, now()->addDays(1));
 
         //return to the view
-        return view('resource.index', compact('resources', 'resourceAvailability','nextTwelveMonths'))
+        return view('resource.index', compact('resources', 'resourceAvailability', 'nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
 
@@ -134,8 +135,31 @@ class ResourceController extends Controller
     public function create(): View
     {
         $resource = new Resource();
+        $locations = Location::all();
+        return view('resource.create', compact('resource', 'locations'));
+    }
 
-        return view('resource.create', compact('resource'));
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id): View
+    {
+        $resource = Resource::with('location')->find($id);
+        $locations = Location::all();
+        $skills = Skill::all()->map(function ($skill) {
+            return [
+                'value' => $skill->id,
+                'name' => $skill->skill_name,
+            ];
+        })->toArray();
+        $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
+            ->with('skill')
+            ->get();
+        // Log::info("resource: " . json_encode($resource));
+        // Log::info("resourceSkills: " . json_encode($resourceSkills));
+        Log::info("all skills: " . json_encode($skills));
+        return view('resource.edit', compact('resource', 'locations', 'skills', 'resourceSkills'));
     }
 
     /**
@@ -154,12 +178,12 @@ class ResourceController extends Controller
      */
     public function show($id): View
     {
-        $resource = Resource::find($id);
+        $resource = Resource::with('location')->find($id);
 
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resources_id', $id)
             ->select('skills_id', 'proficiency_levels')
-            ->pluck( 'proficiency_levels', 'skills_id')
+            ->pluck('proficiency_levels', 'skills_id')
             ->toArray();
 
         $skills = Skill::whereIn('id', array_keys($resourceSkills))->get(['id', 'skill_name']);
@@ -170,7 +194,7 @@ class ResourceController extends Controller
             ];
         }
         $skills = $resourceSkills;
-        
+
         return view('resource.show', compact('resource', 'skills'));
     }
 
@@ -219,25 +243,48 @@ class ResourceController extends Controller
                     $allocationArray[$project->id]['allocation'][$key] = $totalAllocation;
                 }
             }
-            
+
         }
 
         $projectIds = array_keys($allocationArray);
         $projects = Project::whereIn('id', $projectIds)->get();
 
-// Log::info("resource: {$resource->name} has allocated projects: " . print_r($allocationArray,true));
+        // Log::info("resource: {$resource->name} has allocated projects: " . print_r($allocationArray,true));
 
-        return view('resource.allocations', compact('resource', 'allocationArray','projects', 'nextTwelveMonths'));
+        return view('resource.allocations', compact('resource', 'allocationArray', 'projects', 'nextTwelveMonths'));
     }
 
-  
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(ResourceRequest $request, Resource $resource): RedirectResponse
     {
-        $resource->update($request->validated());
+        // Log::info("input skills: " . $request->validated()['skills']);
+        // Parse the input skills
+        $skillsData = [];
+        foreach (json_decode($request->validated()['skills'], true) as $skill) {
+            $skillsData[$skill['id']] = [
+                'proficiency_levels' => $skill['proficiency'],
+            ];
+        }
+
+        // Update resource details
+        $resource->full_name = $request->validated()['full_name'];
+        $resource->empowerID = $request->validated()['empowerID'];
+        $resource->adID = $request->validated()['adID'];
+        $resource->location_id = $request->validated()['location_id'];
+        $location = Location::find($request->validated()['location_id']);
+        $resource->region_id = $location->region_id;
+
+        $resource->save();
+
+        // Synchronize ResourceSkill entries
+        $resource->skills()->sync($skillsData);
+
+        // $resourceSkills = ResourceSkill::where('resources_id', $resource->id)->get();
+        // Log::info("resourceskills-after: " . json_encode($resourceSkills));
 
         return Redirect::route('resources.index')
             ->with('success', 'Resource updated successfully');

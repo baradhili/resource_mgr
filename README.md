@@ -21,14 +21,14 @@ Its early stages right now, we are looking for help in:
 - [X] Collect skill list
 - [X] Add skills to a resource
 - [X] Add teams and privileges etc
-- [ ] Manual Demand collection (inc business need, funding etc)
-- [ ] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
+- [X] Manual Demand collection (inc business need, funding etc)
+- [X] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
 - [ ] Differentiate manual demand from uploads so we don't delete the wrong stuff
 - [ ] Allow editing of manual demand, but not uploaded
 - [ ] Provide rest of skills allocation crud
 - [ ] Surely there is a decent dashboard with tile system that works easily (spatie/laravel-dashboard seems to have a very specific use case)
 - [X] Do something with top nav bar
-- [ ] Add region/office to a resource so we can do bulk leave
+- [X] Add region/office to a resource so we can do bulk leave
 - [ ] Bulk add leave aka public holidays - to people in a region
 
 Yes it is currently Laravel 10 based, not 11. Bleading edge, especially for major changes is not my thing.

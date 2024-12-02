@@ -45,8 +45,18 @@
 
         <div class="form-group mb-2 mb20">
             <label for="status" class="form-label">{{ __('Status') }}</label>
-            <input type="text" name="status" class="form-control @error('status') is-invalid @enderror"
-                value="{{ old('status', $demand?->status) }}" id="status" placeholder="Status">
+            <select name="status" class="form-control @error('status') is-invalid @enderror" id="status">
+                <option value="">{{ __('Select a Status') }}</option>
+                <option value="Proposed" @if(old('status', $demand?->status) == 'Proposed') selected @endif>
+                    {{ __('Proposed') }}
+                </option>
+                <option value="Committed" @if(old('status', $demand?->status) == 'Committed') selected @endif>
+                    {{ __('Committed') }}
+                </option>
+                <option value="Manual" @if(old('status', $demand?->status) == 'Manual') selected @endif>
+                    {{ __('Manual') }}
+                </option>
+            </select>
             {!! $errors->first('status', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
 
