@@ -61,21 +61,14 @@
             // Initialize Tagify
             var input = document.querySelector('#skills');
             var tagify = new Tagify(input, {
-                whitelist: [
-                    @foreach ($skills as $skill)
-                        {
-                            value: "{{ $skill->id }}",
-                            name: "{{ $skill->skill_name }}"
-                        },
-                    @endforeach
-                ],
+                whitelist: @json($skills),
                 editTags: {
                     clicks: 2, // single click to edit a tag
                     keepInvalid: false // if after editing, tag is invalid, auto-revert
                 },
                 enforceWhitelist: true,
                 dropdown: {
-                    enabled: 2,
+                    enabled: 0,
                     maxItems: 20,
                     closeOnSelect: true,
                     highlightFirst: true,
@@ -160,8 +153,9 @@
                 input.value = JSON.stringify(skillsData);
                 //this.submit();
             });
-
         });
+            
+            
     </script>
 </div>
 </div>

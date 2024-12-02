@@ -34,7 +34,7 @@ class UpcomingDemand extends AbstractWidget
                 'monthName' => $date->format('F'),
             ];
         }
-        
+
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addMonths(3)->startOfMonth();
@@ -101,9 +101,6 @@ class UpcomingDemand extends AbstractWidget
             $yearMonthSums[$yearMonthShortName] = $sum;
             unset($yearMonthSums[$yearMonth]);
         }
-
-        Log::info('yearMonthSums'.json_encode($yearMonthSums));
-
 
         return view('widgets.upcoming_demand', [
             'config' => $this->config,

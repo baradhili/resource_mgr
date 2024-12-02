@@ -147,13 +147,18 @@ class ResourceController extends Controller
     {
         $resource = Resource::with('location')->find($id);
         $locations = Location::all();
-        $skills = Skill::all();
+        $skills = Skill::all()->map(function ($skill) {
+            return [
+                'value' => $skill->id,
+                'name' => $skill->skill_name,
+            ];
+        })->toArray();
         $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
             ->with('skill')
             ->get();
         // Log::info("resource: " . json_encode($resource));
         // Log::info("resourceSkills: " . json_encode($resourceSkills));
-        // Log::info("all skills: " . json_encode($skills));
+        Log::info("all skills: " . json_encode($skills));
         return view('resource.edit', compact('resource', 'locations', 'skills', 'resourceSkills'));
     }
 
