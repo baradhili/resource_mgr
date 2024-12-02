@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->string('empowerID', 10)->nullable();
+            $table->string('empowerID', 20)->nullable();
             $table->string('name')->nullable();
             $table->string('projectManager', 45)->nullable();
             $table->enum('status', ['Proposed', 'Active', 'Cancelled', 'Completed', 'On Hold', 'Prioritised'])->nullable();

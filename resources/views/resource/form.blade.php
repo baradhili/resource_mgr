@@ -75,9 +75,9 @@
                 },
                 enforceWhitelist: true,
                 dropdown: {
-                    enabled: 2, 
+                    enabled: 2,
                     maxItems: 20,
-                    closeOnSelect: true, 
+                    closeOnSelect: true,
                     highlightFirst: true,
                     searchKeys: ["name"]
                 },
@@ -127,23 +127,39 @@
                     dialog.querySelector('select').value = tagData.proficiency;
                     dialog.showModal();
 
-                    document.getElementById('saveProficiency').addEventListener('click', function(e) {
+                    document.getElementById('saveProficiency').addEventListener('click', function(
+                    e) {
                         e.preventDefault();
                         const dialog = document.getElementById('editProficiencyDialog');
                         const selectedProficiency = dialog.querySelector('select').value;
                         tagData.proficiency = selectedProficiency;
-                        tagElm.querySelector('.tagify__tag-text').innerText = `${tagData.name} - ${selectedProficiency}`;
+                        tagElm.querySelector('.tagify__tag-text').innerText =
+                            `${tagData.name} - ${selectedProficiency}`;
                         dialog.close();
                     })
 
-                    document.getElementById('cancelProficiency').addEventListener('click', function(e) {
+                    document.getElementById('cancelProficiency').addEventListener('click', function(
+                        e) {
                         e.preventDefault();
                         const dialog = document.getElementById('editProficiencyDialog');
                         dialog.close();
                     })
-                    
+
                 }, 200);
             })
+            // Handle form submission to include proficiency in the skills input
+            $('form').on('submit', function(e) {
+                e.preventDefault();
+                var skillsData = tagify.value.map(tag => {
+                    return {
+                        id: tag.value,
+                        proficiency: tag.proficiency || 'Unknown'
+                    };
+                });
+                console.log(skillsData);
+                input.value = JSON.stringify(skillsData);
+                //this.submit();
+            });
 
         });
     </script>
