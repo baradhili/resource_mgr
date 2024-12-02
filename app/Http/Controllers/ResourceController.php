@@ -261,15 +261,16 @@ class ResourceController extends Controller
      */
     public function update(ResourceRequest $request, Resource $resource): RedirectResponse
     {
-        Log::info("skills: ".$request->validated()['skills']);
-        $skills = [];
+        // Log::info("input skills: " . $request->validated()['skills']);
+        // Parse the input skills
+        $skillsData = [];
         foreach (json_decode($request->validated()['skills'], true) as $skill) {
-            $skills[] = [
-                'skills_id' => $skill['id'],
+            $skillsData[$skill['id']] = [
                 'proficiency_levels' => $skill['proficiency'],
             ];
         }
 
+        // Update resource details
         $resource->full_name = $request->validated()['full_name'];
         $resource->empowerID = $request->validated()['empowerID'];
         $resource->adID = $request->validated()['adID'];
@@ -279,21 +280,11 @@ class ResourceController extends Controller
 
         $resource->save();
 
-        $resourceSkills = ResourceSkill::where('resources_id', $resource->id)->get();
-        Log::info("resourceskills: ".json_encode($resourceSkills));
+        // Synchronize ResourceSkill entries
+        $resource->skills()->sync($skillsData);
 
-        $resourceSkillsArray = array_map(function ($skill) use ($resource) {
-            return [
-                'resources_id' => $resource->id,
-                'skills_id' => $skill['skills_id'],
-                'proficiency_levels' => $skill['proficiency_levels'],
-            ];
-        }, $skills);
-
-       
-
-        $resourceSkills = ResourceSkill::where('resources_id', $resource->id)->get();
-        Log::info("resourceskills-after: ".json_encode($resourceSkills));
+        // $resourceSkills = ResourceSkill::where('resources_id', $resource->id)->get();
+        // Log::info("resourceskills-after: " . json_encode($resourceSkills));
 
         return Redirect::route('resources.index')
             ->with('success', 'Resource updated successfully');

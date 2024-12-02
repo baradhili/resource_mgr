@@ -77,16 +77,16 @@
                 templates: {
                     tag: function(tagData, tagify) {
                         return `<tag title="${tagData.name}" contenteditable='false' spellcheck="false" class='tagify__tag ${tagData.class ? tagData.class : ""}' ${this.getAttributes(tagData)}>
-                                <x title='' class='tagify__tag__removeBtn' role='button' aria-label='remove tag'></x>
-                                <div>
-                                    <span class='tagify__tag-text'>${tagData.name} - ${tagData.proficiency}</span>
-                                </div>
-                            </tag>`;
+                            <x title='' class='tagify__tag__removeBtn' role='button' aria-label='remove tag'></x>
+                            <div>
+                                <span class='tagify__tag-text'>${tagData.name} - ${tagData.proficiency}</span>
+                            </div>
+                        </tag>`;
                     },
                     dropdownItem: function(tagData, tagify) {
                         return `<div ${this.getAttributes(tagData)} class='tagify__dropdown__item ${tagData.class ? tagData.class : ""}'>
-                                ${tagData.name}
-                            </div>`;
+                            ${tagData.name}
+                        </div>`;
                     }
                 }
             });
@@ -111,7 +111,7 @@
                 } = e.detail;
 
                 // a delay is needed to distinguish between regular click and double-click.
-                // this allows enough time for a possible double-click, and noly fires if such
+                // this allows enough time for a possible double-click, and only fires if such
                 // did not occur.
                 clearTimeout(clickDebounce);
                 clickDebounce = setTimeout(() => {
@@ -121,7 +121,7 @@
                     dialog.showModal();
 
                     document.getElementById('saveProficiency').addEventListener('click', function(
-                    e) {
+                        e) {
                         e.preventDefault();
                         const dialog = document.getElementById('editProficiencyDialog');
                         const selectedProficiency = dialog.querySelector('select').value;
@@ -129,17 +129,29 @@
                         tagElm.querySelector('.tagify__tag-text').innerText =
                             `${tagData.name} - ${selectedProficiency}`;
                         dialog.close();
-                    })
+                        // Update the tagify value
+                        tagify.value = tagify.value.map(tag => {
+                            if (tag.value === tagData.value) {
+                                return {
+                                    value: tag.value,
+                                    name: tag.name,
+                                    proficiency: tagData.proficiency
+                                };
+                            }
+                            return tag;
+                        });
+                    });
 
                     document.getElementById('cancelProficiency').addEventListener('click', function(
                         e) {
                         e.preventDefault();
                         const dialog = document.getElementById('editProficiencyDialog');
                         dialog.close();
-                    })
+                    });
 
                 }, 200);
-            })
+            });
+
             // Handle form submission to include proficiency in the skills input
             $('form').on('submit', function(e) {
                 e.preventDefault();
@@ -149,13 +161,12 @@
                         proficiency: tag.proficiency || 'Unknown'
                     };
                 });
-                console.log(skillsData);
+                //console.log('Tagify Value:', tagify.value);
+                //console.log('Skills Data:', skillsData);
                 input.value = JSON.stringify(skillsData);
-                //this.submit();
+                this.submit(); // Submit the form after setting the value
             });
         });
-            
-            
     </script>
-</div>
+
 </div>

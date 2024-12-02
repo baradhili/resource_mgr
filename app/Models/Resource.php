@@ -60,11 +60,11 @@ class Resource extends Model
     }
     
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function skills()
     {
-        return $this->hasMany(\App\Models\ResourceSkill::class, 'resources_id', 'id');
+        return $this->belongsToMany(\App\Models\Skill::class, 'resource_skill', 'resources_id', 'skills_id');
     }
     
     /**
