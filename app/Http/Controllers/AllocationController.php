@@ -196,8 +196,18 @@ class AllocationController extends Controller
                         if ($columnLetter >= 'D' && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
-                            Allocation::where('allocation_date', '=',$monthDate)->delete();
-                            Demand::where('demand_date', '=',$monthDate)->delete();
+                            Allocation::where('allocation_date', '=',$monthDate)
+                            ->where(function ($query) {
+                                $query->where('source', '=', 'Imported')
+                                    ->orWhereNull('source');
+                            })
+                            ->delete();
+                            Demand::where('demand_date', '=',$monthDate)
+                            ->where(function ($query) {
+                                $query->where('source', '=', 'Imported')
+                                    ->orWhereNull('source');
+                            })
+                            ->delete();
                         }
                     }
                     // Log::info("months " . print_r($monthYear, true));
@@ -206,7 +216,7 @@ class AllocationController extends Controller
                     continue;
                 } elseif ($rowData['B'] != null) { //ignore empty lines
                     $resourceName = $rowData['A'] ?? $resourceName;
-                    if (strpos($resourceName, 'rchitect') == false) {
+                    if (strpos($resourceName, 'rchitect') == false) { //TODO: make this part of Team
 
                         $resource = Resource::where('empowerID', $resourceName)->first();
                         $resourceID = $resource->id ?? null;
@@ -279,7 +289,8 @@ class AllocationController extends Controller
                                     [
                                         'fte' => $fte,
                                         'status' => 'Proposed', // or any other default status you want to set
-                                        'resource_type' => $resourceName
+                                        'resource_type' => $resourceName,
+                                        'source' => 'Imported'
                                     ]
                                 );
 

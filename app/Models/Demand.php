@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property $status
  * @property $resource_type
  * @property $projects_id
+ * @property $source
  * @property $created_at
  * @property $updated_at
  *
@@ -30,7 +31,7 @@ class Demand extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['demand_date', 'fte', 'status', 'resource_type','projects_id'];
+    protected $fillable = ['demand_date', 'fte', 'status', 'resource_type','projects_id', 'source'];
 
 
     /**
