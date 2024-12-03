@@ -10,10 +10,19 @@ use Illuminate\Database\Eloquent\Model;
  * @property $id
  * @property $skill_name
  * @property $skill_description
- * @property $sfia_code
- * @property $sfia_level
  * @property $created_at
  * @property $updated_at
+ * @property $context
+ * @property $employers
+ * @property $keywords
+ * @property $category
+ * @property $certifications
+ * @property $occupations
+ * @property $license
+ * @property $derived_from
+ * @property $source_id
+ * @property $type
+ * @property $authors
  *
  * @property ResourceSkill[] $resourceSkills
  * @package App
@@ -29,15 +38,15 @@ class Skill extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['skill_name', 'skill_description', 'sfia_code', 'sfia_level'];
+    protected $fillable = ['skill_name', 'skill_description', 'context', 'employers', 'keywords', 'category', 'certifications', 'occupations', 'license', 'derived_from', 'source_id', 'type', 'authors'];
 
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function resources()
+    public function resourceSkills()
     {
-        return $this->belongsToMany(\App\Models\Resource::class, 'resource_skill', 'skill_id', 'resources_id');
+        return $this->hasMany(\App\Models\ResourceSkill::class, 'id', 'skills_id');
     }
     
 }

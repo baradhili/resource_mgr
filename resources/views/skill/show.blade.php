@@ -29,12 +29,48 @@
                                     {{ $skill->skill_description }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Sfia Code:</strong>
-                                    {{ $skill->sfia_code }}
+                                    <strong>Context:</strong>
+                                    {{ $skill->context }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Sfia Level:</strong>
-                                    {{ $skill->sfia_level }}
+                                    <strong>Employers:</strong>
+                                    {{ $skill->employers }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Keywords:</strong>
+                                    {{ $skill->keywords }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Category:</strong>
+                                    {{ $skill->category }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Certifications:</strong>
+                                    {{ $skill->certifications }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Occupations:</strong>
+                                    {{ $skill->occupations }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>License:</strong>
+                                    {{ $skill->license }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Derived From:</strong>
+                                    {{ $skill->derived_from }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Source Id:</strong>
+                                    {{ $skill->source_id }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Type:</strong>
+                                    {{ $skill->type }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Authors:</strong>
+                                    {{ $skill->authors }}
                                 </div>
 
                     </div>

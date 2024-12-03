@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('projects', ProjectController::class); 
     Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
     Route::resource('resources', ResourceController::class);
+    Route::post('/skills/upload', [SkillController::class, 'importRsd'])->name('skills.upload');
     Route::resource('skills', SkillController::class);
     Route::resource('resource-skills', ResourceSkillController::class);
     Route::get('/users/profile', [UserController::class, 'profile'])->name('users.profile');

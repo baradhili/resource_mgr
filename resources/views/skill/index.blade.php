@@ -16,11 +16,38 @@
                                 {{ __('Skills') }}
                             </span>
 
-                             <div class="float-right">
-                                <a href="{{ route('skills.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
+                            <div class="float-right">
+                                <button type="button" class="btn btn-primary btn-sm float-right" onclick="openDialog()">
+                                    {{ __('Upload') }}
+                                </button>
+                                <script>
+                                    function openDialog() {
+                                        document.getElementById('uploadDialog').showModal();
+                                    }
+                                    function closeDialog() {
+                                        document.getElementById('uploadDialog').close();
+                                    }
+                                </script>
+                                <dialog id="uploadDialog">
+                                    <form action="{{ route('skills.upload') }}" method="POST"
+                                        enctype="multipart/form-data">
+                                        @csrf
+                                        <h2>{{ __('Upload File') }}</h2>
+                                        <div class="form-group">
+                                            <input type="file" name="files[]" class="form-control-file" required multiple>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                onclick="closeDialog()">{{ __('Close') }}</button>
+                                            <button type="submit" class="btn btn-primary">{{ __('Upload') }}</button>
+                                        </div>
+                                    </form>
+                                </dialog>
+                                <a href="{{ route('skills.create') }}" class="btn btn-primary btn-sm float-right"
+                                    data-placement="left">
+                                    {{ __('Create New') }}
                                 </a>
-                              </div>
+                            </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -35,11 +62,20 @@
                                 <thead class="thead">
                                     <tr>
                                         <th>No</th>
-                                        
-									<th >Skill Name</th>
-									<th >Skill Description</th>
-									<th >Sfia Code</th>
-									<th >Sfia Level</th>
+
+                                        <th>Skill Name</th>
+                                        <th>Skill Description</th>
+                                        <!-- <th >Context</th>
+             <th >Employers</th>
+             <th >Keywords</th>
+             <th >Category</th>
+             <th >Certifications</th>
+             <th >Occupations</th>
+             <th >License</th>
+             <th >Derived From</th>
+             <th >Source Id</th>
+             <th >Type</th>
+             <th >Authors</th> -->
 
                                         <th></th>
                                     </tr>
@@ -48,19 +84,34 @@
                                     @foreach ($skills as $skill)
                                         <tr>
                                             <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $skill->skill_name }}</td>
-										<td >{{ $skill->skill_description }}</td>
-										<td >{{ $skill->sfia_code }}</td>
-										<td >{{ $skill->sfia_level }}</td>
+
+                                            <td>{{ $skill->skill_name }}</td>
+                                            <td>{{ $skill->skill_description }}</td>
+                                            <!-- <td >{{ $skill->context }}</td>
+              <td >{{ $skill->employers }}</td>
+              <td >{{ $skill->keywords }}</td>
+              <td >{{ $skill->category }}</td>
+              <td >{{ $skill->certifications }}</td>
+              <td >{{ $skill->occupations }}</td>
+              <td >{{ $skill->license }}</td>
+              <td >{{ $skill->derived_from }}</td>
+              <td >{{ $skill->source_id }}</td>
+              <td >{{ $skill->type }}</td>
+              <td >{{ $skill->authors }}</td> -->
 
                                             <td>
                                                 <form action="{{ route('skills.destroy', $skill->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('skills.show', $skill->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('skills.edit', $skill->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                    <a class="btn btn-sm btn-primary "
+                                                        href="{{ route('skills.show', $skill->id) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success"
+                                                        href="{{ route('skills.edit', $skill->id) }}"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
                                                 </form>
                                             </td>
                                         </tr>
