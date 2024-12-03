@@ -121,6 +121,7 @@ class DemandController extends Controller
         $demand->resource_type = '';
         $demand->fte = 0.00;
         $demand->projects_id = null;
+        $demand->source = 'Manual';
 
         $projects = Project::all();
 
@@ -194,7 +195,8 @@ class DemandController extends Controller
             $allocation->resources_id = $request->resource_id;
             $allocation->fte = $demand->fte;
             $allocation->projects_id = $demand->projects_id;
-            $allocation->status = "Proposed";
+            $allocation->status = $demand->status;
+            $allocation->source = $demand->source;
             $allocation->save();
 
             $demand->delete();

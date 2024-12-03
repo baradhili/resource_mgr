@@ -10,25 +10,26 @@ Its early stages right now, we are looking for help in:
 * CRUD expansion, I am only updating cruds as I need them
 * fancy alogrithms - there are a bunch like controlled annealing to allow some automation in resource allocation, it would be nice to have.
 
+## Features
+
+    - Manage Resources: contracts, leave, skills
+    - Receive Demands for resources and allocate them accordingly
+    - View allocations of resources and if necessary remove resources from projects (puts the demand back into the pool)
+    - Create a Service catalogue with associates required skills and estimated effort
+
 ## Next steps
 
-- [X] Allocation view per resource
-- [X] Demand view to see if there are multiple resource requests
 - [ ] Split out some hard coded things into env or a settings table
-- [X] Assign demand to a resource
-- [X] De-assign a project back to demand
-- [X] Some kind of nicer dashboard
-- [X] Collect skill list
-- [X] Add skills to a resource
-- [X] Add teams and privileges etc
-- [X] Manual Demand collection (inc business need, funding etc)
+- [ ] Update Allocations view to show percent of availablity
 - [X] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
 - [ ] Differentiate manual demand from uploads so we don't delete the wrong stuff
 - [ ] Allow editing of manual demand, but not uploaded
-- [ ] Provide rest of skills allocation crud
-- [ ] Surely there is a decent dashboard with tile system that works easily (spatie/laravel-dashboard seems to have a very specific use case)
-- [X] Do something with top nav bar
-- [X] Add region/office to a resource so we can do bulk leave
 - [ ] Bulk add leave aka public holidays - to people in a region
+- [ ] Make calendar controls consistent
+- [ ] Set up teams 
+- [ ] Filter multiple views/permissions by Team
+- [ ] Create a "Senior Manager" role that might oversee one or more Teams
+- [ ] Update User admin to assign the user into various function roles such as "Resource", "Team Owner", etc
+- [ ] Add ability to release demand from a resource from a date (to handle exits)
 
 Yes it is currently Laravel 10 based, not 11. Bleading edge, especially for major changes is not my thing.
