@@ -34,7 +34,8 @@
                                         @csrf
                                         <h2>{{ __('Upload File') }}</h2>
                                         <div class="form-group">
-                                            <input type="file" name="files[]" class="form-control-file" required multiple>
+                                            <input type="file" name="files[]" class="form-control-file" required multiple
+                                                accept=".json">
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"

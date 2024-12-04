@@ -29,48 +29,37 @@
                                     {{ $skill->skill_description }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Context:</strong>
-                                    {{ $skill->context }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Employers:</strong>
-                                    {{ $skill->employers }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Keywords:</strong>
-                                    {{ $skill->keywords }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
                                     <strong>Category:</strong>
                                     {{ $skill->category }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
+                                    <strong>Keywords:</strong>
+                                    {{ implode(', ', json_decode($skill->keywords)) }}
+                                </div>
+                                
+                                <div class="form-group mb-2 mb20">
                                     <strong>Certifications:</strong>
                                     {{ $skill->certifications }}
                                 </div>
-                                <div class="form-group mb-2 mb20">
+                                <!-- <div class="form-group mb-2 mb20">
                                     <strong>Occupations:</strong>
-                                    {{ $skill->occupations }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
+                                    {{ implode(', ', array_column(json_decode($skill->occupations), 'targetNodeName')) }}
+                                </div> -->
+                                <!-- <div class="form-group mb-2 mb20">
                                     <strong>License:</strong>
                                     {{ $skill->license }}
-                                </div>
+                                </div> -->
                                 <div class="form-group mb-2 mb20">
                                     <strong>Derived From:</strong>
-                                    {{ $skill->derived_from }}
+                                    <a href="{{ json_decode($skill->derived_from)->id }}" target="_blank">{{ json_decode($skill->derived_from)->author }}</a>
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Source Id:</strong>
-                                    {{ $skill->source_id }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Type:</strong>
-                                    {{ $skill->type }}
+                                    <a href="{{ $skill->source_id }}" target="_blank">{{ $skill->source_id }}</a>
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Authors:</strong>
-                                    {{ $skill->authors }}
+                                    {{ implode(', ', json_decode($skill->authors)) }}
                                 </div>
 
                     </div>
