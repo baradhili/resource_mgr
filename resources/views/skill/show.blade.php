@@ -29,12 +29,37 @@
                                     {{ $skill->skill_description }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Sfia Code:</strong>
-                                    {{ $skill->sfia_code }}
+                                    <strong>Category:</strong>
+                                    {{ $skill->category }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Sfia Level:</strong>
-                                    {{ $skill->sfia_level }}
+                                    <strong>Keywords:</strong>
+                                    {{ implode(', ', json_decode($skill->keywords)) }}
+                                </div>
+                                
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Certifications:</strong>
+                                    {{ $skill->certifications }}
+                                </div>
+                                <!-- <div class="form-group mb-2 mb20">
+                                    <strong>Occupations:</strong>
+                                    {{ implode(', ', array_column(json_decode($skill->occupations), 'targetNodeName')) }}
+                                </div> -->
+                                <!-- <div class="form-group mb-2 mb20">
+                                    <strong>License:</strong>
+                                    {{ $skill->license }}
+                                </div> -->
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Derived From:</strong>
+                                    <a href="{{ json_decode($skill->derived_from)->id }}" target="_blank">{{ json_decode($skill->derived_from)->author }}</a>
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Source Id:</strong>
+                                    <a href="{{ $skill->source_id }}" target="_blank">{{ $skill->source_id }}</a>
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Authors:</strong>
+                                    {{ implode(', ', json_decode($skill->authors)) }}
                                 </div>
 
                     </div>

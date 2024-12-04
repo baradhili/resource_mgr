@@ -16,6 +16,7 @@ Its early stages right now, we are looking for help in:
     - Receive Demands for resources and allocate them accordingly
     - View allocations of resources and if necessary remove resources from projects (puts the demand back into the pool)
     - Create a Service catalogue with associates required skills and estimated effort
+    - Basic Skill library with imports using RSD
 
 ## Next steps
 

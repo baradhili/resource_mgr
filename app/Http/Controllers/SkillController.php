@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests\SkillRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+
 
 class SkillController extends Controller
 {
@@ -37,10 +41,7 @@ class SkillController extends Controller
      */
     public function store(SkillRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-        $validated['sfia_level'] = (int) $validated['sfia_level'];
-
-        Skill::create($validated);
+        Skill::create($request->validated());
 
         return Redirect::route('skills.index')
             ->with('success', 'Skill created successfully.');
@@ -84,4 +85,60 @@ class SkillController extends Controller
         return Redirect::route('skills.index')
             ->with('success', 'Skill deleted successfully');
     }
+
+    public function importRsd(Request $request)
+    {
+        // Validate the request
+        $validator = Validator::make($request->all(), [
+            'files.*' => 'required|file|mimes:json',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $files = $request->file('files');
+        $count = count($files);
+
+        foreach ($files as $file) {
+            // Get the file
+            $filePath = $file->getRealPath();
+
+            // Read and decode the JSON file
+            $json = File::get($filePath);
+            $data = json_decode($json, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json(['error' => 'Invalid JSON file'], 422);
+            }
+
+            // Map JSON data to Skill model attributes
+            $skillData = [
+                'id' => Str::uuid(),
+                'skill_name' => $data['skillName'],
+                'skill_description' => $data['skillStatement'],
+                'context' => $data['@context'],
+                'employers' => json_encode($data['employers']),
+                'keywords' => json_encode($data['keywords']),
+                'category' => $data['category'],
+                'certifications' => json_encode($data['certifications']),
+                'occupations' => json_encode($data['occupations']),
+                'license' => $data['license'],
+                'derived_from' => json_encode($data['derivedFrom']),
+                'source_id' => $data['id'],
+                'type' => $data['type'],
+                'authors' => json_encode([$data['author']]),
+            ];
+
+            // Create or update the skill in the database
+            Skill::updateOrCreate(
+                ['source_id' => $data['id']],
+                $skillData
+            );
+        }
+
+        return Redirect::route('skills.index')
+            ->with('success', "{$count} Skills imported successfully");
+    }
 }
+

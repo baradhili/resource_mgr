@@ -24,8 +24,12 @@ class SkillRequest extends FormRequest
         return [
 			'skill_name' => 'required|string',
 			'skill_description' => 'string',
-			'sfia_code' => 'string',
-            'sfia_level' => 'integer',
+			'context' => 'string',
+			'category' => 'string',
+			'license' => 'string',
+			'source_id' => 'string',
+			'type' => 'string',
+			'authors' => 'string',
         ];
     }
 }
