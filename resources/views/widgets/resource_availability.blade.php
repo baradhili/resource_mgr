@@ -6,7 +6,7 @@
 
         <div class="col-auto">
             <div class="stat text-primary">
-                <i class="align-middle" data-feather="battery"></i>
+                <x-feathericon-battery class="align-middle" />
             </div>
         </div>
     </div>

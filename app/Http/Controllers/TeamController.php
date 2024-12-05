@@ -75,8 +75,6 @@ Log::info("teams :".json_encode($teams));
             return ['value' => $user->id, 'name' => $user->name];
         })->toArray();
         
-        Log::info("team members: " . json_encode($team->members));
-        Log::info("users :" . json_encode($users));
         return view('team.edit', compact('team', 'users'));
     }
 
