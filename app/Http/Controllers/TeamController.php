@@ -84,6 +84,7 @@ Log::info("teams :".json_encode($teams));
     public function update(TeamRequest $request, Team $team): RedirectResponse
     {
 
+        Log::info("input: ".json_encode($request->all()));
         $team->update($request->validated());
 
         $existing_members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
