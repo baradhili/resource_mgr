@@ -21,7 +21,7 @@ class TeamController extends Controller
     {
         // $teams = Team::paginate();
         $teams = Team::with('owner')->paginate();
-
+Log::info("teams :".json_encode($teams));
         return view('team.index', compact('teams'))
             ->with('i', ($request->input('page', 1) - 1) * $teams->perPage());
     }
@@ -71,8 +71,10 @@ class TeamController extends Controller
             ->where('team_user.team_id', $team->id)
             ->get();
 
-        $users = User::all();
- 
+        $users = User::all()->map(function ($user) {
+            return ['value' => $user->id, 'name' => $user->name];
+        })->toArray();
+        
         return view('team.edit', compact('team', 'users'));
     }
 
@@ -82,6 +84,7 @@ class TeamController extends Controller
     public function update(TeamRequest $request, Team $team): RedirectResponse
     {
 
+        Log::info("input: ".json_encode($request->all()));
         $team->update($request->validated());
 
         $existing_members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
@@ -91,24 +94,8 @@ class TeamController extends Controller
 
         $members = [];
         $members_data = json_decode($request->input('members'), true);
-        foreach ($members_data as $member_data) {
-            $member_name = $member_data['value'];
-
-            $member = User::where('name', $member_name)->pluck('id')->first();
-            if ($member) {
-                Log::info("member: " . print_r($member, true));
-                \App\Models\TeamUser::firstOrCreate([
-                    'team_id' => $team->id,
-                    'user_id' => $member,
-                ]);
-                $members[] = $member;
-            }
-        }
-        $members_to_remove = array_diff($existing_members, $members);
-        foreach ($members_to_remove as $member_id) {
-            TeamUser::where('team_id', $team->id)->where('user_id', $member_id)->delete();
-        }
-
+        $members = array_column($members_data, 'value');
+        $team->users()->sync($members);
 
         return Redirect::route('teams.index')
             ->with('success', 'Team updated successfully');

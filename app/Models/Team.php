@@ -12,6 +12,7 @@ use Mpociot\Teamwork\TeamworkTeam;
  * @property $id
  * @property $owner_id
  * @property $name
+ * @property $resource_type
  * @property $created_at
  * @property $updated_at
  *
@@ -30,7 +31,7 @@ class Team extends TeamworkTeam
      *
      * @var array<int, string>
      */
-    protected $fillable = ['owner_id', 'name'];
+    protected $fillable = ['owner_id', 'name', 'resource_type'];
 
 
     /**

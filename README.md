@@ -26,8 +26,9 @@ Its early stages right now, we are looking for help in:
 - [ ] Differentiate manual demand from uploads so we don't delete the wrong stuff
 - [ ] Allow editing of manual demand, but not uploaded
 - [ ] Bulk add leave aka public holidays - to people in a region
-- [ ] Make calendar controls consistent
+- [X] Make calendar controls consistent
 - [ ] Set up teams 
+- [ ] Create Resource Type crud and link with teams
 - [ ] Filter multiple views/permissions by Team
 - [ ] Create a "Senior Manager" role that might oversee one or more Teams
 - [ ] Update User admin to assign the user into various function roles such as "Resource", "Team Owner", etc
