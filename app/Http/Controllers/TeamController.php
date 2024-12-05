@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\TeamUser;
+use App\Models\ResourceType;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\TeamRequest;
@@ -21,7 +22,7 @@ class TeamController extends Controller
     {
         // $teams = Team::paginate();
         $teams = Team::with('owner')->paginate();
-Log::info("teams :".json_encode($teams));
+
         return view('team.index', compact('teams'))
             ->with('i', ($request->input('page', 1) - 1) * $teams->perPage());
     }
@@ -32,8 +33,10 @@ Log::info("teams :".json_encode($teams));
     public function create(): View
     {
         $team = new Team();
-
-        return view('team.create', compact('team'));
+        $resource_types = ResourceType::all()->map(function ($resource_type) {
+            return ['name' => $resource_type->name];
+        })->toArray();
+        return view('team.create', compact('team', 'resource_types'));
     }
 
     /**
@@ -74,17 +77,21 @@ Log::info("teams :".json_encode($teams));
         $users = User::all()->map(function ($user) {
             return ['value' => $user->id, 'name' => $user->name];
         })->toArray();
-        
-        return view('team.edit', compact('team', 'users'));
+
+        $resource_types = ResourceType::all()->map(function ($resource_type) {
+            return ['name' => $resource_type->name];
+        })->toArray();
+
+        return view('team.edit', compact('team', 'users', 'resource_types'));
     }
 
-    /**
+    /** 
      * Update the specified resource in storage.
      */
     public function update(TeamRequest $request, Team $team): RedirectResponse
     {
 
-        Log::info("input: ".json_encode($request->all()));
+        Log::info("input: " . json_encode($request->all()));
         $team->update($request->validated());
 
         $existing_members = User::join('team_user', 'users.id', '=', 'team_user.user_id')

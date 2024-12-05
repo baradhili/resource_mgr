@@ -20,6 +20,7 @@ use App\Http\Controllers\TermsAndConditionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\ResourceTypeController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -82,6 +83,7 @@ Route::middleware('auth')->group(function () {
         Route::get('users/{userId}/delete', [App\Http\Controllers\UserController::class, 'destroy']);
         Route::resource('regions', RegionController::class);
         Route::resource('locations', LocationController::class);
+        Route::resource('resource-types', ResourceTypeController::class);
     });
 });
 

@@ -19,9 +19,15 @@
         </div>
         <div class="form-group mb-2 mb20">
             <label for="resource_type" class="form-label">{{ __('Resource Type') }}</label>
-            <input type="text" name="resource_type" class="form-control @error('resource_type') is-invalid @enderror"
-                value="{{ old('resource_type', $team?->resource_type) }}" id="resource_type"
-                placeholder="Resource Type">
+            <select name="resource_type" class="form-control @error('resource_type') is-invalid @enderror" id="resource_type">
+                <option value="">{{ __('Select a Resource Type') }}</option>
+                @foreach ($resource_types as $resource_type)
+                    <option value="{{ $resource_type['name'] }}"
+                        @if(old('resource_type', $team?->resource_type) == $resource_type['name']) selected @endif>
+                        {{ $resource_type['name'] }}
+                    </option>
+                @endforeach
+            </select>
             {!! $errors->first(
                 'resource_type',
                 '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>',
