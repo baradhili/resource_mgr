@@ -207,18 +207,18 @@ class AllocationController extends Controller
                         if ($columnLetter >= 'D' && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
-                            Allocation::where('allocation_date', '=', $monthDate)
-                                ->where(function ($query) {
-                                    $query->where('source', '=', 'Imported')
-                                        ->orWhereNull('source');
-                                })
-                                ->delete();
-                            Demand::where('demand_date', '=', $monthDate)
-                                ->where(function ($query) {
-                                    $query->where('source', '=', 'Imported')
-                                        ->orWhereNull('source');
-                                })
-                                ->delete();
+                            // Allocation::where('allocation_date', '=', $monthDate)
+                            //     ->where(function ($query) {
+                            //         $query->where('source', '=', 'Imported')
+                            //             ->orWhereNull('source');
+                            //     })
+                            //     ->delete();
+                            // Demand::where('demand_date', '=', $monthDate)
+                            //     ->where(function ($query) {
+                            //         $query->where('source', '=', 'Imported')
+                            //             ->orWhereNull('source');
+                            //     })
+                            //     ->delete();
                         }
                     }
                     // Log::info("months " . print_r($monthYear, true));

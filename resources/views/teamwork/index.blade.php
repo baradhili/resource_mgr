@@ -17,6 +17,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Status</th>
+                                    <th>Resource Type</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -31,6 +32,7 @@
                                                 <span class="label label-primary">Member</span>
                                             @endif
                                         </td>
+                                        <td >{{ $team->resource_type ?? 'N/A' }}</td>
                                         <td>
                                             @if(is_null(auth()->user()->currentTeam) || auth()->user()->currentTeam->getKey() !== $team->getKey())
                                                 <a href="{{route('teams.switch', $team)}}" class="btn btn-sm btn-default">

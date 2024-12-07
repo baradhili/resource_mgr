@@ -20,6 +20,12 @@ class TeamController extends Controller
      */
     public function index()
     {
+        /**
+         * old
+         *  $teams = Team::with('owner')->paginate();
+         *         return view('team.index', compact('teams'))
+         *             ->with('i', ($request->input('page', 1) - 1) * $teams->perPage());
+         */
         return view('teamwork.index')
             ->with('teams', auth()->user()->teams);
     }
@@ -31,6 +37,11 @@ class TeamController extends Controller
      */
     public function create()
     {
+        // old
+        // $resource_types = ResourceType::all()->map(function ($resource_type) {
+        //     return ['name' => $resource_type->name];
+        // })->toArray();
+        // return view('team.create', compact('team', 'resource_types'));
         return view('teamwork.create');
     }
 
@@ -56,6 +67,19 @@ class TeamController extends Controller
 
         return redirect(route('teams.index'));
     }
+
+     /**
+     * Display the specified resource.
+     */
+    // public function show($id): View
+    // {
+    //     $team = Team::with(['owner'])->find($id);
+    //     $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
+    //         ->where('team_user.team_id', $team->id)
+    //         ->get();
+
+    //     return view('team.show', compact('team'));
+    // }
 
     /**
      * Switch to the given team.
@@ -84,6 +108,19 @@ class TeamController extends Controller
      */
     public function edit($id)
     {
+        // $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
+        //     ->where('team_user.team_id', $team->id)
+        //     ->get();
+
+        // $users = User::all()->map(function ($user) {
+        //     return ['value' => $user->id, 'name' => $user->name];
+        // })->toArray();
+
+        // $resource_types = ResourceType::all()->map(function ($resource_type) {
+        //     return ['name' => $resource_type->name];
+        // })->toArray();
+
+        // return view('team.edit', compact('team', 'users', 'resource_types'));
         $teamModel = config('teamwork.team_model');
         $team = $teamModel::findOrFail($id);
 
@@ -103,6 +140,20 @@ class TeamController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // $team->update($request->validated());
+
+        // $existing_members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
+        //     ->where('team_user.team_id', $team->id)
+        //     ->pluck('id')
+        //     ->toArray();
+
+        // $members = [];
+        // $members_data = json_decode($request->input('members'), true);
+        // $members = array_column($members_data, 'value');
+        // $team->users()->sync($members);
+
+        // return Redirect::route('teams.index')
+        //     ->with('success', 'Team updated successfully');
         $request->validate([
             'name' => 'required|string',
         ]);
