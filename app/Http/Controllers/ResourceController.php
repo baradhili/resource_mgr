@@ -136,7 +136,16 @@ class ResourceController extends Controller
     {
         $resource = new Resource();
         $locations = Location::all();
-        return view('resource.create', compact('resource', 'locations'));
+        $skills = Skill::all()->map(function ($skill) {
+            return [
+                'value' => $skill->id,
+                'name' => $skill->skill_name,
+            ];
+        })->toArray();
+        $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
+            ->with('skill')
+            ->get();
+        return view('resource.create', compact('resource', 'locations', 'skills', 'resourceSkills'));
     }
 
 
@@ -215,7 +224,13 @@ class ResourceController extends Controller
             ];
         }
 
+        //hope that they have viewed the resources in the last day
+        $resourceAvailability = Cache::get('resourceAvailability');
+        //pick our resource out
+        $resourceAvailability = $resourceAvailability[$id]["availability"];
+
         $resource = Resource::find($id);
+
         $allocations = $resource->allocations()->get();
 
         $projects = $allocations->map(function ($allocation) {
@@ -238,9 +253,30 @@ class ResourceController extends Controller
                 // if ($totalAllocation !== null) Log::info(print_r($totalAllocation,true) . "Resource: {$resource->id} Date: {$monthStartDate} Project: {$project->id}");
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
+                // Get the availability for the current month
+                $availability = isset($resourceAvailability[$key]) ? (float)$resourceAvailability[$key] : 0.0;
+
+                
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
-                    $allocationArray[$project->id]['allocation'][$key] = $totalAllocation;
+                    // $allocationArray[$project->id]['allocation'][$key] = $totalAllocation;
+                // }
+                // Calculate the percentage allocation
+                    if ($availability > 0 && $totalAllocation !== null) {
+                        $percentageAllocation = ($totalAllocation / $availability) * 100;
+                        
+                        // Add the calculated percentage allocation to the resource availability array
+                        $allocationArray[$project->id]['allocation'][$key] = [
+                            'fte' => $totalAllocation,
+                            'percentage' => $percentageAllocation
+                        ];
+                    } else {
+                        // If no allocation or availability is zero, store the allocation as is
+                        $allocationArray[$project->id]['allocation'][$key] = [
+                            'fte' => -1 * $totalAllocation,
+                            'percentage' => 0.0
+                        ];
+                    }
                 }
             }
 

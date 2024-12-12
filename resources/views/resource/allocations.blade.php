@@ -45,7 +45,7 @@
                                                         '-' .
                                                         str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                                                     $demandFTE =
-                                                        $allocationArray[$project['id']]['allocation'][$monthKey] ??
+                                                        $allocationArray[$project['id']]['allocation'][$monthKey]['fte'] ??
                                                         '-';
                                                 @endphp
                                                 <td>{{ $demandFTE }}</td>
@@ -64,22 +64,21 @@
                                     @endforeach
 
                                     <tr>
-                                        <td> <strong>Total</strong> </td>
+                                        <td> <strong>Percent of availability allocated</strong> </td>
                                         @foreach ($nextTwelveMonths as $month)
                                             <td>
-                                                @php
-                                                    $sum = 0;
-                                                    foreach ($projects as $project) {
-                                                        $monthKey =
-                                                            $month['year'] .
-                                                            '-' .
-                                                            str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                                                        $sum +=
-                                                            $allocationArray[$project['id']]['allocation'][$monthKey] ??
-                                                            0;
-                                                    }
-                                                @endphp
-                                                <strong>{{ $sum }}</strong>
+                                            @php
+                                                $sumPercentage = 0;
+                                                foreach ($projects as $project) {
+                                                    $monthKey =
+                                                        $month['year'] .
+                                                        '-' .
+                                                        str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                                                    $sumPercentage +=
+                                                        $allocationArray[$project->id]['allocation'][$monthKey]['percentage'] ?? 0;
+                                                }
+                                            @endphp
+                                                <strong>{{ number_format($sumPercentage, 0) }}%</strong>
                                             </td>
                                         @endforeach
                                     </tr>

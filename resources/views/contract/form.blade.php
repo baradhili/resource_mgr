@@ -15,7 +15,11 @@
         </div>
         <div class="form-group mb-2 mb20">
             <label for="availability" class="form-label">{{ __('Availability') }}</label>
-            <input type="text" name="availability" class="form-control @error('availability') is-invalid @enderror" value="{{ old('availability', $contract?->availability) }}" id="availability" placeholder="Availability">
+            <input type="number" name="availability" class="form-control @error('availability') is-invalid @enderror" 
+            value="{{ old('availability', $contract?->availability) }}" id="availability" placeholder="Availability"
+            min="0" 
+        max="1" 
+        step="any">
             {!! $errors->first('availability', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">

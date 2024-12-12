@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use \avadim\FastExcelReader\Excel;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -63,6 +64,9 @@ class AllocationController extends Controller
                 ->where('end_date', '>=', now());
         })->paginate();
 
+        //Collect the availability
+        $resourceAvailability = Cache::get('resourceAvailability');
+        Log::info("availability: ".json_encode($resourceAvailability));
         // For each resource - find teh allocations for the period
         foreach ($resources as $resource) {
 
@@ -79,9 +83,17 @@ class AllocationController extends Controller
                 // Use year-month as the key
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
-                // Add the calculated base availability to the resource availability array - only if not zero
-                if ($totalAllocation > 0) {
-                    $resourceAllocation[$resource->id]['allocation'][$key] = $totalAllocation;
+                // Get the availability for the month
+                $availability = isset($resourceAvailability[$resource->id]['availability'][$key]) 
+                ? (float) $resourceAvailability[$resource->id]['availability'][$key] 
+                : 0;
+
+                // Calculate the percentage of total allocation divided by availability
+                $percentage = $availability > 0 ? ($totalAllocation / $availability) * 100 : 0;
+
+                // Add the calculated percentage to the resource allocation array
+                if ($percentage > 0) {
+                    $resourceAllocation[$resource->id]['allocation'][$key] = (int)$percentage;
                 }
             }
         }

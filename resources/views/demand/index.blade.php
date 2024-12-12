@@ -66,18 +66,15 @@
                                                 <td>{{ $demandFTE }}</td>
                                             @endforeach
                                             <td>
-                                                <form action="{{ route('demands.edit', $project->id) }}" method="GET"
-                                                    style="display: flex;"><select name="resource_id"
-                                                        class="form-control @error('resource_id') is-invalid @enderror"
-                                                        id="resource_id">
-                                                        <option value="">Select Resource</option>
-                                                        @foreach ($resources as $resource)
-                                                            <option value="{{ $resource->id }}">{{ $resource->full_name }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select><button type="submit" class="btn btn-sm btn-success"><i
-                                                            class="fa fa-fw fa-edit"></i> {{ __('Assign') }}</button>
-                                                </form>
+                                            <form action="{{ route('demands.edit', $project->id) }}" method="GET" style="display: flex;">
+    <select name="resource_id" class="form-control @error('resource_id') is-invalid @enderror" id="resource_id_{{ $project->id }}" onchange="toggleSubmitButton(this)">
+        <option value="">Select Resource</option>
+        @foreach ($resources as $resource)
+            <option value="{{ $resource->id }}">{{ $resource->full_name }}</option>
+        @endforeach
+    </select>
+    <button type="submit" class="btn btn-sm btn-success" id="assign_button_{{ $project->id }}" disabled><i class="fa fa-fw fa-edit"></i> {{ __('Assign') }}</button>
+</form>
                                                 <form action="{{ route('demands.destroy', $project->id) }}" method="POST">
                                                 <a class="btn btn-sm btn-primary "
                                                     href="{{ route('demands.show', $project->id) }}"><i
@@ -102,5 +99,27 @@
                 {!! $projects->withQueryString()->links() !!}
             </div>
         </div>
+        <script>
+function toggleSubmitButton(selectElement) {
+    var selectedValue = selectElement.value;
+    var buttonId = selectElement.id.replace('resource_id', 'assign_button');
+    var submitButton = document.getElementById(buttonId);
+    
+    // Check if a valid resource is selected
+    if (selectedValue !== "") {
+        submitButton.disabled = false;
+    } else {
+        submitButton.disabled = true;
+    }
+}
+
+// Optionally, call the function on page load to ensure the button is initially disabled
+window.onload = function() {
+    var selectElements = document.querySelectorAll('select[name="resource_id"]');
+    selectElements.forEach(function(selectElement) {
+        toggleSubmitButton(selectElement);
+    });
+};
+</script>
     </div>
 @endsection
