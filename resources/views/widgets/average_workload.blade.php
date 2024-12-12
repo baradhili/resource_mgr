@@ -1,4 +1,4 @@
-<div class="bg-secondary">
+<div >
     <div class="row">
         <div class="col mt-0">
             <h5 class="card-title">Average Workload</h5>
@@ -10,9 +10,9 @@
             </div>
         </div>
     </div>
-    <h1 class="mt-1 mb-3">95%</h1>
+    <h1 class="mt-1 mb-3">{{$currentMonthAverage}}%</h1>
     <div class="mb-0">
-        <span class="text-danger">-3.65%</span>
-        <span class="text-muted">Since last week</span>
+        <span class="text-danger">{{$delta}}</span>
+        <span class="text-muted">Since last month</span>
     </div>
 </div>
