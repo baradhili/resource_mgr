@@ -19,9 +19,16 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Services\CacheService;
 
 class ResourceController extends Controller
 {
+    protected $cacheService;
+
+    public function __construct(CacheService $cacheService)
+    {
+        $this->cacheService = $cacheService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -44,85 +51,93 @@ class ResourceController extends Controller
                 ->where('end_date', '>=', now());
         })->paginate();
 
-        foreach ($resources as $resource) {
-
-            $resourceAvailability[$resource->id] = [
-                'name' => $resource->full_name,
-            ];
-            $currentContract = $resource->contracts()->where('start_date', '<=', now())
-                ->where('end_date', '>=', now())
-                ->first();
-
-            if ($currentContract) {
-                // Calculate base availability for each month
-                $contractStartDate = Carbon::parse($currentContract->start_date);
-                $contractEndDate = Carbon::parse($currentContract->end_date);
-
-                foreach ($nextTwelveMonths as $month) {
-                    $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
-                    $monthEndDate = $monthStartDate->copy()->endOfMonth();
-
-                    if (
-                        $contractStartDate->isBetween($monthStartDate, $monthEndDate) ||
-                        $contractEndDate->isBetween($monthStartDate, $monthEndDate) ||
-                        ($contractStartDate->lessThanOrEqualTo($monthStartDate) && $contractEndDate->greaterThanOrEqualTo($monthEndDate))
-                    ) {
-                        // If the contract overlaps with the month, calculate availability
-                        if (
-                            $contractStartDate->isSameMonth($monthStartDate) ||
-                            $contractEndDate->isSameMonth($monthEndDate)
-                        ) {
-                            // If the contract start_date or end_date lands in this month, calculate the percentage of the month inside the contract
-                            $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
-                            $contractDaysInMonth = min($contractEndDate, $monthEndDate)->diffInDays(max($contractStartDate, $monthStartDate)) + 1;
-                            $baseAvailability = round(($contractDaysInMonth / $daysInMonth) * $currentContract->availability, 2);
-                        } else {
-                            // Otherwise, it will be the availability
-                            $baseAvailability = $currentContract->availability;
-                        }
-                        // Use year-month as the key
-                        $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-
-                        // Add the calculated base availability to the resource availability array
-                        $resourceAvailability[$resource->id]['availability'][$key] = $baseAvailability;
-                    }
-                    //now check for leave
-                    foreach ($resource->leaves as $leave) {
-                        $leaveStartDate = Carbon::parse($leave->start_date);
-                        $leaveEndDate = Carbon::parse($leave->end_date);
-
-                        if (
-                            $leaveStartDate->isBetween($monthStartDate, $monthEndDate) ||
-                            $leaveEndDate->isBetween($monthStartDate, $monthEndDate) ||
-                            ($leaveStartDate->lessThanOrEqualTo($monthStartDate) && $leaveEndDate->greaterThanOrEqualTo($monthEndDate))
-                        ) {
-                            // If the leave overlaps with the month, calculate availability
-                            if (
-                                $leaveStartDate->isSameMonth($monthStartDate) ||
-                                $leaveEndDate->isSameMonth($monthEndDate)
-                            ) {
-                                // If the leave start_date or end_date lands in this month, calculate the percentage of the month inside the leave
-                                $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
-                                $leaveDaysInMonth = min($leaveEndDate, $monthEndDate)->diffInDays(max($leaveStartDate, $monthStartDate)) + 1;
-                                $leaveAvailability = round(($leaveDaysInMonth / $daysInMonth) * 1.00, 2);
-                            } else {
-                                // Otherwise, it will be 100
-                                $leaveAvailability = 1.00;
-                            }
-                            // Use year-month as the key
-                            $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-
-                            // Add the calculated base availability to the resource availability array
-                            $resourceAvailability[$resource->id]['availability'][$key] = $resourceAvailability[$resource->id]['availability'][$key] - $leaveAvailability;
-
-                        }
-                    }
-                }
-            }
-
+        if (!Cache::has('resourceAvailability')) {
+            $this->cacheService->cacheResourceAvailability();
+            $resourceAvailability = Cache::get('resourceAvailability');
+        } else {
+            $resourceAvailability = Cache::get('resourceAvailability');
+            Log::info("data: ".json_encode($resourceAvailability));
         }
-        // Cache the resourceAvailability data
-        Cache::put('resourceAvailability', $resourceAvailability, now()->addDays(1));
+
+        // foreach ($resources as $resource) {
+
+        //     $resourceAvailability[$resource->id] = [
+        //         'name' => $resource->full_name,
+        //     ];
+        //     $currentContract = $resource->contracts()->where('start_date', '<=', now())
+        //         ->where('end_date', '>=', now())
+        //         ->first();
+
+        //     if ($currentContract) {
+        //         // Calculate base availability for each month
+        //         $contractStartDate = Carbon::parse($currentContract->start_date);
+        //         $contractEndDate = Carbon::parse($currentContract->end_date);
+
+        //         foreach ($nextTwelveMonths as $month) {
+        //             $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
+        //             $monthEndDate = $monthStartDate->copy()->endOfMonth();
+
+        //             if (
+        //                 $contractStartDate->isBetween($monthStartDate, $monthEndDate) ||
+        //                 $contractEndDate->isBetween($monthStartDate, $monthEndDate) ||
+        //                 ($contractStartDate->lessThanOrEqualTo($monthStartDate) && $contractEndDate->greaterThanOrEqualTo($monthEndDate))
+        //             ) {
+        //                 // If the contract overlaps with the month, calculate availability
+        //                 if (
+        //                     $contractStartDate->isSameMonth($monthStartDate) ||
+        //                     $contractEndDate->isSameMonth($monthEndDate)
+        //                 ) {
+        //                     // If the contract start_date or end_date lands in this month, calculate the percentage of the month inside the contract
+        //                     $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
+        //                     $contractDaysInMonth = min($contractEndDate, $monthEndDate)->diffInDays(max($contractStartDate, $monthStartDate)) + 1;
+        //                     $baseAvailability = round(($contractDaysInMonth / $daysInMonth) * $currentContract->availability, 2);
+        //                 } else {
+        //                     // Otherwise, it will be the availability
+        //                     $baseAvailability = $currentContract->availability;
+        //                 }
+        //                 // Use year-month as the key
+        //                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+
+        //                 // Add the calculated base availability to the resource availability array
+        //                 $resourceAvailability[$resource->id]['availability'][$key] = $baseAvailability;
+        //             }
+        //             //now check for leave
+        //             foreach ($resource->leaves as $leave) {
+        //                 $leaveStartDate = Carbon::parse($leave->start_date);
+        //                 $leaveEndDate = Carbon::parse($leave->end_date);
+
+        //                 if (
+        //                     $leaveStartDate->isBetween($monthStartDate, $monthEndDate) ||
+        //                     $leaveEndDate->isBetween($monthStartDate, $monthEndDate) ||
+        //                     ($leaveStartDate->lessThanOrEqualTo($monthStartDate) && $leaveEndDate->greaterThanOrEqualTo($monthEndDate))
+        //                 ) {
+        //                     // If the leave overlaps with the month, calculate availability
+        //                     if (
+        //                         $leaveStartDate->isSameMonth($monthStartDate) ||
+        //                         $leaveEndDate->isSameMonth($monthEndDate)
+        //                     ) {
+        //                         // If the leave start_date or end_date lands in this month, calculate the percentage of the month inside the leave
+        //                         $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
+        //                         $leaveDaysInMonth = min($leaveEndDate, $monthEndDate)->diffInDays(max($leaveStartDate, $monthStartDate)) + 1;
+        //                         $leaveAvailability = round(($leaveDaysInMonth / $daysInMonth) * 1.00, 2);
+        //                     } else {
+        //                         // Otherwise, it will be 100
+        //                         $leaveAvailability = 1.00;
+        //                     }
+        //                     // Use year-month as the key
+        //                     $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+
+        //                     // Add the calculated base availability to the resource availability array
+        //                     $resourceAvailability[$resource->id]['availability'][$key] = $resourceAvailability[$resource->id]['availability'][$key] - $leaveAvailability;
+
+        //                 }
+        //             }
+        //         }
+        //     }
+
+        // }
+        // // Cache the resourceAvailability data
+        // Cache::put('resourceAvailability', $resourceAvailability, now()->addDays(1));
 
         //return to the view
         return view('resource.index', compact('resources', 'resourceAvailability', 'nextTwelveMonths'))
@@ -136,7 +151,16 @@ class ResourceController extends Controller
     {
         $resource = new Resource();
         $locations = Location::all();
-        return view('resource.create', compact('resource', 'locations'));
+        $skills = Skill::all()->map(function ($skill) {
+            return [
+                'value' => $skill->id,
+                'name' => $skill->skill_name,
+            ];
+        })->toArray();
+        $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
+            ->with('skill')
+            ->get();
+        return view('resource.create', compact('resource', 'locations', 'skills', 'resourceSkills'));
     }
 
 
@@ -215,7 +239,13 @@ class ResourceController extends Controller
             ];
         }
 
+        //hope that they have viewed the resources in the last day
+        $resourceAvailability = Cache::get('resourceAvailability');
+        //pick our resource out
+        $resourceAvailability = $resourceAvailability[$id]["availability"];
+
         $resource = Resource::find($id);
+
         $allocations = $resource->allocations()->get();
 
         $projects = $allocations->map(function ($allocation) {
@@ -238,9 +268,30 @@ class ResourceController extends Controller
                 // if ($totalAllocation !== null) Log::info(print_r($totalAllocation,true) . "Resource: {$resource->id} Date: {$monthStartDate} Project: {$project->id}");
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
+                // Get the availability for the current month
+                $availability = isset($resourceAvailability[$key]) ? (float)$resourceAvailability[$key] : 0.0;
+
+                
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
-                    $allocationArray[$project->id]['allocation'][$key] = $totalAllocation;
+                    // $allocationArray[$project->id]['allocation'][$key] = $totalAllocation;
+                // }
+                // Calculate the percentage allocation
+                    if ($availability > 0 && $totalAllocation !== null) {
+                        $percentageAllocation = ($totalAllocation / $availability) * 100;
+                        
+                        // Add the calculated percentage allocation to the resource availability array
+                        $allocationArray[$project->id]['allocation'][$key] = [
+                            'fte' => $totalAllocation,
+                            'percentage' => $percentageAllocation
+                        ];
+                    } else {
+                        // If no allocation or availability is zero, store the allocation as is
+                        $allocationArray[$project->id]['allocation'][$key] = [
+                            'fte' => -1 * $totalAllocation,
+                            'percentage' => 0.0
+                        ];
+                    }
                 }
             }
 

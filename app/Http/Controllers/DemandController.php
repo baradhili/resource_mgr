@@ -103,7 +103,7 @@ class DemandController extends Controller
                 }
             }
         }
-         Log::info("return: " . print_r($projects, true));
+        //  Log::info("return: " . print_r($projects, true));
         return view('demand.index', compact('projects', 'demandArray', 'nextTwelveMonths', 'resources'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }

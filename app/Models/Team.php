@@ -1,9 +1,5 @@
-<?php
+<?php namespace App;
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 use Mpociot\Teamwork\TeamworkTeam;
 
 /**
@@ -23,7 +19,6 @@ use Mpociot\Teamwork\TeamworkTeam;
  */
 class Team extends TeamworkTeam
 {
-    
     protected $perPage = 20;
 
     /**
@@ -32,45 +27,4 @@ class Team extends TeamworkTeam
      * @var array<int, string>
      */
     protected $fillable = ['owner_id', 'name', 'resource_type'];
-
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function teamInvites()
-    {
-        return $this->hasMany(\App\Models\TeamInvite::class, 'id', 'team_id');
-    }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function teamUsers()
-    {
-        return $this->hasMany(\App\Models\TeamUser::class, 'id', 'team_id');
-    }
-
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function owner()
-    {
-        return $this->belongsTo(\App\Models\User::class, 'owner_id', 'id');
-    }
-
-    /**
-     * Returns a collection of User models representing the members of the team.
-     *
-     * @return \Illuminate\Support\Collection|\App\Models\User[]
-     */
-    // public function members()
-    // {
-    //     return $this->teamUsers()->with('user')->get()->pluck('user');
-    // }
 }
-
-
-
-
-

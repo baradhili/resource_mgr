@@ -27,7 +27,7 @@ Its early stages right now, we are looking for help in:
 - [ ] Allow editing of manual demand, but not uploaded
 - [ ] Bulk add leave aka public holidays - to people in a region
 - [X] Make calendar controls consistent
-- [ ] Set up teams 
+- [X] Set up teams 
 - [ ] Create Resource Type crud and link with teams
 - [ ] Filter multiple views/permissions by Team
 - [ ] Create a "Senior Manager" role that might oversee one or more Teams
