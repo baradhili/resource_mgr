@@ -20,8 +20,8 @@ Its early stages right now, we are looking for help in:
 
 ## Next steps
 
-- [ ] Split out some hard coded things into env or a settings table
-- [ ] Update Allocations view to show percent of availablity
+- [X] Split out some hard coded things into env or a settings table
+- [X] Update Allocations view to show percent of availablity
 - [X] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
 - [X] Differentiate manual demand from uploads so we don't delete the wrong stuff
 - [ ] Allow editing of manual demand, but not uploaded
