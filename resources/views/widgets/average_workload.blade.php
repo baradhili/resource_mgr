@@ -12,7 +12,7 @@
     </div>
     <h1 class="mt-1 mb-3">{{$currentMonthAverage}}%</h1>
     <div class="mb-0">
-        <span class="text-danger">{{$delta}}</span>
+        <span class="text-danger">{{ intval($delta) }}%</span>
         <span class="text-muted">Since last month</span>
     </div>
 </div>
