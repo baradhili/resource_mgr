@@ -34,7 +34,7 @@ class ContractController extends Controller
      */
     public function index(Request $request): View
     {
-        $contracts = Contract::paginate();
+        $contracts = Contract::orderBy('end_date', 'asc')->paginate();
 
         return view('contract.index', compact('contracts'))
             ->with('i', ($request->input('page', 1) - 1) * $contracts->perPage());
