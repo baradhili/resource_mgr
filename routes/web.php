@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/demands/{project}/editFullDemand', [DemandController::class, 'editFullDemand'])->name('demands.editFullDemand');
     Route::resource('demands', DemandController::class);
     Route::resource('leaves', LeaveController::class);
+    Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
     Route::resource('projects', ProjectController::class); 
     Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
     Route::resource('resources', ResourceController::class);

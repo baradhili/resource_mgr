@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
+    public function __construct()
+    {
+        //do the auth stuff here
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -29,7 +34,7 @@ class ProjectController extends Controller
     public function create(Request $request): View
     {
         $project = new Project();
-  
+
         if ($request->has('name')) {
             $project->name = $request->query('name');
         }
@@ -85,5 +90,18 @@ class ProjectController extends Controller
 
         return Redirect::route('projects.index')
             ->with('success', 'Project deleted successfully');
+    }
+
+    public function search(Request $request): View
+    {
+        $search = $request->input('search');
+
+        $projects = Project::where(function ($query) use ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('empowerID', 'like', "%{$search}%");
+        })->paginate();
+
+        return view('project.index', compact('projects'))
+            ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }
 }

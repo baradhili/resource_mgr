@@ -16,9 +16,14 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Services\CacheService;
 
 class DemandController extends Controller
 {
+    public function __construct(CacheService $cacheService)
+    {
+        $this->cacheService = $cacheService;
+    }
 
     /**
      * Display a listing of the resource.
@@ -202,6 +207,8 @@ class DemandController extends Controller
             $demand->delete();
         }
 
+        //Update the cache
+        $this->cacheService->cacheResourceAllocation();
         return Redirect::route('demands.index')
             ->with('success', 'Resource assigned to project successfully.');
     }

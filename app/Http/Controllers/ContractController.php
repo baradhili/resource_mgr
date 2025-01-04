@@ -10,6 +10,7 @@ use App\Http\Requests\ContractRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
+use App\Services\CacheService;
 
 class ContractController extends Controller
 {
@@ -20,8 +21,9 @@ class ContractController extends Controller
      * The middleware configured here will be assigned to this controller's
      * routes.
      */
-    public function __construct() 
+    public function __construct(CacheService $cacheService)
     {
+        $this->cacheService = $cacheService;
         // $this->middleware('teamowner', ['only' => ['create','store','update','edit','destroy']]);  
         // $this->middleware('contract:view', ['only' => ['index']]);
         // $this->middleware('contract:create', ['only' => ['create','store']]);
@@ -91,7 +93,7 @@ class ContractController extends Controller
     public function update(ContractRequest $request, Contract $contract): RedirectResponse
     {
         $contract->update($request->validated());
-        
+        $this->cacheService->cacheResourceAvailability();
         return Redirect::route('contracts.index')
             ->with('success', 'Contract updated successfully');
     }
