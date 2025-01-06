@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Log;
 
 class CacheService
 {
-
-    public function cacheResourceAvailability() {
+    public function cacheResourceAvailability()
+    {
         $nextTwelveMonths = [];
 
         for ($i = -1; $i < 12; $i++) {
@@ -111,62 +111,70 @@ class CacheService
         Cache::put('resourceAvailability', $resourceAvailability, now()->addDays(1));
     }
 
-    public function cacheResourceAllocation() {
-          // Build our next twelve month array
-          $nextTwelveMonths = [];
+    public function cacheResourceAllocation()
+    {
+        // Build our next twelve month array
+        $nextTwelveMonths = [];
 
-          for ($i = -1; $i < 12; $i++) {
-              $date = Carbon::now()->addMonthsNoOverflow($i);
-              $nextTwelveMonths[] = [
-                  'year' => $date->year,
-                  'month' => $date->month,
-                  'monthName' => $date->format('M'),
-                  'monthFullName' => $date->format('F')
-              ];
-          }
-          //  Start and end dates for the period
-          $startDate = Carbon::now()->startOfMonth();
-          $endDate = Carbon::now()->addYear()->startOfMonth();
-  
-          // Collect our resources who have a current contract
-          $resources = Resource::whereHas('contracts', function ($query) {
-              $query->where('start_date', '<=', now())
-                  ->where('end_date', '>=', now());
-          })->paginate();
-  
-          //Collect the availability
-          $resourceAvailability = Cache::get('resourceAvailability');
-  
-          // For each resource - find teh allocations for the period
-          foreach ($resources as $resource) {
-  
-              $resourceAllocation[$resource->id] = [
-                  'name' => $resource->full_name,
-              ];
-  
-              foreach ($nextTwelveMonths as $month) {
-                  $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
-                  // $monthEndDate = $monthStartDate->copy()->endOfMonth();
-                  $totalAllocation = Allocation::where('allocation_date', '=', $monthStartDate)
-                      ->where('resources_id', '=', $resource->id)
-                      ->sum('fte');
-                  // Use year-month as the key
-                  $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-  
-                  // Get the availability for the month
-                  $availability = isset($resourceAvailability[$resource->id]['availability'][$key]) 
-                  ? (float) $resourceAvailability[$resource->id]['availability'][$key] 
-                  : 0;
-  
-                  // Calculate the percentage of total allocation divided by availability
-                  $percentage = $availability > 0 ? ($totalAllocation / $availability) * 100 : 0;
-  
-                  // Add the calculated percentage to the resource allocation array
-                  if ($percentage > 0) {
-                      $resourceAllocation[$resource->id]['allocation'][$key] = (int)$percentage;
-                  }
-              }
-          }
-          Cache::put('resourceAllocation', $resourceAllocation, now()->addDays(1));
+        for ($i = -1; $i < 12; $i++) {
+            $date = Carbon::now()->addMonthsNoOverflow($i);
+            $nextTwelveMonths[] = [
+                'year' => $date->year,
+                'month' => $date->month,
+                'monthName' => $date->format('M'),
+                'monthFullName' => $date->format('F')
+            ];
+        }
+        //  Start and end dates for the period
+        $startDate = Carbon::now()->startOfMonth();
+        $endDate = Carbon::now()->addYear()->startOfMonth();
+
+        // Collect our resources who have a current contract
+        $resources = Resource::whereHas('contracts', function ($query) {
+            $query->where('start_date', '<=', now())
+                ->where('end_date', '>=', now());
+        })->paginate();
+
+        //Collect the availability
+        $resourceAvailability = Cache::get('resourceAvailability');
+        if (!Cache::has('resourceAvailability')) {
+            $this->cacheResourceAvailability();
+            $resourceAvailability = Cache::get('resourceAvailability');
+        } else {
+            $resourceAvailability = Cache::get('resourceAvailability');
+        }
+
+        // For each resource - find teh allocations for the period
+        foreach ($resources as $resource) {
+
+            $resourceAllocation[$resource->id] = [
+                'name' => $resource->full_name,
+            ];
+
+            foreach ($nextTwelveMonths as $month) {
+                $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
+                // $monthEndDate = $monthStartDate->copy()->endOfMonth();
+                $totalAllocation = Allocation::where('allocation_date', '=', $monthStartDate)
+                    ->where('resources_id', '=', $resource->id)
+                    ->sum('fte');
+                // Use year-month as the key
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+
+                // Get the availability for the month
+                $availability = isset($resourceAvailability[$resource->id]['availability'][$key])
+                    ? (float) $resourceAvailability[$resource->id]['availability'][$key]
+                    : 0;
+
+                // Calculate the percentage of total allocation divided by availability
+                $percentage = $availability > 0 ? ($totalAllocation / $availability) * 100 : 0;
+
+                // Add the calculated percentage to the resource allocation array
+                if ($percentage > 0) {
+                    $resourceAllocation[$resource->id]['allocation'][$key] = (int) $percentage;
+                }
+            }
+        }
+        // Log::info("allocations: ".json_encode($resourceAllocation));
+        Cache::put('resourceAllocation', $resourceAllocation, now()->addDays(1));
     }
 }

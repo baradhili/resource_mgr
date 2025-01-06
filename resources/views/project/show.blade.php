@@ -22,7 +22,7 @@
                         
                                 <div class="form-group mb-2 mb20">
                                     <strong>Empowerid:</strong>
-                                    {{ $project->empowerID }}
+                                    {{ $project->empowerID ?? __('Not Available') }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Name:</strong>
@@ -30,7 +30,7 @@
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Projectmanager:</strong>
-                                    {{ $project->projectManager }}
+                                    {{ $project->projectManager ?? __('Not Available')}}
                                 </div>
 
                     </div>

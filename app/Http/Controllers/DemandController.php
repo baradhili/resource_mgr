@@ -16,9 +16,15 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Services\CacheService;
+use App\Models\ResourceType;
 
 class DemandController extends Controller
 {
+    public function __construct(CacheService $cacheService)
+    {
+        $this->cacheService = $cacheService;
+    }
 
     /**
      * Display a listing of the resource.
@@ -124,8 +130,8 @@ class DemandController extends Controller
         $demand->source = 'Manual';
 
         $projects = Project::all();
-
-        return view('demand.create', compact('demand', 'projects'));
+        $resourceTypes = ResourceType::all();
+        return view('demand.create', compact('demand', 'projects', 'resourceTypes'));
     }
 
     /**
@@ -135,7 +141,7 @@ class DemandController extends Controller
     {
         $startDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'));
         $endDate = Carbon::createFromFormat('Y-m-d', $request->input('end_date'));
-        $projectID = $request->input('projects_id');
+        $projectID = $request->input('project_id');
 
         $monthStartDate = Carbon::create($startDate->year, $startDate->month, 1);
         $monthEndDate = Carbon::create($endDate->year, $endDate->month, 1)->endOfMonth();
@@ -202,6 +208,8 @@ class DemandController extends Controller
             $demand->delete();
         }
 
+        //Update the cache
+        $this->cacheService->cacheResourceAllocation();
         return Redirect::route('demands.index')
             ->with('success', 'Resource assigned to project successfully.');
     }
@@ -231,8 +239,8 @@ class DemandController extends Controller
 
 
         $projects = Project::all();
-
-        return view('demand.edit', compact('demand', 'projects'));
+        $resourceTypes = ResourceType::all();
+        return view('demand.edit', compact('demand', 'projects', 'resourceTypes'));
     }
 
     /**

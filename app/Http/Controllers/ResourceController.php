@@ -239,8 +239,14 @@ class ResourceController extends Controller
             ];
         }
 
+        if (!Cache::has('resourceAvailability')) {
+            $this->cacheService->cacheResourceAvailability();
+            $resourceAvailability = Cache::get('resourceAvailability');
+        } else {
+            $resourceAvailability = Cache::get('resourceAvailability');
+        }
         //hope that they have viewed the resources in the last day
-        $resourceAvailability = Cache::get('resourceAvailability');
+        // $resourceAvailability = Cache::get('resourceAvailability');
         //pick our resource out
         $resourceAvailability = $resourceAvailability[$id]["availability"];
 

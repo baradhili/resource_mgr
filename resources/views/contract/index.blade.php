@@ -40,7 +40,7 @@ Contracts
                                     <th>Start Date</th>
                                     <th>End Date</th>
                                     <th>Availability</th>
-                                    
+                                    <th>Tenure</th>
 
                                     <th></th>
                                 </tr>
@@ -52,7 +52,7 @@ Contracts
                                         <td>{{ \Carbon\Carbon::parse($contract->start_date)->format('Y-m-d') }}</td>
                                         <td>{{ \Carbon\Carbon::parse($contract->end_date)->format('Y-m-d') }}</td>
                                         <td>{{ $contract->availability }}</td>
-
+                                        <td>{{ number_format(\Carbon\Carbon::parse($contract->end_date)->floatDiffInYears(\Carbon\Carbon::parse($contract->start_date)), 1) }}</td>
 
                                         <td>
                                             <form action="{{ route('contracts.destroy', $contract->id) }}" method="POST">
@@ -67,6 +67,9 @@ Contracts
                                                 <button type="submit" class="btn btn-danger btn-sm"
                                                     onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
                                                         class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                <a class="btn btn-sm btn-success"
+                                                    href="{{ route('contracts.clean', ['end_date' => $contract->end_date, 'resource_id' => $contract->resource->id]) }}"><i
+                                                        class="fa fa-fw fa-edit"></i> {{ __('Return Projects') }}</a>
                                             </form>
                                         </td>
                                     </tr>

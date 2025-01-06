@@ -1,16 +1,16 @@
 <div class="row padding-1 p-1">
     <div class="col-md-12">
-        
+
         <div class="form-group mb-2 mb20">
             <label for="start_date" class="form-label">{{ __('Start Date') }}</label>
             <input type="date" name="start_date" class="form-control @error('start_date') is-invalid @enderror"
-                value="{{ old('start_date', $contract->start_date) }}" id="start_date" placeholder="Start Date">
+                value="{{ old('start_date', $contract?->start_date ? date('Y-m-d', strtotime($contract->start_date)) : '') }}" id="start_date" placeholder="Start Date">
             {!! $errors->first('start_date', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
             <label for="end_date" class="form-label">{{ __('End Date') }}</label>
             <input type="date" name="end_date" class="form-control @error('end_date') is-invalid @enderror"
-                value="{{ old('end_date', $contract->end_date) }}" id="end_date" placeholder="End Date">
+                value="{{ old('end_date', $contract?->end_date ? date('Y-m-d', strtotime($contract->end_date)) : '') }}" id="end_date" placeholder="End Date">
             {!! $errors->first('end_date', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">

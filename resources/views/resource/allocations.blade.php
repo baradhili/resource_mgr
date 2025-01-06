@@ -48,7 +48,15 @@
                                                         $allocationArray[$project['id']]['allocation'][$monthKey]['fte'] ??
                                                         '-';
                                                 @endphp
-                                                <td>{{ $demandFTE }}</td>
+                                                <td>
+                                                    @if ($demandFTE !== '-')
+                                                        <a href="{{ route('allocations.editOne', ['projectId' => $project->id, 'resourceId' => $resource->id, 'monthKey' => $monthKey]) }}">
+                                                            {{ $demandFTE }}
+                                                        </a>
+                                                    @else
+                                                        {{ $demandFTE }}
+                                                    @endif
+                                                </td>
                                             @endforeach
                                             <td>
                                                 <form

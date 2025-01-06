@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Contract;
 use App\Models\Resource;
+use App\Models\Allocation;
+use App\Models\Demand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\ContractRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
+use App\Services\CacheService;
 
 class ContractController extends Controller
 {
@@ -20,8 +23,9 @@ class ContractController extends Controller
      * The middleware configured here will be assigned to this controller's
      * routes.
      */
-    public function __construct() 
+    public function __construct(CacheService $cacheService)
     {
+        $this->cacheService = $cacheService;
         // $this->middleware('teamowner', ['only' => ['create','store','update','edit','destroy']]);  
         // $this->middleware('contract:view', ['only' => ['index']]);
         // $this->middleware('contract:create', ['only' => ['create','store']]);
@@ -34,7 +38,7 @@ class ContractController extends Controller
      */
     public function index(Request $request): View
     {
-        $contracts = Contract::paginate();
+        $contracts = Contract::orderBy('end_date', 'asc')->paginate();
 
         return view('contract.index', compact('contracts'))
             ->with('i', ($request->input('page', 1) - 1) * $contracts->perPage());
@@ -91,7 +95,7 @@ class ContractController extends Controller
     public function update(ContractRequest $request, Contract $contract): RedirectResponse
     {
         $contract->update($request->validated());
-        
+        $this->cacheService->cacheResourceAvailability();
         return Redirect::route('contracts.index')
             ->with('success', 'Contract updated successfully');
     }
@@ -102,5 +106,29 @@ class ContractController extends Controller
 
         return Redirect::route('contracts.index')
             ->with('success', 'Contract deleted successfully');
+    }
+
+    public function cleanProjects(Request $request) :RedirectResponse
+    {
+        $resourceID = $request->resource_id;
+        $end_date = $request->end_date;
+
+        $allocations = Allocation::where('resources_id', $resourceID)
+            ->whereDate('allocation_date', '>=', $end_date)
+            ->get();
+
+        foreach ($allocations as $allocation) {
+            $demand = new Demand();
+            $demand->demand_date = $allocation->allocation_date;
+            $demand->fte = $allocation->fte;
+            $demand->projects_id = $allocation->projects_id;
+            $demand->resource_type = "Solution Architect";
+            $demand->save();
+
+            $allocation->delete();
+        }
+
+        return Redirect::route('contracts.index')
+            ->with('success', 'Allocations returned successfully');
     }
 }

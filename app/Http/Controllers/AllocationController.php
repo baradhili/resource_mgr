@@ -35,13 +35,13 @@ class AllocationController extends Controller
     public function __construct(CacheService $cacheService)
     {
         $this->cacheService = $cacheService;
-    
+
         // $this->middleware('allocation:view', ['only' => ['index']]);
         // $this->middleware('allocation:create', ['only' => ['create','store']]);
         // $this->middleware('allocation:update', ['only' => ['update','edit']]);
         // $this->middleware('allocation:delete', ['only' => ['destroy']]);
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -75,40 +75,7 @@ class AllocationController extends Controller
         } else {
             $resourceAllocation = Cache::get('resourceAllocation');
         }
-        // //Collect the availability
-        // $resourceAvailability = Cache::get('resourceAvailability');
 
-        // // For each resource - find teh allocations for the period
-        // foreach ($resources as $resource) {
-
-        //     $resourceAllocation[$resource->id] = [
-        //         'name' => $resource->full_name,
-        //     ];
-
-        //     foreach ($nextTwelveMonths as $month) {
-        //         $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
-        //         // $monthEndDate = $monthStartDate->copy()->endOfMonth();
-        //         $totalAllocation = Allocation::where('allocation_date', '=', $monthStartDate)
-        //             ->where('resources_id', '=', $resource->id)
-        //             ->sum('fte');
-        //         // Use year-month as the key
-        //         $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-
-        //         // Get the availability for the month
-        //         $availability = isset($resourceAvailability[$resource->id]['availability'][$key]) 
-        //         ? (float) $resourceAvailability[$resource->id]['availability'][$key] 
-        //         : 0;
-
-        //         // Calculate the percentage of total allocation divided by availability
-        //         $percentage = $availability > 0 ? ($totalAllocation / $availability) * 100 : 0;
-
-        //         // Add the calculated percentage to the resource allocation array
-        //         if ($percentage > 0) {
-        //             $resourceAllocation[$resource->id]['allocation'][$key] = (int)$percentage;
-        //         }
-        //     }
-        // }
-        // Cache::put('resourceAllocation', $resourceAllocation, now()->addDays(1));
         return view('allocation.index', compact('resources', 'resourceAllocation', 'nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
@@ -151,10 +118,23 @@ class AllocationController extends Controller
      */
     public function edit($project_id, Request $request): RedirectResponse
     {
-        $allocationArray = Allocation::where('projects_id', $project_id)
-            ->whereBetween('allocation_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
-            ->where('resources_id', '=', $request->resource_id)
-            ->get();
+        if ($request->input('start_date')) {
+            if ($request->input('end_date')) {
+                $allocationArray = Allocation::where('projects_id', $project_id)
+                    ->whereBetween('allocation_date', [$startDate, $endDate])
+                    ->where('resources_id', '=', $request->resource_id)
+                    ->get();
+            } else {
+                $allocationArray = Allocation::where('projects_id', $project_id)
+                    ->where('allocation_date', '>=', $startDate)
+                    ->where('resources_id', '=', $request->resource_id)
+                    ->get();
+            }
+        } else {
+            $allocationArray = Allocation::where('projects_id', $project_id)
+                ->where('resources_id', '=', $request->resource_id)
+                ->get();
+        }
 
         foreach ($allocationArray as $allocation) {
             $demand = new Demand();
@@ -169,6 +149,22 @@ class AllocationController extends Controller
 
         return Redirect::route('allocations.index');
     }
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function editOne(Request $request): View
+    {
+        $allocation_date = Carbon::parse($request->monthKey . '-01')->format('Y-m-d');
+        $allocation = Allocation::where('projects_id', $request->projectId)
+            ->where('resources_id', $request->resourceId)
+            ->where('allocation_date', $allocation_date)
+            ->first();
+        $resources = Resource::all();
+        $projects = Project::all();
+        $form_type = "one";
+
+        return view('allocation.edit', compact('allocation', 'resources', 'projects', 'form_type'));
+    }
 
     /**
      * Update the specified resource in storage.
@@ -176,7 +172,7 @@ class AllocationController extends Controller
     public function update(AllocationRequest $request, Allocation $allocation): RedirectResponse
     {
         $allocation->update($request->validated());
-
+        $this->cacheService->cacheResourceAllocation();
         return Redirect::route('allocations.index')
             ->with('success', 'Allocation updated successfully');
     }
@@ -200,7 +196,6 @@ class AllocationController extends Controller
             $resourceTypes = ResourceType::all()->pluck('name')->map(function ($name) {
                 return strtolower($name);
             })->toArray();
-           
 
             //initialise missingResources array
             $missingResources = [];
@@ -230,18 +225,6 @@ class AllocationController extends Controller
                         if ($columnLetter >= 'D' && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
-                            // Allocation::where('allocation_date', '=', $monthDate)
-                            //     ->where(function ($query) {
-                            //         $query->where('source', '=', 'Imported')
-                            //             ->orWhereNull('source');
-                            //     })
-                            //     ->delete();
-                            // Demand::where('demand_date', '=', $monthDate)
-                            //     ->where(function ($query) {
-                            //         $query->where('source', '=', 'Imported')
-                            //             ->orWhereNull('source');
-                            //     })
-                            //     ->delete();
                         }
                     }
                     // Log::info("months " . print_r($monthYear, true));
@@ -250,7 +233,7 @@ class AllocationController extends Controller
                     continue;
                 } elseif ($rowData['B'] != null) { //ignore empty lines
                     $resourceName = $rowData['A'] ?? $resourceName;
-                    
+
                     $resourceNameLower = strtolower($resourceName);
                     // Check if any of the resource types are contained within the resource name
                     $contains = false;
@@ -263,7 +246,7 @@ class AllocationController extends Controller
 
                     //if (strpos($resourceName, 'rchitect') == false) { //TODO: make this part of Team
                     if (!$contains) {
-                        
+
                         $resource = Resource::where('empowerID', $resourceName)->first();
                         $resourceID = $resource->id ?? null;
                         if (is_null($resourceID)) {
