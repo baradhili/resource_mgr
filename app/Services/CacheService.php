@@ -174,7 +174,7 @@ class CacheService
                 }
             }
         }
-        Log::info("allocations: ".json_encode($resourceAllocation));
+        // Log::info("allocations: ".json_encode($resourceAllocation));
         Cache::put('resourceAllocation', $resourceAllocation, now()->addDays(1));
     }
 }

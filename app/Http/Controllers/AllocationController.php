@@ -35,13 +35,13 @@ class AllocationController extends Controller
     public function __construct(CacheService $cacheService)
     {
         $this->cacheService = $cacheService;
-    
+
         // $this->middleware('allocation:view', ['only' => ['index']]);
         // $this->middleware('allocation:create', ['only' => ['create','store']]);
         // $this->middleware('allocation:update', ['only' => ['update','edit']]);
         // $this->middleware('allocation:delete', ['only' => ['destroy']]);
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -75,7 +75,7 @@ class AllocationController extends Controller
         } else {
             $resourceAllocation = Cache::get('resourceAllocation');
         }
-        
+
         return view('allocation.index', compact('resources', 'resourceAllocation', 'nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
@@ -118,10 +118,23 @@ class AllocationController extends Controller
      */
     public function edit($project_id, Request $request): RedirectResponse
     {
-        $allocationArray = Allocation::where('projects_id', $project_id)
-            ->whereBetween('allocation_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
-            ->where('resources_id', '=', $request->resource_id)
-            ->get();
+        if ($request->input('start_date')) {
+            if ($request->input('end_date')) {
+                $allocationArray = Allocation::where('projects_id', $project_id)
+                    ->whereBetween('allocation_date', [$startDate, $endDate])
+                    ->where('resources_id', '=', $request->resource_id)
+                    ->get();
+            } else {
+                $allocationArray = Allocation::where('projects_id', $project_id)
+                    ->where('allocation_date', '>=', $startDate)
+                    ->where('resources_id', '=', $request->resource_id)
+                    ->get();
+            }
+        } else {
+            $allocationArray = Allocation::where('projects_id', $project_id)
+                ->where('resources_id', '=', $request->resource_id)
+                ->get();
+        }
 
         foreach ($allocationArray as $allocation) {
             $demand = new Demand();
@@ -133,7 +146,7 @@ class AllocationController extends Controller
 
             $allocation->delete();
         }
-        
+
         return Redirect::route('allocations.index');
     }
     /**
@@ -149,7 +162,7 @@ class AllocationController extends Controller
         $resources = Resource::all();
         $projects = Project::all();
         $form_type = "one";
-        Log::info("Allocation: " . json_encode($allocation));
+
         return view('allocation.edit', compact('allocation', 'resources', 'projects', 'form_type'));
     }
 
@@ -220,7 +233,7 @@ class AllocationController extends Controller
                     continue;
                 } elseif ($rowData['B'] != null) { //ignore empty lines
                     $resourceName = $rowData['A'] ?? $resourceName;
-                    
+
                     $resourceNameLower = strtolower($resourceName);
                     // Check if any of the resource types are contained within the resource name
                     $contains = false;
@@ -233,7 +246,7 @@ class AllocationController extends Controller
 
                     //if (strpos($resourceName, 'rchitect') == false) { //TODO: make this part of Team
                     if (!$contains) {
-                        
+
                         $resource = Resource::where('empowerID', $resourceName)->first();
                         $resourceID = $resource->id ?? null;
                         if (is_null($resourceID)) {

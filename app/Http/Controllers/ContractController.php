@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Contract;
 use App\Models\Resource;
+use App\Models\Allocation;
+use App\Models\Demand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\ContractRequest;
@@ -104,5 +106,29 @@ class ContractController extends Controller
 
         return Redirect::route('contracts.index')
             ->with('success', 'Contract deleted successfully');
+    }
+
+    public function cleanProjects(Request $request) :RedirectResponse
+    {
+        $resourceID = $request->resource_id;
+        $end_date = $request->end_date;
+
+        $allocations = Allocation::where('resources_id', $resourceID)
+            ->whereDate('allocation_date', '>=', $end_date)
+            ->get();
+
+        foreach ($allocations as $allocation) {
+            $demand = new Demand();
+            $demand->demand_date = $allocation->allocation_date;
+            $demand->fte = $allocation->fte;
+            $demand->projects_id = $allocation->projects_id;
+            $demand->resource_type = "Solution Architect";
+            $demand->save();
+
+            $allocation->delete();
+        }
+
+        return Redirect::route('contracts.index')
+            ->with('success', 'Allocations returned successfully');
     }
 }

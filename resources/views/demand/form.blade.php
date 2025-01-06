@@ -61,13 +61,15 @@
 
         <div class="form-group mb-2 mb20">
             <label for="resource_type" class="form-label">{{ __('Resource Type') }}</label>
-            <input type="text" name="resource_type" class="form-control @error('resource_type') is-invalid @enderror"
-                value="{{ old('resource_type', $demand?->resource_type) }}" id="resource_type"
-                placeholder="Resource Type">
-            {!! $errors->first(
-                'resource_type',
-                '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>',
-            ) !!}
+            <select name="resource_type" class="form-control @error('resource_type') is-invalid @enderror" id="resource_type">
+                <option value="">{{ __('Select a Resource Type') }}</option>
+                @foreach ($resourceTypes as $type)
+                    <option value="{{ $type->id }}" @if(old('resource_type', $demand?->resource_type) == $type->id) selected @endif>
+                        {{ $type->name }}
+                    </option>
+                @endforeach
+            </select>
+            {!! $errors->first('resource_type', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
 
         <div class="form-group mb-2 mb20">
