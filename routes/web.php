@@ -47,6 +47,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('allocations/editOne', [AllocationController::class, 'editOne'])->name('allocations.editOne');
     Route::resource('allocations', AllocationController::class);
     //additional functions
     Route::post('/allocations-upload', [AllocationController::class, 'populateAllocations'])->name('allocations.upload');

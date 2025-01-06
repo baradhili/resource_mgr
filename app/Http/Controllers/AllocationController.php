@@ -133,8 +133,24 @@ class AllocationController extends Controller
 
             $allocation->delete();
         }
-
+        
         return Redirect::route('allocations.index');
+    }
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function editOne(Request $request): View
+    {
+        $allocation_date = Carbon::parse($request->monthKey . '-01')->format('Y-m-d');
+        $allocation = Allocation::where('projects_id', $request->projectId)
+            ->where('resources_id', $request->resourceId)
+            ->where('allocation_date', $allocation_date)
+            ->first();
+        $resources = Resource::all();
+        $projects = Project::all();
+        $form_type = "one";
+        Log::info("Allocation: " . json_encode($allocation));
+        return view('allocation.edit', compact('allocation', 'resources', 'projects', 'form_type'));
     }
 
     /**

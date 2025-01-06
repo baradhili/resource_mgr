@@ -16,7 +16,11 @@
                             {{ method_field('PATCH') }}
                             @csrf
 
-                            @include('allocation.form')
+                            @if($form_type == "one")
+                                @include('allocation.formOne')
+                            @else
+                                @include('allocation.form')
+                            @endif
 
                         </form>
                     </div>
