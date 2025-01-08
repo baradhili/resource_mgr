@@ -16,8 +16,7 @@
 
     <!-- Styles -->
     <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
- 
-    
+
     <style>
         .skill-entry {
             margin-bottom: 10px;
@@ -29,9 +28,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   
-
-
 
 </head>
 
