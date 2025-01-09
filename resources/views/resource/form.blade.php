@@ -13,10 +13,43 @@
             {!! $errors->first('empowerID', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="ad_i_d" class="form-label">{{ __('AD id') }}</label>
-            <input type="text" name="adID" class="form-control @error('adID') is-invalid @enderror"
-                value="{{ old('adID', $resource?->adID) }}" id="ad_i_d" placeholder="Adid">
-            {!! $errors->first('adID', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+            <label for="user_id" class="form-label">{{ __('Linked User') }}</label>
+            <div class="input-group">
+                <select class="form-control" name="userID" id="user_id">
+                    <option value="" disabled {{ isset($resource) && $resource->user_ID === null ? 'selected' : '' }}>
+                        {{ isset($resource) && $resource->user_ID === null ? 'Search for a user' : $resource->user->name }}
+                    </option>
+                    @foreach ($users as $user)
+                        <option value="{{ $user->id }}"
+                            {{ isset($resource) && $resource->user_ID == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button"
+                        onclick="document.getElementById('user_id').value = '';">
+                        <i class="fa fa-times-circle"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-plus"
+                        onclick="window.open('{{ route('users.create') }}?name='+document.getElementById('full_name').value+'&resource_type='+document.getElementById('resource_type').value, '_blank')">
+                        <i class="fa fa-plus-circle fa-lg"></i>
+                    </button>
+                </div>
+            </div>
+            {!! $errors->first('userID', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+        </div>
+        <div class="form-group mb-2 mb20">
+            <label for="resource_type" class="form-label">{{ __('Resource Type') }}</label>
+            <select name="resource_type" class="form-control @error('resource_type') is-invalid @enderror" id="resource_type" required>
+                <option value="">{{ __('Select a Resource Type') }}</option>
+                @foreach ($resourceTypes as $type)
+                    <option value="{{ $type->id }}" @if(old('resource_type', $resource?->resource_type) == $type->id) selected @endif>
+                        {{ $type->name }}
+                    </option>
+                @endforeach
+            </select>
+            {!! $errors->first('resource_type', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
             <label for="location_id" class="form-label">{{ __('Location') }}</label>

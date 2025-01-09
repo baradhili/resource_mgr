@@ -40,6 +40,7 @@
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Team</th>
+                                        <th>Resource</th>
 
                                         <th></th>
                                     </tr>
@@ -52,6 +53,7 @@
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
                                             <td>{{ $user->currentTeam->name ?? 'No Team' }}</td>
+                                            <td>{{ isset($user->resource_id) ? 'Y' : 'N' }}</td>
 
                                             <td>
                                                 <form action="{{ route('users.destroy', $user->id) }}" method="POST">
