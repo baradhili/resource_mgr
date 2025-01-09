@@ -243,7 +243,7 @@ class ResourceController extends Controller
      */
     public function update(ResourceRequest $request, Resource $resource): RedirectResponse
     {
-        Log::info('Validated fields: ' . print_r($request->validated(), true));
+        // Log::info('Validated fields: ' . print_r($request->validated(), true));
         // Parse the input skills
         $skillsData = [];
         foreach (json_decode($request->validated()['skills'], true) as $skill) {
@@ -256,7 +256,7 @@ class ResourceController extends Controller
         $resource->full_name = $request->validated()['full_name'];
         $resource->empowerID = $request->validated()['empowerID'];
         if (array_key_exists('userID', $request->validated()) && $request->validated()['userID'] !== null) {
-            $resource->userID = $request->validated()['userID'];
+            $resource->user_id = $request->validated()['userID'];
         }
         $resource->resource_type = $request->validated()['resource_type'];
         $resource->location_id = $request->validated()['location_id'];

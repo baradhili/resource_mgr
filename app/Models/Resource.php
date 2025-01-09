@@ -100,7 +100,7 @@ class Resource extends Model
      */
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'userID', 'id')->withDefault();
+        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id')->withDefault();
     }
 
     /**

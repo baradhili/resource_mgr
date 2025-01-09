@@ -29,8 +29,8 @@
                                     {{ $resource->empowerID }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>User id:</strong>
-                                    {{ $resource->user_ID ?? 'No Linked User' }}
+                                    <strong>Linked User:</strong>
+                                    {{ $resource->user_id ? $resource->user->name : 'No Linked User' }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Resource Type:</strong>
