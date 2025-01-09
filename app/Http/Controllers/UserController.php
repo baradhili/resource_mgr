@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Team;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
@@ -28,16 +29,17 @@ class UserController extends Controller
     public function create(): View
     {
         $user = new User();
+        $teams = Team::all();
 
-        return view('user.create', compact('user'));
+        return view('user.create', compact('user', 'teams'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(UserRequest $request): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
-        User::create($request->validated());
+        User::create($request->all());
 
         return Redirect::route('users.index')
             ->with('success', 'User created successfully.');
@@ -59,16 +61,32 @@ class UserController extends Controller
     public function edit($id): View
     {
         $user = User::find($id);
+        $teams = Team::all();
 
-        return view('user.edit', compact('user'));
+        return view('user.edit', compact('user', 'teams'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UserRequest $request, User $user): RedirectResponse
+    public function update(Request $request, User $user): RedirectResponse
     {
-        $user->update($request->validated());
+        Log::info("input: " . json_encode($request->all()));
+        $user->update($request->all());
+        $currentTeam = $user->currentTeam;
+        $inputTeam = $request->input('team');
+
+        if ($currentTeam !== $inputTeam) {
+            $user->detachTeam($currentTeam);
+        }
+
+        if ($inputTeam) {
+            $newTeam = Team::find($inputTeam);
+            if ($newTeam) {
+                $user->attachTeam($newTeam);
+            }
+        }
+
 
         return Redirect::route('users.index')
             ->with('success', 'User updated successfully');

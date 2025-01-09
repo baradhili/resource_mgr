@@ -12,11 +12,17 @@
             {!! $errors->first('email', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="settings" class="form-label">{{ __('Settings') }}</label>
-            <input type="text" name="settings" class="form-control @error('settings') is-invalid @enderror" value="{{ old('settings', $user?->settings) }}" id="settings" placeholder="Settings">
-            {!! $errors->first('settings', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+            <label for="team" class="form-label">{{ __('Team') }}</label>
+            <select name="team" class="form-control @error('team') is-invalid @enderror" id="team">
+                <option value="">{{ __('Select a Team') }}</option>
+                @foreach ($teams as $team)
+                    <option value="{{ $team->id }}" {{ old('team', $user?->current_team_id) == $team->id ? 'selected' : '' }}>
+                        {{ $team->name }}
+                    </option>
+                @endforeach
+            </select>
+            {!! $errors->first('team', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
-
     </div>
     <div class="col-md-12 mt20 mt-2">
         <button type="submit" class="btn btn-primary">{{ __('Submit') }}</button>
