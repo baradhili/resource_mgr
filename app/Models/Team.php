@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Mpociot\Teamwork\TeamworkTeam;
+use Mpociot\Teamwork\Traits\TeamTrait;
 
 /**
  * Class Team
@@ -13,6 +14,7 @@ use Mpociot\Teamwork\TeamworkTeam;
  * @property $resource_type
  * @property $created_at
  * @property $updated_at
+ * @property $parent_team_id
  *
  * @property TeamInvite[] $teamInvites
  * @property TeamUser[] $teamUsers
@@ -29,4 +31,14 @@ class Team extends TeamworkTeam
      * @var array<int, string>
      */
     protected $fillable = ['owner_id', 'name', 'resource_type'];
+
+    public function parentTeam()
+    {
+        return $this->belongsTo(Team::class, 'parent_team_id');
+    }
+
+    public function subTeams()
+    {
+        return $this->hasMany(Team::class, 'parent_team_id');
+    }
 }

@@ -56,49 +56,4 @@ class TeamMemberController extends Controller
         return redirect(route('teams.index'));
     }
 
-    /**
-     * @param Request $request
-     * @param int $team_id
-     * @return $this
-     */
-    public function invite(Request $request, $team_id)
-    {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
-
-        $teamModel = config('teamwork.team_model');
-        $team = $teamModel::findOrFail($team_id);
-
-        if (! Teamwork::hasPendingInvite($request->email, $team)) {
-            Teamwork::inviteToTeam($request->email, $team, function ($invite) {
-                Mail::send('teamwork.emails.invite', ['team' => $invite->team, 'invite' => $invite], function ($m) use ($invite) {
-                    $m->to($invite->email)->subject('Invitation to join team '.$invite->team->name);
-                });
-                // Send email to user
-            });
-        } else {
-            return redirect()->back()->withErrors([
-                'email' => 'The email address is already invited to the team.',
-            ]);
-        }
-
-        return redirect(route('teams.members.show', $team->id));
-    }
-
-    /**
-     * Resend an invitation mail.
-     *
-     * @param $invite_id
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function resendInvite($invite_id)
-    {
-        $invite = TeamInvite::findOrFail($invite_id);
-        Mail::send('teamwork.emails.invite', ['team' => $invite->team, 'invite' => $invite], function ($m) use ($invite) {
-            $m->to($invite->email)->subject('Invitation to join team '.$invite->team->name);
-        });
-
-        return redirect(route('teams.members.show', $invite->team));
-    }
 }
