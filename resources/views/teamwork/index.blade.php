@@ -44,7 +44,7 @@
                                         <td>{{ $team->resource_type ?? 'N/A' }}</td>
                                         <td>
                                             <a class="btn btn-sm btn-primary "
-                                                href="{{ route('teams.members.show', $team->id) }}"><i
+                                                href="{{ route('teams.show', $team->id) }}"><i
                                                     class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
 
                                             @if (auth()->user()->isOwnerOfTeam($team))

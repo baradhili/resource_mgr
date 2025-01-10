@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers\Teamwork;
 
+use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Mpociot\Teamwork\Exceptions\UserNotInTeamException;
+use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class TeamController extends Controller
 {
@@ -68,18 +72,21 @@ class TeamController extends Controller
         return redirect(route('teams.index'));
     }
 
-     /**
+    /**
      * Display the specified resource.
+     * 
+     * @return \Illuminate\Http\Response
      */
-    // public function show($id): View
-    // {
-    //     $team = Team::with(['owner'])->find($id);
-    //     $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
-    //         ->where('team_user.team_id', $team->id)
-    //         ->get();
+    public function show($id): View
+    {
+        $team = Team::with(['owner'])->find($id);
+        $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
+            ->where('team_user.team_id', $team->id)
+            ->get();
+        $team->owner = User::find($team->owner_id);
 
-    //     return view('team.show', compact('team'));
-    // }
+        return view('teamwork.show', compact('team'));
+    }
 
     /**
      * Switch to the given team.
@@ -124,7 +131,7 @@ class TeamController extends Controller
         $teamModel = config('teamwork.team_model');
         $team = $teamModel::findOrFail($id);
 
-        if (! auth()->user()->isOwnerOfTeam($team)) {
+        if (!auth()->user()->isOwnerOfTeam($team)) {
             abort(403);
         }
 
@@ -178,7 +185,7 @@ class TeamController extends Controller
         $teamModel = config('teamwork.team_model');
 
         $team = $teamModel::findOrFail($id);
-        if (! auth()->user()->isOwnerOfTeam($team)) {
+        if (!auth()->user()->isOwnerOfTeam($team)) {
             abort(403);
         }
 
@@ -186,8 +193,36 @@ class TeamController extends Controller
 
         $userModel = config('teamwork.user_model');
         $userModel::where('current_team_id', $id)
-                    ->update(['current_team_id' => null]);
+            ->update(['current_team_id' => null]);
 
         return redirect(route('teams.index'));
     }
+
+
+    /**
+     * Make the given user the leader of the current team.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function makeLeader($teamId, $userId)
+    {
+        Log::info("Team ID: $teamId, User ID: $userId");
+
+        $team = Team::findOrFail($teamId);
+        $user = User::findOrFail($userId);
+        if (auth()->user()->isOwnerOfTeam($team)) {
+            if ($team->hasUser($user)) {
+                $team->owner_id = $user->id;
+                $team->save();
+            } else {
+                return redirect(route('teams.index'))->with('error', 'User is not a member of the team');
+            }
+        } else {
+            return redirect(route('teams.index'))->with('error', 'You are not the owner of this team');
+        }
+
+        return redirect(route('teams.show', $teamId))->with('success', 'Team leader updated successfully');
+    }
+
 }

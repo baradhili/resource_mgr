@@ -1,13 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Edit team {{$team->name}}</div>
-                    <div class="panel-body">
-                        <form class="form-horizontal" method="post" action="{{route('teams.update', $team)}}">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span id="card_title">
+                                {{ __('Edit team: ') }}{{ $team->name }}
+                            </span>
+                            <div class="float-right">
+                                <a href="{{ route('teams.index') }}" class="btn btn-primary btn-sm float-right"
+                                    data-placement="left">
+                                    {{ __('Back') }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    @if ($message = Session::get('success'))
+                        <div class="alert alert-success m-4">
+                            <p>{{ $message }}</p>
+                        </div>
+                    @endif
+                    <div class="card-body">
+                        <form class="form-horizontal" method="post"
+                            action="{{ route('teams.update', $team->id) }}">
                             <input type="hidden" name="_method" value="PUT" />
                             {!! csrf_field() !!}
 
@@ -15,7 +33,8 @@
                                 <label class="col-md-4 control-label">Name</label>
 
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control" name="name" value="{{ old('name', $team->name) }}">
+                                    <input type="text" class="form-control" name="name"
+                                        value="{{ old('name', $team->name) }}">
 
                                     @if ($errors->has('name'))
                                         <span class="help-block">
