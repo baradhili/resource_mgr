@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Teamwork;
 
 use App\Models\Team;
 use App\Models\User;
+use App\Models\ResourceType;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Mpociot\Teamwork\Exceptions\UserNotInTeamException;
@@ -24,6 +25,8 @@ class TeamController extends Controller
      */
     public function index()
     {
+        //TODO based on privs either show teams wher ethe user is a member, or show all teams
+
         /**
          * old
          *  $teams = Team::with('owner')->paginate();
@@ -42,11 +45,15 @@ class TeamController extends Controller
     public function create()
     {
         // old
-        // $resource_types = ResourceType::all()->map(function ($resource_type) {
-        //     return ['name' => $resource_type->name];
-        // })->toArray();
-        // return view('team.create', compact('team', 'resource_types'));
-        return view('teamwork.create');
+        $team = new Team();
+        $users = User::all()->map(function ($user) {
+            return ['value' => $user->id, 'name' => $user->name];
+        })->toArray();
+        $resource_types = ResourceType::all()->map(function ($resource_type) {
+            return ['name' => $resource_type->name];
+        })->toArray();
+        return view('teamwork.create', compact('team', 'resource_types', 'users'));
+        //return view('teamwork.create');
     }
 
     /**
@@ -115,27 +122,27 @@ class TeamController extends Controller
      */
     public function edit($id)
     {
-        // $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
-        //     ->where('team_user.team_id', $team->id)
-        //     ->get();
-
-        // $users = User::all()->map(function ($user) {
-        //     return ['value' => $user->id, 'name' => $user->name];
-        // })->toArray();
-
-        // $resource_types = ResourceType::all()->map(function ($resource_type) {
-        //     return ['name' => $resource_type->name];
-        // })->toArray();
-
-        // return view('team.edit', compact('team', 'users', 'resource_types'));
         $teamModel = config('teamwork.team_model');
         $team = $teamModel::findOrFail($id);
+
+        $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
+            ->where('team_user.team_id', $team->id)
+            ->get();
+
+        $users = User::all()->map(function ($user) {
+            return ['value' => $user->id, 'name' => $user->name];
+        })->toArray();
+
+        $resource_types = ResourceType::all()->map(function ($resource_type) {
+            return ['name' => $resource_type->name];
+        })->toArray();
 
         if (!auth()->user()->isOwnerOfTeam($team)) {
             abort(403);
         }
 
-        return view('teamwork.edit')->withTeam($team);
+        //return view('teamwork.edit')->withTeam($team);
+        return view('teamwork.edit', compact('team', 'users', 'resource_types'));
     }
 
     /**
