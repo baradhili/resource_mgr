@@ -111,5 +111,16 @@ class Resource extends Model
         return $this->belongsTo(ResourceType::class, 'resource_type', 'id')->withDefault();
     }
 
+    /**
+     * Get all resources that match a list of resource_type.
+     *
+     * @param array $resourceTypes
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public static function getResourcesByTypes(array $resourceTypes)
+    {
+        return self::whereIn('resource_type', $resourceTypes)->get();
+    }
+
 }
 

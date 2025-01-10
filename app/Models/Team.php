@@ -41,4 +41,20 @@ class Team extends TeamworkTeam
     {
         return $this->hasMany(Team::class, 'parent_team_id');
     }
+
+    
+    public static function allSubTeamResourceTypes(Team $parentTeam): array
+    {
+        $subTeams = $parentTeam->subTeams;
+        $subTeamResourceTypes = collect($subTeams->pluck('resource_type')->filter()->toArray());
+        if ($parentTeam->resource_type !== null) {
+            $subTeamResourceTypes->push($parentTeam->resource_type);
+        }
+        
+        foreach ($subTeams as $subTeam) {
+            $subTeamResourceTypes = $subTeamResourceTypes->merge(self::allSubTeamResourceTypes($subTeam));
+        }
+        
+        return $subTeamResourceTypes->unique()->toArray();
+    }
 }
