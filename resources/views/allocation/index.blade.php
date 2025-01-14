@@ -5,15 +5,6 @@
 @endsection
 
 @section('content')
-    <script>
-        function openDialog() {
-            document.getElementById('uploadDialog').showModal();
-        }
-
-        function closeDialog() {
-            document.getElementById('uploadDialog').close();
-        }
-    </script>
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
@@ -26,28 +17,6 @@
                             </span>
 
                             <div class="float-right">
-                                <!-- Button to open the dialog -->
-                                <button type="button" class="btn btn-primary btn-sm float-right" onclick="openDialog()">
-                                    {{ __('Upload') }}
-                                </button>
-
-                                <!-- Dialog -->
-                                <dialog id="uploadDialog">
-                                    <form action="{{ route('allocations.upload') }}" method="POST"
-                                        enctype="multipart/form-data">
-                                        @csrf
-                                        <h2>{{ __('Upload File') }}</h2>
-                                        <div class="form-group">
-                                            <input type="file" name="file" class="form-control-file" required>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary"
-                                                onclick="closeDialog()">{{ __('Close') }}</button>
-                                            <button type="submit" class="btn btn-primary">{{ __('Upload') }}</button>
-                                        </div>
-                                    </form>
-                                </dialog>
-
                                 <a href="{{ route('allocations.create') }}" class="btn btn-primary btn-sm float-right"
                                     data-placement="left">
                                     {{ __('Create New') }}

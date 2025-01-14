@@ -7,6 +7,7 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProjectController;
@@ -87,6 +88,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('regions', RegionController::class);
         Route::resource('locations', LocationController::class);
         Route::resource('resource-types', ResourceTypeController::class);
+        Route::get('/import', [ImportController::class, 'index'])->name('import.index');
+        Route::post('/import/empower', [ImportController::class, 'populateAllocations'])->name('import.empower');
+        Route::get('/import/review/demands', [ImportController::class, 'reviewDemands'])->name('import.review.demands');
     });
 });
 
