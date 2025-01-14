@@ -91,6 +91,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/import', [ImportController::class, 'index'])->name('import.index');
         Route::post('/import/empower', [ImportController::class, 'populateAllocations'])->name('import.empower');
         Route::get('/import/review/demands', [ImportController::class, 'reviewDemands'])->name('import.review.demands');
+        Route::post('/import/review/actions', [ImportController::class, 'handleReviewAction'])->name('import.review.action');
+   
     });
 });
 

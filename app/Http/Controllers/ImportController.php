@@ -163,7 +163,7 @@ class ImportController extends Controller
     
     public function reviewDemands()
     {
-        $stagedDemands = StagingDemand::all();
+        $stagedDemands = StagingDemand::where('status', '<>', 'Rejected')->get();
         $demands = Demand::all();
         $changes = [];
         
@@ -218,4 +218,39 @@ class ImportController extends Controller
         
         return view('import.reviewDemands', compact('changes'));
     }
+
+public function handleReviewAction(Request $request)
+{
+    $validatedData = $request->validate([
+        'change' => 'required|array',
+        'action' => 'required|string|in:Accept,Reject',
+        'type' => 'required|string|in:Demand,Allocation',
+    ]);
+
+    $change = $validatedData['change'];
+    $action = $validatedData['action'];
+    $type = $validatedData['type'];
+
+    if ($type === 'Demand') {
+        if ($action === 'Accept') {
+            // Handle acceptance logic for Demand
+            // Example: Update Demand model with new data
+        } elseif ($action === 'Reject') {
+            // Handle rejection logic for Demand
+            // Example: Remove or ignore changes
+        }
+    } elseif ($type === 'Allocation') {
+        if ($action === 'Accept') {
+            // Handle acceptance logic for Allocation
+            // Example: Update Allocation model with new data
+        } elseif ($action === 'Reject') {
+            // Handle rejection logic for Allocation
+            // Example: Remove or ignore changes
+        }
+    }
+
+    // Return response, e.g., redirect or JSON response
+    return response()->json(['status' => 'success', 'message' => 'Action processed successfully.']);
+}
+
 }

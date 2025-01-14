@@ -23,6 +23,7 @@
                                         <th>Resource type</th>
                                         <th>Old FTE</th>
                                         <th>New FTE</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,6 +39,16 @@
                                             <td>{{ $change['resource'] }}</td>
                                             <td>{{ number_format(round($change['old_ftes'], 2), 2) }}</td>
                                             <td>{{ number_format(round($change['new_ftes'], 2), 2) }}</td>
+                                            <td>
+                                                <form action="{{ route('import.review.action', ['change' => $change, 'action' => 'Accept', 'type' => 'demand']) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                                </form>
+                                                <form action="{{ route('import.review.action', ['change' => $change, 'action' => 'Reject', 'type' => 'demand']) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
