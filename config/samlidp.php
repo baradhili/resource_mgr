@@ -10,7 +10,7 @@ return [
     |
     | Use this file to configure the service providers you want to use.
     | using https://auth0.com/docs/authenticate/single-sign-on/outbound-single-sign-on/configure-auth0-saml-identity-provider
-    |
+    | also check here - https://stackoverflow.com/questions/54289010/azure-active-directory-sso-with-laravel
      */
     // Outputs data to your laravel.log file for debugging
     'debug' => false,

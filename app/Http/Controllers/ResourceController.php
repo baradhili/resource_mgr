@@ -12,6 +12,8 @@ use App\Models\Resource;
 use App\Models\ResourceSkill;
 use App\Models\Skill;
 use App\Models\Location;
+use App\Models\User;
+use App\Models\ResourceType;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -56,88 +58,7 @@ class ResourceController extends Controller
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
             $resourceAvailability = Cache::get('resourceAvailability');
-            Log::info("data: ".json_encode($resourceAvailability));
         }
-
-        // foreach ($resources as $resource) {
-
-        //     $resourceAvailability[$resource->id] = [
-        //         'name' => $resource->full_name,
-        //     ];
-        //     $currentContract = $resource->contracts()->where('start_date', '<=', now())
-        //         ->where('end_date', '>=', now())
-        //         ->first();
-
-        //     if ($currentContract) {
-        //         // Calculate base availability for each month
-        //         $contractStartDate = Carbon::parse($currentContract->start_date);
-        //         $contractEndDate = Carbon::parse($currentContract->end_date);
-
-        //         foreach ($nextTwelveMonths as $month) {
-        //             $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
-        //             $monthEndDate = $monthStartDate->copy()->endOfMonth();
-
-        //             if (
-        //                 $contractStartDate->isBetween($monthStartDate, $monthEndDate) ||
-        //                 $contractEndDate->isBetween($monthStartDate, $monthEndDate) ||
-        //                 ($contractStartDate->lessThanOrEqualTo($monthStartDate) && $contractEndDate->greaterThanOrEqualTo($monthEndDate))
-        //             ) {
-        //                 // If the contract overlaps with the month, calculate availability
-        //                 if (
-        //                     $contractStartDate->isSameMonth($monthStartDate) ||
-        //                     $contractEndDate->isSameMonth($monthEndDate)
-        //                 ) {
-        //                     // If the contract start_date or end_date lands in this month, calculate the percentage of the month inside the contract
-        //                     $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
-        //                     $contractDaysInMonth = min($contractEndDate, $monthEndDate)->diffInDays(max($contractStartDate, $monthStartDate)) + 1;
-        //                     $baseAvailability = round(($contractDaysInMonth / $daysInMonth) * $currentContract->availability, 2);
-        //                 } else {
-        //                     // Otherwise, it will be the availability
-        //                     $baseAvailability = $currentContract->availability;
-        //                 }
-        //                 // Use year-month as the key
-        //                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-
-        //                 // Add the calculated base availability to the resource availability array
-        //                 $resourceAvailability[$resource->id]['availability'][$key] = $baseAvailability;
-        //             }
-        //             //now check for leave
-        //             foreach ($resource->leaves as $leave) {
-        //                 $leaveStartDate = Carbon::parse($leave->start_date);
-        //                 $leaveEndDate = Carbon::parse($leave->end_date);
-
-        //                 if (
-        //                     $leaveStartDate->isBetween($monthStartDate, $monthEndDate) ||
-        //                     $leaveEndDate->isBetween($monthStartDate, $monthEndDate) ||
-        //                     ($leaveStartDate->lessThanOrEqualTo($monthStartDate) && $leaveEndDate->greaterThanOrEqualTo($monthEndDate))
-        //                 ) {
-        //                     // If the leave overlaps with the month, calculate availability
-        //                     if (
-        //                         $leaveStartDate->isSameMonth($monthStartDate) ||
-        //                         $leaveEndDate->isSameMonth($monthEndDate)
-        //                     ) {
-        //                         // If the leave start_date or end_date lands in this month, calculate the percentage of the month inside the leave
-        //                         $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
-        //                         $leaveDaysInMonth = min($leaveEndDate, $monthEndDate)->diffInDays(max($leaveStartDate, $monthStartDate)) + 1;
-        //                         $leaveAvailability = round(($leaveDaysInMonth / $daysInMonth) * 1.00, 2);
-        //                     } else {
-        //                         // Otherwise, it will be 100
-        //                         $leaveAvailability = 1.00;
-        //                     }
-        //                     // Use year-month as the key
-        //                     $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-
-        //                     // Add the calculated base availability to the resource availability array
-        //                     $resourceAvailability[$resource->id]['availability'][$key] = $resourceAvailability[$resource->id]['availability'][$key] - $leaveAvailability;
-
-        //                 }
-        //             }
-        //         }
-        //     }
-
-        // }
-        // // Cache the resourceAvailability data
-        // Cache::put('resourceAvailability', $resourceAvailability, now()->addDays(1));
 
         //return to the view
         return view('resource.index', compact('resources', 'resourceAvailability', 'nextTwelveMonths'))
@@ -160,6 +81,8 @@ class ResourceController extends Controller
         $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
             ->with('skill')
             ->get();
+        $resourceTypes = ResourceType::all();
+        
         return view('resource.create', compact('resource', 'locations', 'skills', 'resourceSkills'));
     }
 
@@ -180,10 +103,11 @@ class ResourceController extends Controller
         $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
             ->with('skill')
             ->get();
-        // Log::info("resource: " . json_encode($resource));
-        // Log::info("resourceSkills: " . json_encode($resourceSkills));
-        Log::info("all skills: " . json_encode($skills));
-        return view('resource.edit', compact('resource', 'locations', 'skills', 'resourceSkills'));
+
+        $users = User::all();
+        $resourceTypes = ResourceType::all();
+
+        return view('resource.edit', compact('resource', 'locations', 'skills', 'resourceSkills','users','resourceTypes'));
     }
 
     /**
@@ -202,7 +126,7 @@ class ResourceController extends Controller
      */
     public function show($id): View
     {
-        $resource = Resource::with('location')->find($id);
+        $resource = Resource::with(['location', 'skills', 'contracts', 'allocations', 'leaves','user','resourceType'])->find($id);
 
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resources_id', $id)
@@ -218,6 +142,7 @@ class ResourceController extends Controller
             ];
         }
         $skills = $resourceSkills;
+        
 
         return view('resource.show', compact('resource', 'skills'));
     }
@@ -318,7 +243,7 @@ class ResourceController extends Controller
      */
     public function update(ResourceRequest $request, Resource $resource): RedirectResponse
     {
-        // Log::info("input skills: " . $request->validated()['skills']);
+        // Log::info('Validated fields: ' . print_r($request->validated(), true));
         // Parse the input skills
         $skillsData = [];
         foreach (json_decode($request->validated()['skills'], true) as $skill) {
@@ -330,7 +255,10 @@ class ResourceController extends Controller
         // Update resource details
         $resource->full_name = $request->validated()['full_name'];
         $resource->empowerID = $request->validated()['empowerID'];
-        $resource->adID = $request->validated()['adID'];
+        if (array_key_exists('userID', $request->validated()) && $request->validated()['userID'] !== null) {
+            $resource->user_id = $request->validated()['userID'];
+        }
+        $resource->resource_type = $request->validated()['resource_type'];
         $resource->location_id = $request->validated()['location_id'];
         $location = Location::find($request->validated()['location_id']);
         $resource->region_id = $location->region_id;

@@ -24,7 +24,8 @@ class ResourceRequest extends FormRequest
         return [
             'full_name' => 'string',
             'empowerID' => 'string',
-            'adID' => 'string',
+            'userID' => 'nullable|integer',
+            'resource_type' => 'required|integer',
             'location_id' => 'required|integer',
             'skills' => 'required|json',
         ];

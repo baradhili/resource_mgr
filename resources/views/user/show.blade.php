@@ -29,8 +29,8 @@
                                     {{ $user->email }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Settings:</strong>
-                                    {{ $user->settings }}
+                                    <strong>Team:</strong>
+                                    {{ $user->currentTeam->name ?? 'No Team' }}
                                 </div>
 
                     </div>

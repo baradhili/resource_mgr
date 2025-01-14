@@ -23,6 +23,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'current_team_id',
+        'resource_id',
         'password',
     ];
 
@@ -56,13 +58,6 @@ class User extends Authenticatable
         return $this->hasMany(TeamUser::class, 'user_id');
     }
 
-    /**
-     * Get the teams the user belongs to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    // public function teams()
-    // {
-    //     return $this->belongsToMany(Team::class, 'team_users', 'user_id', 'team_id');
-    // }
+    
+
 }
