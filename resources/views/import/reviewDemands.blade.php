@@ -18,20 +18,26 @@
                                 <thead>
                                     <tr>
                                         <th>Project</th>
-                                        <th>Date</th>
-                                        <th>Resource</th>
-                                        <th>Old FTEs</th>
-                                        <th>New FTEs</th>
+                                        <th>Start</th>
+                                        <th>End</th>
+                                        <th>Resource type</th>
+                                        <th>Old FTE</th>
+                                        <th>New FTE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($changes as $change)
                                         <tr>
                                             <td>{{ $change['project'] }}</td>
-                                            <td>{{ $change['date']->format('M-Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $change['start'])->format('M-Y') }}</td>
+                                            <td>
+                                                @if ($change['start'] !== $change['end'])
+                                                    {{ \Carbon\Carbon::createFromFormat('Y-m-d', $change['end'])->format('M-Y') }}
+                                                @endif
+                                            </td>
                                             <td>{{ $change['resource'] }}</td>
-                                            <td>{{ $change['old_ftes'] }}</td>
-                                            <td>{{ $change['new_ftes'] }}</td>
+                                            <td>{{ number_format(round($change['old_ftes'], 2), 2) }}</td>
+                                            <td>{{ number_format(round($change['new_ftes'], 2), 2) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

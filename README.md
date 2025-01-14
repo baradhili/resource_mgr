@@ -29,7 +29,7 @@ Its early stages right now, we are looking for help in:
 - [X] Set up teams 
 - [X] Create Resource Type crud and link with teams
 - [ ] Filter multiple views/permissions by Team
-- [ ] Create a "Senior Manager" role that might oversee one or more Teams
+- [X] Create a "Senior Manager" role that might oversee one or more Teams
 - [ ] Update User admin to assign the user into various function roles such as "Resource", "Team Owner", etc
 - [X] Add ability to release demand from a resource from a date (to handle exits)
 - [ ] Separate allocations and demands from external sources and deliberately accept them instead of assuming they are correct

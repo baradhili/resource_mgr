@@ -166,24 +166,56 @@ class ImportController extends Controller
         $stagedDemands = StagingDemand::all();
         $demands = Demand::all();
         $changes = [];
+        
         foreach ($stagedDemands as $stagedDemand) {
-            Log::info("staged demand:".json_encode($stagedDemand));
             $demand = $demands->firstWhere('projects_id', $stagedDemand->projects_id);
             if ($demand) {
                 $demand = $demand->where('demand_date', $stagedDemand->demand_date)->first();
-            } else {
-                $demand = null;
             }
-            if ($demand && $stagedDemand->fte != $demand->fte) {
-                $changes[] = [
-                    'project' => $stagedDemand->project->name,
-                    'date' => $stagedDemand->demand_date,
-                    'resource' => $stagedDemand->resource_type,
-                    'old_ftes' => $demand->fte,
-                    'new_ftes' => $stagedDemand->fte,
-                ];
+            
+            if ($demand) {
+                if ($stagedDemand->fte != $demand->fte) {
+                    $lastChange = end($changes);
+
+                    if ($lastChange && $lastChange['project'] === $stagedDemand->project->name &&
+                        $lastChange['resource'] === $stagedDemand->resource_type &&
+                        $lastChange['new_ftes'] === $stagedDemand->fte &&
+                        Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedDemand->demand_date))) {
+                        
+                        $changes[key($changes)]['end'] = $stagedDemand->demand_date;
+                    } else {
+                        $changes[] = [
+                            'project' => $stagedDemand->project->name,
+                            'start' => $stagedDemand->demand_date,
+                            'end' => $stagedDemand->demand_date,
+                            'resource' => $stagedDemand->resource_type,
+                            'old_ftes' => $demand->fte,
+                            'new_ftes' => $stagedDemand->fte,
+                        ];
+                    }
+                }
+            } else {
+                $lastChange = end($changes);
+
+                if ($lastChange && $lastChange['project'] === $stagedDemand->project->name &&
+                    $lastChange['resource'] === $stagedDemand->resource_type &&
+                    $lastChange['new_ftes'] === $stagedDemand->fte &&
+                    Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedDemand->demand_date))) {
+                    
+                    $changes[key($changes)]['end'] = $stagedDemand->demand_date;
+                } else {
+                    $changes[] = [
+                        'project' => $stagedDemand->project->name,
+                        'start' => $stagedDemand->demand_date,
+                        'end' => $stagedDemand->demand_date,
+                        'resource' => $stagedDemand->resource_type,
+                        'old_ftes' => 0,
+                        'new_ftes' => $stagedDemand->fte,
+                    ];
+                }
             }
         }
+        
         return view('import.reviewDemands', compact('changes'));
     }
 }
