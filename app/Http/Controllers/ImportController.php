@@ -168,14 +168,16 @@ class ImportController extends Controller
             ->get();
         $demands = Demand::all();
         $changes = [];
-
+        // TODO figure out how to check for changes where a demand or an allocation is deleted
         foreach ($stagedDemands as $stagedDemand) {
-            Log::info("Staged Demand: ". json_encode($stagedDemand));
+
+            // Check if we have an existing Demand
             $demand = $demands->firstWhere('projects_id', $stagedDemand->projects_id);
             if ($demand) {
                 $demand = $demand->where('demand_date', $stagedDemand->demand_date)->first();
             }
 
+            //If we have an existing demand then process as a change
             if ($demand) {
                 if ($stagedDemand->fte != $demand->fte) {
                     $lastChange = end($changes);

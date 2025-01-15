@@ -55,4 +55,8 @@ class Region extends Model
         return $this->hasMany(\App\Models\Resource::class, 'id', 'region_id');
     }
     
+    public function publicHolidays()
+    {
+        return $this->hasMany(\App\Models\PublicHoliday::class);
+    }
 }

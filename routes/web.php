@@ -22,6 +22,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ResourceTypeController;
+use App\Http\Controllers\PublicHolidayController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -93,7 +94,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/import/review/demands', [ImportController::class, 'reviewDemands'])->name('import.review.demands');
         Route::get('/import/review/allocations', [ImportController::class, 'reviewAllocations'])->name('import.review.allocations');
         Route::post('/import/review/actions', [ImportController::class, 'handleReviewAction'])->name('import.review.action');
-
+        Route::resource('public-holidays', PublicHolidayController::class);
     });
 });
 

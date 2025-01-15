@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    Regions
+    Public Holidays
 @endsection
 
 @section('content')
@@ -13,15 +13,14 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
                             <span id="card_title">
-                                {{ __('Regions') }}
+                                {{ __('Public Holidays') }}
                             </span>
 
-                            <div class="float-right">
-                                <a href="{{ route('regions.create') }}" class="btn btn-primary btn-sm float-right"
-                                    data-placement="left">
-                                    {{ __('Create New') }}
+                             <div class="float-right">
+                                <a href="{{ route('public-holidays.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
+                                  {{ __('Create New') }}
                                 </a>
-                            </div>
+                              </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -36,32 +35,30 @@
                                 <thead class="thead">
                                     <tr>
                                         <th>No</th>
-
-                                        <th>Name</th>
+                                        
+									<th >Date</th>
+									<th >Name</th>
+									<th >Region Id</th>
 
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($regions as $region)
+                                    @foreach ($publicHolidays as $publicHoliday)
                                         <tr>
                                             <td>{{ ++$i }}</td>
-
-                                            <td>{{ $region->name }}</td>
+                                            
+										<td >{{ $publicHoliday->date }}</td>
+										<td >{{ $publicHoliday->name }}</td>
+										<td >{{ $publicHoliday->region_id }}</td>
 
                                             <td>
-                                                <form action="{{ route('regions.destroy', $region->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary "
-                                                        href="{{ route('regions.show', $region->id) }}"><i
-                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success"
-                                                        href="{{ route('regions.edit', $region->id) }}"><i
-                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form action="{{ route('public-holidays.destroy', $publicHoliday->id) }}" method="POST">
+                                                    <a class="btn btn-sm btn-primary " href="{{ route('public-holidays.show', $publicHoliday->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success" href="{{ route('public-holidays.edit', $publicHoliday->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -71,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $regions->withQueryString()->links() !!}
+                {!! $publicHolidays->withQueryString()->links() !!}
             </div>
         </div>
     </div>
