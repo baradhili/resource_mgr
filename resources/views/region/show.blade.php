@@ -24,6 +24,10 @@
                                     <strong>Name:</strong>
                                     {{ $region->name }}
                                 </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Jurisdiction:</strong>
+                                    {{ $region->jurisdiction }}
+                                </div>
 
                     </div>
                 </div>

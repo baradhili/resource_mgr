@@ -10,6 +10,8 @@ use App\Models\Allocation;
 use App\Models\StagingAllocation;
 use App\Models\StagingDemand;
 use App\Models\ResourceType;
+use App\Models\Region;
+use App\Models\PublicHoliday;
 use \avadim\FastExcelReader\Excel;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -379,6 +381,36 @@ class ImportController extends Controller
 
         // Return response, e.g., redirect or JSON response
         return redirect($referringURL)->with('success', 'Action processed successfully.');
+    }
+
+    
+    public function importHolidays()
+    {
+        $url = 'https://data.gov.au/data/dataset/b1bc6077-dadd-4f61-9f8c-002ab2cdff10/resource/33673aca-0857-42e5-b8f0-9981b4755686/download/australian-public-holidays-combined-2021-2025.csv';
+        $client = new \GuzzleHttp\Client();
+        $response = $client->get($url);
+        $stream = $response->getBody();
+        $rows = array_map('str_getcsv', explode("\n", $stream));
+        $header = array_shift($rows);
+        $data = [];
+        foreach ($rows as $row) {
+            $data[] = array_combine($header, $row);
+        }
+        foreach (array_slice($data, 1) as $holiday) { // Skip the first row
+            $region = Region::where('jurisdiction', strtolower($holiday['Jurisdiction']))->first();
+            if ($region) {
+                $holidayData = [
+                    'region_id' => $region->id,
+                    'date' => $holiday['Date'],
+                    'name' => $holiday['Holiday Name'],
+                ];
+                PublicHoliday::updateOrCreate([
+                    'region_id' => $region->id,
+                    'date' => $holiday['Date']
+                ], $holidayData);
+            }
+        }
+        return redirect()->back()->with('success', 'Public Holidays imported successfully.');
     }
 
 }

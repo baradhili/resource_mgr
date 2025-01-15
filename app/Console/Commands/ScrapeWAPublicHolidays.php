@@ -48,63 +48,81 @@ class ScrapeWAPublicHolidays extends Command
 
         $crawler = new Crawler($html);
 
-        // Extract the years from the table header
-        $years = [];
-        $crawler->filterXPath('//table//thead/tr/th')->each(function ($node, $i) use (&$years) {
-            if ($i > 0) { // Skip the first column which contains holiday names
-                $years[] = trim($node->text());
-            }
+        // Find the table
+        $table = $crawler->filterXPath('//table');
+        // $this->info('HTML:');
+        // $this->line($table->html());
+        // Initialize an array to store the data
+        $publicHolidays = [];
+
+        // Extract the years from the first thead tag
+        $years = $table->filter('thead:first-of-type th')->each(function (Crawler $node, $i) {
+            $text = trim($node->text());
+            return $i > 0 && is_numeric($text) ? $text : null; // Skip the first column and non-numeric values
         });
-        $this->info('Extracted years: ' . implode(', ', $years));
-        // Extract holiday data
-        $holidays = [];
-        $crawler->filterXPath('//table//tbody/tr')->each(function ($node) use (&$holidays, $years) {
-            $columns = $node->filter('td')->each(function ($column) {
-                return trim($column->text());
+        $years = array_slice(array_filter($years), 0, 3); // Remove null values and only return the first three cells
+
+        // Extract holiday names and dates
+        $results = [];
+        $crawler->filter('tbody tr')->each(function (Crawler $row) use (&$results, $years) {
+            // Ensure the row has data
+            if ($row->filter('th')->count() === 0 || $row->filter('td')->count() === 0) {
+                return;
+            }
+
+            $holidayName = trim($row->filter('th')->text());
+            $this->info('Extracting public holiday: ' . $holidayName);
+            $dates = $row->filter('td')->each(function (Crawler $cell, $i) use ($years) {
+                $this->info("cell text: ". $cell->text());
+                //clean up cell text
+                $cellText = strip_tags($cell->text());
+                $cleanText = preg_replace('/[^A-Za-z0-9\s]/', '', $cellText);
+
+                $dateString = $cleanText." ". $years[$i];
+                $date = \Carbon\Carbon::createFromFormat('Y j F', $dateString);
             });
 
-            $holidayName = trim($node->filter('th')->text());
-
-            foreach ($years as $index => $year) {
-                if (isset($columns[$index])) {
-                    $dateText = $columns[$index];
-                    $date = $this->parseDate($dateText, $year);
-                    if ($date) {
-                        $holidays[] = [
-                            'date' => $date,
-                            'name' => $holidayName,
-                        ];
-                    }
+            foreach ($dates as $yearDates) {
+                foreach ($yearDates as $fullDate) {
+                    $results[] = [
+                        'holiday' => $holidayName,
+                        'date' => $fullDate,
+                    ];
                 }
             }
         });
 
-        // Remove null values
-        $holidays = array_filter($holidays);
-
-        // Ensure the region exists in the database
-        $region = Region::firstOrCreate(['name' => 'APAC-West']);
-
-        // Save the holidays to the database
-        foreach ($holidays as $holiday) {
-            $this->info('Saving public holiday: ' . $holiday['name']." date: ".$holiday['date']);
-            PublicHoliday::updateOrCreate(
-                [
-                    'date' => \Carbon\Carbon::parse($holiday['date'])->format('Y-m-d'),
-                    'name' => $holiday['name'],
-                    'region_id' => $region->id,
-                ],
-                [
-                    'region_id' => $region->id,
-                ]
-            );
+        // Output the results
+        foreach ($results as $result) {
+            echo "Holiday: {$result['holiday']}, Date: {$result['date']}" . PHP_EOL;
         }
+
+        // // Remove null values
+        // $holidays = array_filter($holidays);
+
+        // // Ensure the region exists in the database
+        // $region = Region::firstOrCreate(['name' => 'APAC-West']);
+
+        // // Save the holidays to the database
+        // foreach ($holidays as $holiday) {
+        //     $this->info('Saving public holiday: ' . $holiday['name'] . " date: " . $holiday['date']);
+        //     PublicHoliday::updateOrCreate(
+        //         [
+        //             'date' => \Carbon\Carbon::parse($holiday['date'])->format('Y-m-d'),
+        //             'name' => $holiday['name'],
+        //             'region_id' => $region->id,
+        //         ],
+        //         [
+        //             'region_id' => $region->id,
+        //         ]
+        //     );
+        // }
 
         $this->info('Public holidays saved to the database');
 
         return Command::SUCCESS;
     }
-    
+
     /**
      * Parse the date text and return a formatted date.
      *

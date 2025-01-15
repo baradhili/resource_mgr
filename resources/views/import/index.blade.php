@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
- <script>
+    <script>
         function openDialog() {
             document.getElementById('uploadDialog').showModal();
         }
@@ -39,7 +39,8 @@
                                         <td>Empower Data</td>
                                         <td>
                                             <!-- Button to open the dialog -->
-                                            <button type="button" class="btn btn-primary btn-sm float-right" onclick="openDialog()">
+                                            <button type="button" class="btn btn-primary btn-sm float-right"
+                                                onclick="openDialog()">
                                                 {{ __('Upload') }}
                                             </button>
                                             <!-- Dialog -->
@@ -49,16 +50,28 @@
                                                     @csrf
                                                     <h2>{{ __('Upload File') }}</h2>
                                                     <div class="form-group">
-                                                        <input type="file" name="file" class="form-control-file" required>
+                                                        <input type="file" name="file" class="form-control-file"
+                                                            required>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary"
                                                             onclick="closeDialog()">{{ __('Close') }}</button>
-                                                        <button type="submit" class="btn btn-primary">{{ __('Upload') }}</button>
+                                                        <button type="submit"
+                                                            class="btn btn-primary">{{ __('Upload') }}</button>
                                                     </div>
                                                 </form>
                                             </dialog>
                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Public Holidays</td>
+                                        <td>
+                                            <a href="{{ route('import.holidays') }}"
+                                                class="btn btn-primary btn-sm float-right">
+                                                {{ __('Upload') }}
+                                            </a>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>

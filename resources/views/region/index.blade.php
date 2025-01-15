@@ -38,6 +38,7 @@
                                         <th>No</th>
 
                                         <th>Name</th>
+                                        <th>Holidays Jurisdiction</th>
 
                                         <th></th>
                                     </tr>
@@ -48,6 +49,7 @@
                                             <td>{{ ++$i }}</td>
 
                                             <td>{{ $region->name }}</td>
+                                            <td>{{ $region->jurisdiction }}</td>
 
                                             <td>
                                                 <form action="{{ route('regions.destroy', $region->id) }}" method="POST">

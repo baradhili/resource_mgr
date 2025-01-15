@@ -94,6 +94,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/import/review/demands', [ImportController::class, 'reviewDemands'])->name('import.review.demands');
         Route::get('/import/review/allocations', [ImportController::class, 'reviewAllocations'])->name('import.review.allocations');
         Route::post('/import/review/actions', [ImportController::class, 'handleReviewAction'])->name('import.review.action');
+        Route::get('/import/holidays', [ImportController::class, 'importHolidays'])->name('import.holidays');
         Route::resource('public-holidays', PublicHolidayController::class);
     });
 });
