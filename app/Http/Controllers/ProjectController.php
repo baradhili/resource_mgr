@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Allocation;
+use App\Models\Resource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\ProjectRequest;
@@ -59,8 +61,12 @@ class ProjectController extends Controller
     public function show($id): View
     {
         $project = Project::find($id);
-
-        return view('project.show', compact('project'));
+        // $allocations = Allocation::where('projects_id', $id)->get();
+        $resources = Resource::whereHas('allocations', function ($query) use ($id) {
+            $query->where('projects_id', $id);
+        })->with('resourceType')->get();
+Log::info(json_encode($resources, JSON_PRETTY_PRINT));
+        return view('project.show', compact('project', 'resources'));
     }
 
     /**
