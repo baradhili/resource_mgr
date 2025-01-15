@@ -59,7 +59,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('demands', DemandController::class);
     Route::resource('leaves', LeaveController::class);
     Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
-    Route::resource('projects', ProjectController::class); 
+    Route::resource('projects', ProjectController::class);
     Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
     Route::resource('resources', ResourceController::class);
     Route::post('/skills/upload', [SkillController::class, 'importRsd'])->name('skills.upload');
@@ -91,8 +91,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/import', [ImportController::class, 'index'])->name('import.index');
         Route::post('/import/empower', [ImportController::class, 'populateAllocations'])->name('import.empower');
         Route::get('/import/review/demands', [ImportController::class, 'reviewDemands'])->name('import.review.demands');
+        Route::get('/import/review/allocations', [ImportController::class, 'reviewAllocations'])->name('import.review.allocations');
         Route::post('/import/review/actions', [ImportController::class, 'handleReviewAction'])->name('import.review.action');
-   
+
     });
 });
 
@@ -101,8 +102,7 @@ Route::middleware('auth')->group(function () {
 /**
  * Teamwork routes
  */
-Route::group(['prefix' => 'teams', 'namespace' => 'Teamwork'], function()
-{
+Route::group(['prefix' => 'teams', 'namespace' => 'Teamwork'], function () {
     Route::get('/', [App\Http\Controllers\Teamwork\TeamController::class, 'index'])->name('teams.index');
     Route::get('create', [App\Http\Controllers\Teamwork\TeamController::class, 'create'])->name('teams.create');
     Route::post('teams', [App\Http\Controllers\Teamwork\TeamController::class, 'store'])->name('teams.store');
