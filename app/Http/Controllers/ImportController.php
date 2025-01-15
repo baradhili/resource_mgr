@@ -288,12 +288,13 @@ class ImportController extends Controller
     }
 public function handleReviewAction(Request $request)
 {
+    $referringURL = $request->headers->get('referer');
     $validatedData = $request->validate([
         'change' => 'required|array',
         'action' => 'required|string|in:Accept,Reject',
         'type' => 'required|string|in:Demand,Allocation',
     ]);
-
+    
     $change = $validatedData['change'];
     $action = $validatedData['action'];
     $type = $validatedData['type'];
@@ -319,7 +320,7 @@ public function handleReviewAction(Request $request)
     }
 
     // Return response, e.g., redirect or JSON response
-    return response()->json(['status' => 'success', 'message' => 'Action processed successfully.']);
+    return redirect($referringURL)->with('success', 'Action processed successfully.');
 }
 
 }

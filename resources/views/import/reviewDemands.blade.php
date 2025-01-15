@@ -12,6 +12,11 @@
                     <div class="card-header">
                         <span class="card-title">Review Demands</span>
                     </div>
+                    @if ($message = Session::get('success'))
+                        <div class="alert alert-success m-4">
+                            <p>{{ $message }}</p>
+                        </div>
+                    @endif
                     <div class="card-body">
                         @if (count($changes) > 0)
                             <table class="table table-striped">
@@ -30,7 +35,8 @@
                                     @foreach ($changes as $change)
                                         <tr>
                                             <td>{{ $change['project'] }}</td>
-                                            <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $change['start'])->format('M-Y') }}</td>
+                                            <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $change['start'])->format('M-Y') }}
+                                            </td>
                                             <td>
                                                 @if ($change['start'] !== $change['end'])
                                                     {{ \Carbon\Carbon::createFromFormat('Y-m-d', $change['end'])->format('M-Y') }}
@@ -40,11 +46,15 @@
                                             <td>{{ number_format(round($change['old_ftes'], 2), 2) }}</td>
                                             <td>{{ number_format(round($change['new_ftes'], 2), 2) }}</td>
                                             <td>
-                                                <form action="{{ route('import.review.action', ['change' => $change, 'action' => 'Accept', 'type' => 'demand']) }}" method="POST">
+                                                <form
+                                                    action="{{ route('import.review.action', ['change' => $change, 'action' => 'Accept', 'type' => 'Demand']) }}"
+                                                    method="POST">
                                                     @csrf
                                                     <button type="submit" class="btn btn-sm btn-success">Accept</button>
                                                 </form>
-                                                <form action="{{ route('import.review.action', ['change' => $change, 'action' => 'Reject', 'type' => 'demand']) }}" method="POST">
+                                                <form
+                                                    action="{{ route('import.review.action', ['change' => $change, 'action' => 'Reject', 'type' => 'Demand']) }}"
+                                                    method="POST">
                                                     @csrf
                                                     <button type="submit" class="btn btn-sm btn-danger">Reject</button>
                                                 </form>
