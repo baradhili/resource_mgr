@@ -65,7 +65,7 @@ class ProjectController extends Controller
         $resources = Resource::whereHas('allocations', function ($query) use ($id) {
             $query->where('projects_id', $id);
         })->with('resourceType')->get();
-Log::info(json_encode($resources, JSON_PRETTY_PRINT));
+
         return view('project.show', compact('project', 'resources'));
     }
 

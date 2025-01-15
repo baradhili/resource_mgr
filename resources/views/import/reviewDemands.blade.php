@@ -34,7 +34,7 @@
                                 <tbody>
                                     @foreach ($changes as $change)
                                         <tr>
-                                            <td>{{ $change['project'] }}</td>
+                                            <td><a href="{{ route('projects.show', $change['project_id']) }}">{{ $change['project'] }}</a></td>
                                             <td>{{ \Carbon\Carbon::createFromFormat('Y-m-d', $change['start'])->format('M-Y') }}
                                             </td>
                                             <td>

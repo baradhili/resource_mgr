@@ -163,11 +163,14 @@ class ImportController extends Controller
 
     public function reviewDemands()
     {
-        $stagedDemands = StagingDemand::where('status', '<>', 'Rejected')->get();
+        $stagedDemands = StagingDemand::where('status', '<>', 'Rejected')
+            ->with('project')
+            ->get();
         $demands = Demand::all();
         $changes = [];
 
         foreach ($stagedDemands as $stagedDemand) {
+            Log::info("Staged Demand: ". json_encode($stagedDemand));
             $demand = $demands->firstWhere('projects_id', $stagedDemand->projects_id);
             if ($demand) {
                 $demand = $demand->where('demand_date', $stagedDemand->demand_date)->first();
@@ -189,6 +192,7 @@ class ImportController extends Controller
                         $changes[] = [
                             'id' => $stagedDemand->id,
                             'project' => $stagedDemand->project->name,
+                            'project_id' => $stagedDemand->projects_id,
                             'start' => $stagedDemand->demand_date,
                             'end' => $stagedDemand->demand_date,
                             'resource' => $stagedDemand->resource_type,
@@ -221,6 +225,7 @@ class ImportController extends Controller
                     $changes[] = [
                         'id' => $stagedDemand->id,
                         'project' => $stagedDemand->project->name,
+                        'project_id' => $stagedDemand->projects_id,
                         'start' => $stagedDemand->demand_date,
                         'end' => $stagedDemand->demand_date,
                         'resource' => $stagedDemand->resource_type,
@@ -263,6 +268,7 @@ class ImportController extends Controller
                         $changes[] = [
                             'id' => $stagedAllocation->id,
                             'project' => $stagedAllocation->project->name,
+                            'project_id' => $stagedAllocation->projects_id,
                             'start' => $stagedAllocation->allocation_date,
                             'end' => $stagedAllocation->allocation_date,
                             'resource' => $stagedAllocation->resource_type,
@@ -286,6 +292,7 @@ class ImportController extends Controller
                     $changes[] = [
                         'id' => $stagedAllocation->id,
                         'project' => $stagedAllocation->project->name,
+                        'project_id' => $stagedAllocation->projects_id,
                         'start' => $stagedAllocation->allocation_date,
                         'end' => $stagedAllocation->allocation_date,
                         'resource' => $stagedAllocation->resource_type,

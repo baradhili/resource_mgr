@@ -37,7 +37,7 @@
                             <ul>
                                 @foreach ($resources as $resource)
                                     <li>
-                                        <strong>Full Name:</strong> {{ $resource->full_name }} - {{ $resource->resourceType->name }}
+                                        {{ $resource->full_name }} - {{ $resource->resourceType->name }}
                                     </li>
                                 @endforeach
                             </ul>
