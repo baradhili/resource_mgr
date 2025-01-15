@@ -160,31 +160,34 @@ class ImportController extends Controller
         }
     }
 
-    
+
     public function reviewDemands()
     {
         $stagedDemands = StagingDemand::where('status', '<>', 'Rejected')->get();
         $demands = Demand::all();
         $changes = [];
-        
+
         foreach ($stagedDemands as $stagedDemand) {
             $demand = $demands->firstWhere('projects_id', $stagedDemand->projects_id);
             if ($demand) {
                 $demand = $demand->where('demand_date', $stagedDemand->demand_date)->first();
             }
-            
+
             if ($demand) {
                 if ($stagedDemand->fte != $demand->fte) {
                     $lastChange = end($changes);
 
-                    if ($lastChange && $lastChange['project'] === $stagedDemand->project->name &&
+                    if (
+                        $lastChange && $lastChange['project'] === $stagedDemand->project->name &&
                         $lastChange['resource'] === $stagedDemand->resource_type &&
                         $lastChange['new_ftes'] === $stagedDemand->fte &&
-                        Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedDemand->demand_date))) {
-                        
+                        Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedDemand->demand_date))
+                    ) {
+
                         $changes[key($changes)]['end'] = $stagedDemand->demand_date;
                     } else {
                         $changes[] = [
+                            'id' => $stagedDemand->id,
                             'project' => $stagedDemand->project->name,
                             'start' => $stagedDemand->demand_date,
                             'end' => $stagedDemand->demand_date,
@@ -206,14 +209,17 @@ class ImportController extends Controller
                 //otherise compact if there are sequential identical FTE allocations
                 $lastChange = end($changes);
 
-                if ($lastChange && $lastChange['project'] === $stagedDemand->project->name &&
+                if (
+                    $lastChange && $lastChange['project'] === $stagedDemand->project->name &&
                     $lastChange['resource'] === $stagedDemand->resource_type &&
                     $lastChange['new_ftes'] === $stagedDemand->fte &&
-                    Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedDemand->demand_date))) {
-                    
+                    Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedDemand->demand_date))
+                ) {
+
                     $changes[key($changes)]['end'] = $stagedDemand->demand_date;
                 } else {
                     $changes[] = [
+                        'id' => $stagedDemand->id,
                         'project' => $stagedDemand->project->name,
                         'start' => $stagedDemand->demand_date,
                         'end' => $stagedDemand->demand_date,
@@ -224,35 +230,38 @@ class ImportController extends Controller
                 }
             }
         }
-        
+
         return view('import.reviewDemands', compact('changes'));
     }
 
-    
+
     public function reviewAllocations()
     {
         $stagedAllocations = StagingAllocation::where('status', '<>', 'Rejected')->get();
         $allocations = Allocation::all();
         $changes = [];
-        
+
         foreach ($stagedAllocations as $stagedAllocation) {
             $allocation = $allocations->firstWhere('projects_id', $stagedAllocation->projects_id);
             if ($allocation) {
                 $allocation = $allocation->where('allocation_date', $stagedAllocation->allocation_date)->first();
             }
-            
+
             if ($allocation) {
                 if ($stagedAllocation->fte != $allocation->fte) {
                     $lastChange = end($changes);
 
-                    if ($lastChange && $lastChange['project'] === $stagedAllocation->project->name &&
+                    if (
+                        $lastChange && $lastChange['project'] === $stagedAllocation->project->name &&
                         $lastChange['resource'] === $stagedAllocation->resource_type &&
                         $lastChange['new_ftes'] === $stagedAllocation->fte &&
-                        Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedAllocation->allocation_date))) {
-                        
+                        Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedAllocation->allocation_date))
+                    ) {
+
                         $changes[key($changes)]['end'] = $stagedAllocation->allocation_date;
                     } else {
                         $changes[] = [
+                            'id' => $stagedAllocation->id,
                             'project' => $stagedAllocation->project->name,
                             'start' => $stagedAllocation->allocation_date,
                             'end' => $stagedAllocation->allocation_date,
@@ -265,14 +274,17 @@ class ImportController extends Controller
             } else {
                 $lastChange = end($changes);
 
-                if ($lastChange && $lastChange['project'] === $stagedAllocation->project->name &&
+                if (
+                    $lastChange && $lastChange['project'] === $stagedAllocation->project->name &&
                     $lastChange['resource'] === $stagedAllocation->resource_type &&
                     $lastChange['new_ftes'] === $stagedAllocation->fte &&
-                    Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedAllocation->allocation_date))) {
-                    
+                    Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedAllocation->allocation_date))
+                ) {
+
                     $changes[key($changes)]['end'] = $stagedAllocation->allocation_date;
                 } else {
                     $changes[] = [
+                        'id' => $stagedAllocation->id,
                         'project' => $stagedAllocation->project->name,
                         'start' => $stagedAllocation->allocation_date,
                         'end' => $stagedAllocation->allocation_date,
@@ -283,44 +295,81 @@ class ImportController extends Controller
                 }
             }
         }
-        
+
         return view('import.reviewAllocations', compact('changes'));
     }
-public function handleReviewAction(Request $request)
-{
-    $referringURL = $request->headers->get('referer');
-    $validatedData = $request->validate([
-        'change' => 'required|array',
-        'action' => 'required|string|in:Accept,Reject',
-        'type' => 'required|string|in:Demand,Allocation',
-    ]);
-    
-    $change = $validatedData['change'];
-    $action = $validatedData['action'];
-    $type = $validatedData['type'];
+    public function handleReviewAction(Request $request)
+    {
+        $referringURL = $request->headers->get('referer');
+        $validatedData = $request->validate([
+            'change' => 'required|array',
+            'action' => 'required|string|in:Accept,Reject',
+            'type' => 'required|string|in:Demand,Allocation',
+        ]);
 
-    if ($type === 'Demand') {
-        if ($action === 'Accept') {
-            // Handle acceptance logic for Demand
-            // Example: Update Demand model with new data
-            Log::info("accepted demand: " . print_r($change, true));
-        } elseif ($action === 'Reject') {
-            // Handle rejection logic for Demand
-            // Example: Remove or ignore changes
-            Log::info("rejected demand: " . print_r($change, true));
+        $change = $validatedData['change'];
+        $action = $validatedData['action'];
+        $type = $validatedData['type'];
+
+        if ($type === 'Demand') {
+            if ($action === 'Accept') {
+                // Handle acceptance logic for Demand
+                // Example: Update Demand model with new data
+                Log::info("accepted demand: " . print_r($change, true));
+                if ($change['end'] = $change['start']) {
+                    $project = Project::where('name', $change['project'])->first();
+                    $change['project_id'] = $project->id;
+                    $demand = Demand::firstOrCreate([
+                        'projects_id' => $change['project_id'],
+                        'demand_date' => $change['start'],
+                    ], [
+                        'fte' => $change['new_ftes'],
+                        'status' => 'Proposed',
+                        'resource_type' => $change['resource'],
+                    ]);
+                    StagingDemand::where('id', $change['id'])->delete();
+                } else {
+                    // we have a range of months
+                    $project = Project::where('name', $change['project'])->first();
+                    $change['project_id'] = $project->id;
+                    
+                    $currentDate = Carbon::parse($change['start']);
+                    $endDate = Carbon::parse($change['end']);
+                    
+                    while ($currentDate->lte($endDate)) {
+                        Demand::firstOrCreate([
+                            'projects_id' => $change['project_id'],
+                            'demand_date' => $currentDate->format('Y-m-d'),
+                        ], [
+                            'fte' => $change['new_ftes'],
+                            'status' => 'Proposed',
+                            'resource_type' => $change['resource'],
+                        ]);
+                        $currentDate->addMonth();
+                    }
+                    
+                    StagingDemand::where('id', $change['id'])->delete();
+
+                }
+
+            } elseif ($action === 'Reject') {
+                // Handle rejection logic for Demand
+                // Example: Remove or ignore changes
+                Log::info("rejected demand: " . print_r($change, true));
+                StagingDemand::where('id', $change['id'])->update(['status' => 'Rejected']);
+            }
+        } elseif ($type === 'Allocation') {
+            if ($action === 'Accept') {
+                // Handle acceptance logic for Allocation
+                // Example: Update Allocation model with new data
+            } elseif ($action === 'Reject') {
+                // Handle rejection logic for Allocation
+                // Example: Remove or ignore changes
+            }
         }
-    } elseif ($type === 'Allocation') {
-        if ($action === 'Accept') {
-            // Handle acceptance logic for Allocation
-            // Example: Update Allocation model with new data
-        } elseif ($action === 'Reject') {
-            // Handle rejection logic for Allocation
-            // Example: Remove or ignore changes
-        }
+
+        // Return response, e.g., redirect or JSON response
+        return redirect($referringURL)->with('success', 'Action processed successfully.');
     }
-
-    // Return response, e.g., redirect or JSON response
-    return redirect($referringURL)->with('success', 'Action processed successfully.');
-}
 
 }
