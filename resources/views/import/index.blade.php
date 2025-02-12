@@ -32,6 +32,7 @@
                                     <tr>
                                         <th>Importer</th>
                                         <th>Link</th>
+                                        <th colspan="2">Reviews</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -45,7 +46,8 @@
                                             </button>
                                             <!-- Dialog -->
                                             <dialog id="uploadDialog">
-                                                <form action="{{ route('import.empower') }}" method="POST"
+                                                <!-- 'import.empower' -->
+                                                <form action="{{ route('allocations.upload') }}" method="POST"
                                                     enctype="multipart/form-data">
                                                     @csrf
                                                     <h2>{{ __('Upload File') }}</h2>
@@ -62,6 +64,8 @@
                                                 </form>
                                             </dialog>
                                         </td>
+                                        <td><a href="{{ route('import.review.demands') }}" class="btn btn-primary btn-sm float-right">Review Demands</a> </td>
+                                        <td><a  href="{{ route('import.review.allocations') }}" class="btn btn-primary btn-sm float-right">Review Allocations</td>
                                     </tr>
                                     <tr>
                                         <td>Public Holidays</td>
