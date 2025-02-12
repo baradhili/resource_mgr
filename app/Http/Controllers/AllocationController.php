@@ -222,7 +222,7 @@ class AllocationController extends Controller
                     // step throw columns 'D' on until blank, capture each filled column into array as monthYear
                     $monthYear = [];
                     foreach ($rowData as $columnLetter => $columnValue) {
-                        if ($columnLetter >= 'D' && !is_null($columnValue)) {
+                        if ($columnLetter >= 'G' && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
                         }
@@ -267,7 +267,8 @@ class AllocationController extends Controller
                             // Log::info(message: $resourceName." " . $rowNum ." ". $projectID." ". $projectName);
 
                             for ($i = 0; $i < count($monthYear); $i++) {
-                                $columnLetter = chr(68 + $i); // 'D' + i
+                                $columnLetter = chr(71 + $i); // 'D' + i
+                                
                                 $fte = (double) $rowData[$columnLetter];
                                 // Log::info("fte " . $monthYear[$i] . " " . $resourceName . " " . $projectID . " " . $projectName . " " . print_r($rowData[$columnLetter], true));
 
@@ -304,7 +305,8 @@ class AllocationController extends Controller
                         // Log::info(message: $resourceName." " . $rowNum ." ". $projectID." ". $projectName);
 
                         for ($i = 0; $i < count($monthYear); $i++) {
-                            $columnLetter = chr(68 + $i); // 'D' + i
+                            $columnLetter = chr(71 + $i); // 'D' + i
+                           
                             $fte = (double) $rowData[$columnLetter];
                             $monthDate = Carbon::parse($columnValue)->format('Y-m-01');
 
