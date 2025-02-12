@@ -248,18 +248,18 @@ class DemandController extends Controller
      */
     public function update(Request $request, $projects_id): RedirectResponse
     {
-        if (!is_numeric($request->input('projects_id'))) {
-            $project = Project::where('name', $request->input('projects_id'))->first();
-            $projectID = $project->id ?? null;
-            if (is_null($projectID)) {
-                $project = Project::updateOrCreate(
-                    ['name' => $request->input('projects_id')]
-                );
-                $projects_id = $project->id;
-            }
-        } else {
-            $projects_id = $request->input('projects_id');
-        }
+        // if (!is_numeric($request->input('projects_id'))) {
+        //     $project = Project::where('name', $request->input('projects_id'))->first();
+        //     $projectID = $project->id ?? null;
+        //     if (is_null($projectID)) {
+        //         $project = Project::updateOrCreate(
+        //             ['name' => $request->input('projects_id')]
+        //         );
+        //         $projects_id = $project->id;
+        //     }
+        // } else {
+            // $projects_id = $request->input('projects_id');
+        // }
         $request->validate([
             'start_date' => 'required|date',
             'end_date' => 'required|date',

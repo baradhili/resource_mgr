@@ -24,7 +24,7 @@ Its early stages right now, we are looking for help in:
 - [X] Update Allocations view to show percent of availablity
 - [X] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
 - [X] Differentiate manual demand from uploads so we don't delete the wrong stuff
-- [ ] Bulk add public holidays - to people in a region
+- [X] Bulk add public holidays - to people in a region
 - [X] Make calendar controls consistent
 - [X] Set up teams 
 - [X] Create Resource Type crud and link with teams

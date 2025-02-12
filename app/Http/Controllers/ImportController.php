@@ -17,9 +17,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
+
 
 class ImportController extends Controller
 {
+
     public function index()
     {
         return view('import.index');
@@ -77,6 +80,7 @@ class ImportController extends Controller
                     foreach ($resourceTypes as $type) {
                         if (Str::contains($resourceNameLower, $type)) {
                             $contains = true;
+                            Log::info("its a demand");
                             break;
                         }
                     }
@@ -275,7 +279,7 @@ class ImportController extends Controller
                             'project_id' => $stagedAllocation->projects_id,
                             'start' => $stagedAllocation->allocation_date,
                             'end' => $stagedAllocation->allocation_date,
-                            'resource' => $stagedAllocation->resource_type,
+                            'resource' => $stagedAllocation->resource->full_name,
                             'old_ftes' => $allocation->fte,
                             'new_ftes' => $stagedAllocation->fte,
                         ];
@@ -339,14 +343,15 @@ class ImportController extends Controller
                         'resource_type' => $change['resource'],
                     ]);
                     StagingDemand::where('id', $change['id'])->delete();
+                    Artisan::call('app:refresh-cache');
                 } else {
                     // we have a range of months
                     $project = Project::where('name', $change['project'])->first();
                     $change['project_id'] = $project->id;
-                    
+
                     $currentDate = Carbon::parse($change['start']);
                     $endDate = Carbon::parse($change['end']);
-                    
+
                     while ($currentDate->lte($endDate)) {
                         Demand::firstOrCreate([
                             'projects_id' => $change['project_id'],
@@ -358,8 +363,9 @@ class ImportController extends Controller
                         ]);
                         $currentDate->addMonth();
                     }
-                    
+
                     StagingDemand::where('id', $change['id'])->delete();
+                    Artisan::call('app:refresh-cache');
 
                 }
 
@@ -371,11 +377,20 @@ class ImportController extends Controller
             }
         } elseif ($type === 'Allocation') {
             if ($action === 'Accept') {
-                // Handle acceptance logic for Allocation
-                // Example: Update Allocation model with new data
+                $allocation = Allocation::firstOrCreate([
+                    'projects_id' => $change['project_id'],
+                    'allocation_date' => $change['start'],
+                ], [
+                    'fte' => $change['new_ftes'],
+                    'status' => 'Proposed',
+                    'resource_type' => $change['resource'],
+                ]);
+                StagingAllocation::where('id', $change['id'])->delete();
+                Artisan::call('app:refresh-cache');
             } elseif ($action === 'Reject') {
-                // Handle rejection logic for Allocation
-                // Example: Remove or ignore changes
+                Log::info("rejected allocation: " . print_r($change, true));
+                StagingAllocation::where('id', $change['id'])->update(['status' => 'Rejected']);
+                Artisan::call('app:refresh-cache');
             }
         }
 
@@ -383,7 +398,7 @@ class ImportController extends Controller
         return redirect($referringURL)->with('success', 'Action processed successfully.');
     }
 
-    
+
     public function importHolidays()
     {
         $url = 'https://data.gov.au/data/dataset/b1bc6077-dadd-4f61-9f8c-002ab2cdff10/resource/33673aca-0857-42e5-b8f0-9981b4755686/download/australian-public-holidays-combined-2021-2025.csv';

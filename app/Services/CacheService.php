@@ -25,8 +25,13 @@ class CacheService
         }
 
         $resources = Resource::whereHas('contracts', function ($query) {
-            $query->where('start_date', '<=', now())
-                ->where('end_date', '>=', now());
+            $query->where(function($query) {
+                $query->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now());
+            })->orWhere(function($query) {
+                $query->where('start_date', '>', now())
+                    ->where('start_date', '<=', Carbon::now()->addMonth());
+            });
         })->paginate();
 
         foreach ($resources as $resource) {
@@ -131,8 +136,13 @@ class CacheService
 
         // Collect our resources who have a current contract
         $resources = Resource::whereHas('contracts', function ($query) {
-            $query->where('start_date', '<=', now())
-                ->where('end_date', '>=', now());
+            $query->where(function($query) {
+                $query->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now());
+            })->orWhere(function($query) {
+                $query->where('start_date', '>', now())
+                    ->where('start_date', '<=', Carbon::now()->addMonth());
+            });
         })->paginate();
 
         //Collect the availability
@@ -154,6 +164,24 @@ class CacheService
             foreach ($nextTwelveMonths as $month) {
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 // $monthEndDate = $monthStartDate->copy()->endOfMonth();
+                // // Delete duplicate records based on allocation_date | fte  | resources_id | projects_id
+                // // and leave a single record
+                // $duplicates = Allocation::where('resources_id', '=', $resource->id)
+                //     ->where('allocation_date', '=', $monthStartDate)
+                //     ->groupBy('allocation_date', 'fte', 'resources_id', 'projects_id')
+                //     ->havingRaw('count(*) > 1')
+                //     ->pluck('id');
+
+                // if ($duplicates->count() > 0) {
+                //     Allocation::whereIn('id', $duplicates)->delete();
+                //     Allocation::where('resources_id', '=', $resource->id)
+                //         ->where('allocation_date', '=', $monthStartDate)
+                //         ->groupBy('allocation_date', 'fte', 'resources_id', 'projects_id')
+                //         ->havingRaw('count(*) = 1')
+                //         ->first()
+                //         ->replicate()
+                //         ->save();
+                // }
                 $totalAllocation = Allocation::where('allocation_date', '=', $monthStartDate)
                     ->where('resources_id', '=', $resource->id)
                     ->sum('fte');
@@ -161,9 +189,8 @@ class CacheService
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Get the availability for the month
-                $availability = isset($resourceAvailability[$resource->id]['availability'][$key])
-                    ? (float) $resourceAvailability[$resource->id]['availability'][$key]
-                    : 0;
+                // Get the availability for the current month
+                $availability = isset($resourceAvailability[$key]) ? (float)$resourceAvailability[$key] : 0.0;
 
                 // Calculate the percentage of total allocation divided by availability
                 $percentage = $availability > 0 ? ($totalAllocation / $availability) * 100 : 0;
