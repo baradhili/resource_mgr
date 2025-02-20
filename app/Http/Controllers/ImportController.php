@@ -59,10 +59,10 @@ class ImportController extends Controller
             // Collect up the dates in row 5
             foreach ($sheet->nextRow() as $rowNum => $rowData) {
                 if ($rowNum == 5) { // Grab header row
-                    // Step through columns 'D' on until blank, capture each filled column into array as monthYear
+                    // Step through columns 'G' on until blank, capture each filled column into array as monthYear
                     $monthYear = [];
                     foreach ($rowData as $columnLetter => $columnValue) {
-                        if ($columnLetter >= 'D' && !is_null($columnValue)) {
+                        if ($columnLetter >= 'G' && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
                         }
@@ -91,17 +91,7 @@ class ImportController extends Controller
                         if (is_null($resourceID)) {
                             $missingResources[] = $resourceName;
                         } else {
-                            $empowerID = $rowData['B'];
-                            $projectName = preg_replace('/[^\x00-\x7F]/', '', $rowData['C']);
-                            $project = Project::where('empowerID', $empowerID)->first();
-                            $projectID = $project->id ?? null;
-                            if (is_null($projectID)) {
-                                $project = Project::updateOrCreate(
-                                    ['empowerID' => $empowerID],
-                                    ['name' => $projectName]
-                                );
-                                $projectID = $project->id;
-                            }
+                            $projectID = $this->checkProject($rowData);
 
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(68 + $i); // 'D' + i
@@ -123,17 +113,7 @@ class ImportController extends Controller
                             }
                         }
                     } else { // Insert these into demand
-                        $empowerID = $rowData['B'];
-                        $projectName = preg_replace('/[^\x00-\x7F]/', '', $rowData['C']);
-                        $project = Project::where('empowerID', $empowerID)->first();
-                        $projectID = $project->id ?? null;
-                        if (is_null($projectID)) {
-                            $project = Project::updateOrCreate(
-                                ['empowerID' => $empowerID],
-                                ['name' => $projectName]
-                            );
-                            $projectID = $project->id;
-                        }
+                        $projectID = $this->checkProject($rowData);
 
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(68 + $i); // 'D' + i
@@ -164,6 +144,40 @@ class ImportController extends Controller
         } else {
             return redirect()->back()->with('success', 'Data staged successfully for further processing.');
         }
+    }
+
+    private function checkProject($rowData)
+    {
+        $empowerID = $rowData['B'];
+        $projectName = preg_replace('/[^\x00-\x7F]/', '', $rowData['C']);
+        $project = Project::where('empowerID', $empowerID)->first();
+        $projectID = $project->id ?? null;
+        $projectStatus = $rowData['D'];
+        //data is in excel like 15/05/24 needs to be in 2024-05-15
+        $projectStart = Carbon::createFromFormat('d/m/y', $rowData['E'])->format('Y-m-d');
+        $projectEnd = Carbon::createFromFormat('d/m/y', $rowData['F'])->format('Y-m-d');
+        // Log::info("project data: " . $projectID . " " . $projectName . " " . $projectStart . " " . $projectEnd);
+        //check if project exists and check start and end for changes
+        if (!is_null($projectID)) {
+            $projectInDB = Project::find($projectID);
+            if ($projectInDB->start_date != $projectStart || $projectInDB->end_date != $projectEnd) {
+                Log::info("Project start or end date does not match for projectID: $projectID");
+                Log::info ("starts: ". $projectInDB->start_date . " " . $projectStart);
+                Log::info ("ends: ". $projectInDB->end_date . " " . $projectEnd);
+            }
+        }
+        //for the moment we won't handle changes
+        $project = Project::updateOrCreate(
+            ['empowerID' => $empowerID],
+            [
+                'name' => $projectName,
+                'start_date' => $projectStart,
+                'end_date' => $projectEnd
+            ]
+        );
+        $projectID = $project->id;
+
+        return $projectID;
     }
 
 

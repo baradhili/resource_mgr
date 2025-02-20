@@ -47,7 +47,7 @@
                                             <!-- Dialog -->
                                             <dialog id="uploadDialog">
                                                 <!-- 'import.empower' -->
-                                                <form action="{{ route('allocations.upload') }}" method="POST"
+                                                <form action="{{ route('import.empower') }}" method="POST"
                                                     enctype="multipart/form-data">
                                                     @csrf
                                                     <h2>{{ __('Upload File') }}</h2>
