@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    Projects
+    Funding Approval Stages
 @endsection
 
 @section('content')
@@ -13,11 +13,11 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
                             <span id="card_title">
-                                {{ __('Projects') }}
+                                {{ __('Funding Approval Stages') }}
                             </span>
 
                              <div class="float-right">
-                                <a href="{{ route('projects.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
+                                <a href="{{ route('funding-approval-stages.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
                                   {{ __('Create New') }}
                                 </a>
                               </div>
@@ -36,32 +36,24 @@
                                     <tr>
                                         <th>No</th>
                                         
-									<th >Start Date</th>
-									<th >End Date</th>
-									<th >Empowerid</th>
-									<th >Name</th>
-									<th >Projectmanager</th>
-									<th >Status</th>
+									<th >Stage Name</th>
+									<th >Description</th>
 
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($projects as $project)
+                                    @foreach ($fundingApprovalStages as $fundingApprovalStage)
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
-										<td >{{ $project->start_date }}</td>
-										<td >{{ $project->end_date }}</td>
-										<td >{{ $project->empowerID }}</td>
-										<td >{{ $project->name }}</td>
-										<td >{{ $project->projectManager }}</td>
-										<td >{{ $project->status }}</td>
+										<td >{{ $fundingApprovalStage->stage_name }}</td>
+										<td >{{ $fundingApprovalStage->description }}</td>
 
                                             <td>
-                                                <form action="{{ route('projects.destroy', $project->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('projects.show', $project->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('projects.edit', $project->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form action="{{ route('funding-approval-stages.destroy', $fundingApprovalStage->id) }}" method="POST">
+                                                    <a class="btn btn-sm btn-primary " href="{{ route('funding-approval-stages.show', $fundingApprovalStage->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success" href="{{ route('funding-approval-stages.edit', $fundingApprovalStage->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
@@ -74,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $projects->withQueryString()->links() !!}
+                {!! $fundingApprovalStages->withQueryString()->links() !!}
             </div>
         </div>
     </div>
