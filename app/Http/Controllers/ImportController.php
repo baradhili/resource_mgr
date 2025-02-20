@@ -80,7 +80,7 @@ class ImportController extends Controller
                     foreach ($resourceTypes as $type) {
                         if (Str::contains($resourceNameLower, $type)) {
                             $contains = true;
-                            Log::info("its a demand");
+                            // Log::info("its a demand");
                             break;
                         }
                     }
