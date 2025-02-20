@@ -23,6 +23,7 @@ class RegionRequest extends FormRequest
     {
         return [
 			'name' => 'required|string',
+			'jurisdiction' => 'string',
         ];
     }
 }

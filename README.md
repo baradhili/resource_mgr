@@ -24,14 +24,15 @@ Its early stages right now, we are looking for help in:
 - [X] Update Allocations view to show percent of availablity
 - [X] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
 - [X] Differentiate manual demand from uploads so we don't delete the wrong stuff
-- [ ] Bulk add leave aka public holidays - to people in a region
+- [X] Bulk add public holidays - to people in a region
 - [X] Make calendar controls consistent
 - [X] Set up teams 
 - [X] Create Resource Type crud and link with teams
 - [ ] Filter multiple views/permissions by Team
-- [ ] Create a "Senior Manager" role that might oversee one or more Teams
+- [X] Create a "Senior Manager" role that might oversee one or more Teams
 - [ ] Update User admin to assign the user into various function roles such as "Resource", "Team Owner", etc
 - [X] Add ability to release demand from a resource from a date (to handle exits)
-- [ ] Separate allocations and demands from external sources and deliberately accept them instead of assuming they are correct
+- [ ] Detect changes in imported data
+
 
 Yes it is currently Laravel 10 based, not 11. Bleading edge, especially for major changes is not my thing.

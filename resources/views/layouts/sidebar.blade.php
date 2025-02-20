@@ -113,7 +113,7 @@
                                             <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
                                             <line x1="6" y1="9" x2="6" y2="21">
                                             </line>
-                                        </svg><span class="align-middle">Demands</span>
+                                        </svg> <span class="align-middle">Demands</span>
                                     </a>
                                 </li>
                                 <li class="sidebar-item">
@@ -126,7 +126,7 @@
                                             <path
                                                 d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4">
                                             </path>
-                                        </svg><span class="align-middle">Estimates</span>
+                                        </svg> <span class="align-middle">Estimates</span>
                                     </a>
                                     <ul id="estimates" class="sidebar-dropdown list-unstyled collapse">
                                         <li class="sidebar-item"><a class="sidebar-link"

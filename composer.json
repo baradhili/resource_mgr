@@ -22,7 +22,7 @@
         "filament/filament": "*",
         "glorand/laravel-model-settings": "^7.0",
         "graham-campbell/markdown": "^15.2",
-        "guzzlehttp/guzzle": "^7.2",
+        "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/socialite": "^5.16",
@@ -33,6 +33,7 @@
         "phpoffice/phpspreadsheet": "^3.4",
         "spatie/laravel-menu": "^4.2",
         "spatie/laravel-permission": "^6.10",
+        "symfony/dom-crawler": "^7.2",
         "yajra/laravel-datatables": "^10.0"
     },
     "require-dev": {
@@ -40,6 +41,7 @@
         "fakerphp/faker": "^1.9.1",
         "ibex/crud-generator": "^2.1",
         "jeroenzwart/laravel-csv-seeder": "^1.6",
+        "kevincobain2000/laravel-erd": "^1.7",
         "kitloong/laravel-migrations-generator": "^7.0",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",

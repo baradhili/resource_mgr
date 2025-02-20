@@ -25,8 +25,13 @@ class CacheService
         }
 
         $resources = Resource::whereHas('contracts', function ($query) {
-            $query->where('start_date', '<=', now())
-                ->where('end_date', '>=', now());
+            $query->where(function($query) {
+                $query->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now());
+            })->orWhere(function($query) {
+                $query->where('start_date', '>', now())
+                    ->where('start_date', '<=', Carbon::now()->addMonth());
+            });
         })->paginate();
 
         foreach ($resources as $resource) {
@@ -116,7 +121,7 @@ class CacheService
         // Build our next twelve month array
         $nextTwelveMonths = [];
 
-        for ($i = -1; $i < 12; $i++) {
+        for ($i = 0; $i < 12; $i++) {
             $date = Carbon::now()->addMonthsNoOverflow($i);
             $nextTwelveMonths[] = [
                 'year' => $date->year,
@@ -126,13 +131,18 @@ class CacheService
             ];
         }
         //  Start and end dates for the period
-        $startDate = Carbon::now()->startOfMonth();
-        $endDate = Carbon::now()->addYear()->startOfMonth();
+        // $startDate = Carbon::now()->startOfMonth();
+        // $endDate = Carbon::now()->addYear()->startOfMonth();
 
         // Collect our resources who have a current contract
         $resources = Resource::whereHas('contracts', function ($query) {
-            $query->where('start_date', '<=', now())
-                ->where('end_date', '>=', now());
+            $query->where(function($query) {
+                $query->where('start_date', '<=', now())
+                    ->where('end_date', '>=', now());
+            })->orWhere(function($query) {
+                $query->where('start_date', '>', now())
+                    ->where('start_date', '<=', Carbon::now()->addMonth());
+            });
         })->paginate();
 
         //Collect the availability
@@ -143,7 +153,6 @@ class CacheService
         } else {
             $resourceAvailability = Cache::get('resourceAvailability');
         }
-
         // For each resource - find teh allocations for the period
         foreach ($resources as $resource) {
 
@@ -152,19 +161,16 @@ class CacheService
             ];
 
             foreach ($nextTwelveMonths as $month) {
-                $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
-                // $monthEndDate = $monthStartDate->copy()->endOfMonth();
+                $monthStartDate = Carbon::create($month['year'], $month['month'], 1)->format('Y-m-d');
+
                 $totalAllocation = Allocation::where('allocation_date', '=', $monthStartDate)
                     ->where('resources_id', '=', $resource->id)
                     ->sum('fte');
                 // Use year-month as the key
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-
                 // Get the availability for the month
-                $availability = isset($resourceAvailability[$resource->id]['availability'][$key])
-                    ? (float) $resourceAvailability[$resource->id]['availability'][$key]
-                    : 0;
-
+                // Get the availability for the current month
+                $availability = isset($resourceAvailability[$resource->id]['availability'][$key]) ? (float)$resourceAvailability[$resource->id]['availability'][$key] : 0.0;
                 // Calculate the percentage of total allocation divided by availability
                 $percentage = $availability > 0 ? ($totalAllocation / $availability) * 100 : 0;
 
@@ -172,6 +178,8 @@ class CacheService
                 if ($percentage > 0) {
                     $resourceAllocation[$resource->id]['allocation'][$key] = (int) $percentage;
                 }
+                Log::info("totalAllocation for {$monthStartDate} on resource {$resource->id}: ".json_encode($resourceAllocation));
+
             }
         }
         // Log::info("allocations: ".json_encode($resourceAllocation));

@@ -5,15 +5,20 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
+use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EstimateController;
+use App\Http\Controllers\FundingApprovalStageController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ResourceSkillController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TermsAndConditionController;
@@ -21,6 +26,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\ResourceTypeController;
+use App\Http\Controllers\PublicHolidayController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -50,7 +56,6 @@ Route::middleware('auth')->group(function () {
     Route::get('allocations/editOne', [AllocationController::class, 'editOne'])->name('allocations.editOne');
     Route::resource('allocations', AllocationController::class);
     //additional functions
-    Route::post('/allocations-upload', [AllocationController::class, 'populateAllocations'])->name('allocations.upload');
     Route::get('/contracts/clean', [ContractController::class, 'cleanProjects'])->name('contracts.clean');
     Route::resource('contracts', ContractController::class);
     Route::get('/demands/export', [DemandController::class, 'exportDemands'])->name('demands.export');
@@ -58,7 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('demands', DemandController::class);
     Route::resource('leaves', LeaveController::class);
     Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
-    Route::resource('projects', ProjectController::class); 
+    Route::resource('projects', ProjectController::class);
     Route::get('/resources/{resource}/allocations', [ResourceController::class, 'allocations'])->name('resources.allocations');
     Route::resource('resources', ResourceController::class);
     Route::post('/skills/upload', [SkillController::class, 'importRsd'])->name('skills.upload');
@@ -87,6 +92,17 @@ Route::middleware('auth')->group(function () {
         Route::resource('regions', RegionController::class);
         Route::resource('locations', LocationController::class);
         Route::resource('resource-types', ResourceTypeController::class);
+        Route::get('/import', [ImportController::class, 'index'])->name('import.index');
+        Route::post('/import/empower', [ImportController::class, 'populateAllocations'])->name('import.empower');
+        Route::get('/import/review/demands', [ImportController::class, 'reviewDemands'])->name('import.review.demands');
+        Route::get('/import/review/allocations', [ImportController::class, 'reviewAllocations'])->name('import.review.allocations');
+        Route::post('/import/review/actions', [ImportController::class, 'handleReviewAction'])->name('import.review.action');
+        Route::get('/import/holidays', [ImportController::class, 'importHolidays'])->name('import.holidays');
+        Route::resource('public-holidays', PublicHolidayController::class);
+        Route::resource('sites', SiteController::class);
+        Route::resource('domains', DomainController::class);
+        Route::resource('funding-approval-stages', FundingApprovalStageController::class);
+        Route::resource('requests', RequestController::class);
     });
 });
 
@@ -95,8 +111,7 @@ Route::middleware('auth')->group(function () {
 /**
  * Teamwork routes
  */
-Route::group(['prefix' => 'teams', 'namespace' => 'Teamwork'], function()
-{
+Route::group(['prefix' => 'teams', 'namespace' => 'Teamwork'], function () {
     Route::get('/', [App\Http\Controllers\Teamwork\TeamController::class, 'index'])->name('teams.index');
     Route::get('create', [App\Http\Controllers\Teamwork\TeamController::class, 'create'])->name('teams.create');
     Route::post('teams', [App\Http\Controllers\Teamwork\TeamController::class, 'store'])->name('teams.store');

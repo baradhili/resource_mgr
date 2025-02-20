@@ -82,8 +82,9 @@ class ResourceController extends Controller
             ->with('skill')
             ->get();
         $resourceTypes = ResourceType::all();
+        $users = User::all();
         
-        return view('resource.create', compact('resource', 'locations', 'skills', 'resourceSkills'));
+        return view('resource.create', compact('resource', 'locations', 'skills', 'resourceSkills','users','resourceTypes'));
     }
 
 
