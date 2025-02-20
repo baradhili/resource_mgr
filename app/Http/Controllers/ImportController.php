@@ -103,7 +103,7 @@ class ImportController extends Controller
                                 if ($existingAllocation && $existingAllocation->fte != $fte) {
                                     Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
                                 }
-                            
+
                                 if ($fte > 0) {
                                     Allocation::updateOrCreate(
                                         [
@@ -125,7 +125,13 @@ class ImportController extends Controller
 
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(71 + $i); // 'G' + i
-                            $fte = (double) $rowData[$columnLetter];
+                            $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
+                            $existingDemand = Demand::where('projects_id', $projectID)
+                                ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                                ->first();
+                            if ($existingDemand && $existingDemand->fte != $fte) {
+                                Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
+                            }
                             if ($fte > 0) {
                                 Demand::updateOrCreate(
                                     [
@@ -170,8 +176,8 @@ class ImportController extends Controller
             $projectInDB = Project::find($projectID);
             if ($projectInDB->start_date != $projectStart || $projectInDB->end_date != $projectEnd) {
                 Log::info("Project start or end date does not match for projectID: $projectID");
-                Log::info ("starts: ". $projectInDB->start_date . " " . $projectStart);
-                Log::info ("ends: ". $projectInDB->end_date . " " . $projectEnd);
+                Log::info("starts: " . $projectInDB->start_date . " " . $projectStart);
+                Log::info("ends: " . $projectInDB->end_date . " " . $projectEnd);
             }
         }
         //for the moment we won't handle changes
