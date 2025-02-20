@@ -94,10 +94,18 @@ class ImportController extends Controller
                             $projectID = $this->checkProject($rowData);
 
                             for ($i = 0; $i < count($monthYear); $i++) {
-                                $columnLetter = chr(68 + $i); // 'D' + i
-                                $fte = (double) $rowData[$columnLetter];
+                                $columnLetter = chr(71 + $i); // 'G' + i
+                                $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
+                                $existingAllocation = Allocation::where('resources_id', $resourceID)
+                                    ->where('projects_id', $projectID)
+                                    ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                                    ->first();
+                                if ($existingAllocation && $existingAllocation->fte != $fte) {
+                                    Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
+                                }
+                            
                                 if ($fte > 0) {
-                                    StagingAllocation::updateOrCreate(
+                                    Allocation::updateOrCreate(
                                         [
                                             'resources_id' => $resourceID,
                                             'projects_id' => $projectID,
@@ -105,7 +113,7 @@ class ImportController extends Controller
                                         ],
                                         [
                                             'fte' => $fte,
-                                            'status' => 'Staged',
+                                            'status' => 'Proposed',
                                             'source' => 'Imported'
                                         ]
                                     );
@@ -116,10 +124,10 @@ class ImportController extends Controller
                         $projectID = $this->checkProject($rowData);
 
                         for ($i = 0; $i < count($monthYear); $i++) {
-                            $columnLetter = chr(68 + $i); // 'D' + i
+                            $columnLetter = chr(71 + $i); // 'G' + i
                             $fte = (double) $rowData[$columnLetter];
                             if ($fte > 0) {
-                                StagingDemand::updateOrCreate(
+                                Demand::updateOrCreate(
                                     [
                                         'projects_id' => $projectID,
                                         'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
