@@ -178,7 +178,7 @@ class CacheService
                 if ($percentage > 0) {
                     $resourceAllocation[$resource->id]['allocation'][$key] = (int) $percentage;
                 }
-                Log::info("totalAllocation for {$monthStartDate} on resource {$resource->id}: ".json_encode($resourceAllocation));
+                // Log::info("totalAllocation for {$monthStartDate} on resource {$resource->id}: ".json_encode($resourceAllocation));
 
             }
         }
