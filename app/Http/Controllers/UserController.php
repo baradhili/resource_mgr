@@ -7,6 +7,7 @@ use App\Models\Team;
 use App\Models\Resource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
@@ -18,8 +19,8 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $users = User::paginate();
-
+        $users = User::with('reportingLine')->paginate();
+Log::info($users);
         return view('user.index', compact('users'))
             ->with('i', ($request->input('page', 1) - 1) * $users->perPage());
     }
@@ -30,17 +31,18 @@ class UserController extends Controller
     public function create(): View
     {
         $user = new User();
+        $users = User::all();
         $teams = Team::all();
-
-        return view('user.create', compact('user', 'teams'));
+        $resources = Resource::all();
+        return view('user.create', compact('user','users', 'teams', 'resources'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(UserRequest $request): RedirectResponse
     {
-        User::create($request->all());
+        User::create($request->validated());
 
         return Redirect::route('users.index')
             ->with('success', 'User created successfully.');
@@ -62,32 +64,18 @@ class UserController extends Controller
     public function edit($id): View
     {
         $user = User::find($id);
+        $users = User::all();
         $teams = Team::all();
-
-        return view('user.edit', compact('user', 'teams'));
+        $resources = Resource::all();
+        return view('user.edit', compact('user','users','teams','resources'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user): RedirectResponse
+    public function update(UserRequest $request, User $user): RedirectResponse
     {
-        Log::info("input: " . json_encode($request->all()));
-        $user->update($request->all());
-        $currentTeam = $user->currentTeam;
-        $inputTeam = $request->input('team');
-
-        if ($currentTeam !== $inputTeam) {
-            $user->detachTeam($currentTeam);
-        }
-
-        if ($inputTeam) {
-            $newTeam = Team::find($inputTeam);
-            if ($newTeam) {
-                $user->attachTeam($newTeam);
-            }
-        }
-
+        $user->update($request->validated());
 
         return Redirect::route('users.index')
             ->with('success', 'User updated successfully');
@@ -99,19 +87,5 @@ class UserController extends Controller
 
         return Redirect::route('users.index')
             ->with('success', 'User deleted successfully');
-    }
-
-    public function profile(): View
-    {
-        $user = auth()->user();
-
-        return view('user.profile', compact('user'));
-    }
-
-    public function settings(): View
-    {
-        $user = auth()->user();
-
-        return view('user.settings', compact('user'));
     }
 }

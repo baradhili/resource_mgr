@@ -26,6 +26,7 @@ class User extends Authenticatable
         'current_team_id',
         'resource_id',
         'password',
+        'reports'
     ];
 
     /**
@@ -58,6 +59,14 @@ class User extends Authenticatable
         return $this->hasMany(TeamUser::class, 'user_id');
     }
 
-    
+    /**
+     * Get the reporting line of the user.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function reportingLine()
+    {
+        return $this->hasOne(User::class,'id','reports');
+    }
 
 }

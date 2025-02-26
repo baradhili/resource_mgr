@@ -29,8 +29,20 @@
                                     {{ $user->email }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Team:</strong>
-                                    {{ $user->currentTeam->name ?? 'No Team' }}
+                                    <strong>Settings:</strong>
+                                    {{ $user->settings }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Current Team Id:</strong>
+                                    {{ $user->current_team_id }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Resource Id:</strong>
+                                    {{ $user->resource_id }}
+                                </div>
+                                <div class="form-group mb-2 mb20">
+                                    <strong>Reports:</strong>
+                                    {{ $user->reports }}
                                 </div>
 
                     </div>
