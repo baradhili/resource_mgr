@@ -75,15 +75,7 @@ class ImportController extends Controller
                     $resourceName = $rowData['A'] ?? $resourceName;
 
                     $resourceNameLower = strtolower($resourceName);
-                    // Check if any of the resource types are contained within the resource name
-                    $contains = false;
-                    foreach ($resourceTypes as $type) {
-                        if (Str::contains($resourceNameLower, $type)) {
-                            $contains = true;
-                            // Log::info("its a demand");
-                            break;
-                        }
-                    }
+                    $contains = in_array($resourceNameLower, $resourceTypes);
 
                     if (!$contains) {
                         $resource = Resource::where('empowerID', $resourceName)->first();
@@ -92,7 +84,7 @@ class ImportController extends Controller
                             $missingResources[] = $resourceName;
                         } else {
                             $projectID = $this->checkProject($rowData);
-
+                            //check the month allocations
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(71 + $i); // 'G' + i
                                 $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
