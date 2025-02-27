@@ -105,4 +105,15 @@ class UserController extends Controller
         return Redirect::route('users.index')
             ->with('success', 'User deleted successfully');
     }
+
+    /**
+     * Display the specified resource.
+     */
+    public function profile($id): View
+    {
+        $user = User::find($id);
+        $reportees = $user->reportees; // Get the people who report to this user
+
+        return view('user.profile', compact('user', 'reportees'));
+    }
 }

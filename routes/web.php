@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/skills/upload', [SkillController::class, 'importRsd'])->name('skills.upload');
     Route::resource('skills', SkillController::class);
     Route::resource('resource-skills', ResourceSkillController::class);
-    Route::get('/users/profile', [UserController::class, 'profile'])->name('users.profile');
+    Route::get('/users/profile/{user}', [UserController::class, 'profile'])->name('users.profile');
     Route::get('/users/settings', [UserController::class, 'settings'])->name('users.settings');
     Route::resource('users', UserController::class);
     // Route::resource('teams', TeamController::class);
@@ -86,7 +86,7 @@ Route::middleware('auth')->group(function () {
         Route::get('roles/{roleId}/delete', [App\Http\Controllers\RoleController::class, 'destroy']);
         Route::get('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'addPermissionToRole']);
         Route::put('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'givePermissionToRole']);
-
+        Route::get('users/profile/{userId}', [App\Http\Controllers\UserController::class, 'profile']);
         Route::resource('users', App\Http\Controllers\UserController::class);
         Route::get('users/{userId}/delete', [App\Http\Controllers\UserController::class, 'destroy']);
         Route::resource('regions', RegionController::class);
