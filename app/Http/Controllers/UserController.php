@@ -20,7 +20,7 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         $users = User::with('reportingLine')->paginate();
-Log::info($users);
+
         return view('user.index', compact('users'))
             ->with('i', ($request->input('page', 1) - 1) * $users->perPage());
     }
@@ -54,8 +54,9 @@ Log::info($users);
     public function show($id): View
     {
         $user = User::find($id);
-
-        return view('user.show', compact('user'));
+	$reportees = $user->reportees; // Get the people who report to this user
+Log::info("Reportees: ". json_encode($reportees));
+    return view('user.show', compact('user', 'reportees'));
     }
 
     /**

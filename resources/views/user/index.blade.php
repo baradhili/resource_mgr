@@ -39,10 +39,9 @@
 
                                         <th>Name</th>
                                         <th>Email</th>
-                                        <th>Settings</th>
-                                        <th>Current Team</th>
+                                        <th>Resource Group</th>
                                         <th>Resource?</th>
-                                        <th>Reports</th>
+                                        <th>Reports to</th>
 
                                         <th></th>
                                     </tr>
@@ -54,7 +53,6 @@
 
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
-                                            <td>{{ $user->settings }}</td>
                                             <td>{{ $user->currentTeam->name ?? '' }}</td>
                                             <td>{{ $user->resource_id ? 'Yes' : '' }}</td>
 

@@ -24,7 +24,7 @@ class UserRequest extends FormRequest
         return [
 			'name' => 'required|string',
 			'email' => 'required|string',
-            'password' => 'required|string',
+            'password' => 'nullable|string',
             'current_team_id' => 'nullable|integer',
             'resource_id' => 'nullable|integer',
             'reports' => 'nullable|integer'

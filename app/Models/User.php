@@ -69,4 +69,14 @@ class User extends Authenticatable
         return $this->hasOne(User::class,'id','reports');
     }
 
+    /**
+ * Get the people who report to this manager.
+ * 
+ * @return \Illuminate\Database\Eloquent\Relations\HasMany
+ */
+public function reportees()
+{
+    return $this->hasMany(User::class, 'reports', 'id');
+}
+
 }
