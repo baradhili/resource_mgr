@@ -13,7 +13,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\RequestController;
+use App\Http\Controllers\DemandRequestController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ResourceSkillController;
 use App\Http\Controllers\RoleController;
@@ -102,7 +102,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('sites', SiteController::class);
         Route::resource('domains', DomainController::class);
         Route::resource('funding-approval-stages', FundingApprovalStageController::class);
-        Route::resource('requests', RequestController::class);
+        Route::resource('requests', DemandRequestController::class);
     });
 });
 

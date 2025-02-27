@@ -38,7 +38,7 @@ use Illuminate\Database\Eloquent\Model;
  * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-class Request extends Model
+class DemandRequest extends Model
 {
     
     protected $perPage = 20;
