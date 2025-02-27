@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Team;
 use App\Models\Resource;
+use App\Models\Location;
+use App\Models\Region;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
@@ -113,7 +115,24 @@ class UserController extends Controller
     {
         $user = User::find($id);
         $reportees = $user->reportees; // Get the people who report to this user
+        $reports = $user->reports;
+        $resource = $user->resource;
+        $regionObj = Region::find($resource->region_id);
+        $region = $regionObj ? $regionObj->name : 'Unknown Region';
+        $locationObj = Location::find($resource->location_id);
+        $location = $locationObj ? $locationObj->name : 'Unknown Location';
+        $skills = $resource->skills;
+Log::info('User Profile Data:', [
+    'user' => json_encode($user),
+    'reportees' => json_encode($reportees),
+    'region' => json_encode($region),
+    'location' => json_encode($location),
+    'reports' => json_encode($reports),
+    'resource' => json_encode($resource),
+    'skills' => json_encode($skills),
+]);
 
-        return view('user.profile', compact('user', 'reportees'));
+
+        return view('user.profile', compact('user', 'reportees','region','location', 'reports', 'resource','skills'));
     }
 }

@@ -66,17 +66,28 @@ class User extends Authenticatable
      */
     public function reportingLine()
     {
-        return $this->hasOne(User::class,'id','reports');
+        return $this->hasOne(User::class, 'id', 'reports');
     }
 
     /**
- * Get the people who report to this manager.
- * 
- * @return \Illuminate\Database\Eloquent\Relations\HasMany
- */
-public function reportees()
-{
-    return $this->hasMany(User::class, 'reports', 'id');
-}
+     * Get the people who report to this manager.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function reportees()
+    {
+        return $this->hasMany(User::class, 'reports', 'id');
+    }
+
+    /**
+     * Get the resource linked to this user.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function resource()
+    {
+        return $this->belongsTo(Resource::class, 'resource_id');
+    }
+
 
 }
