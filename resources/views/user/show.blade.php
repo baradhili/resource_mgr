@@ -34,7 +34,11 @@
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Linked Project Resource?:</strong>
-                            {{ $user->resource_id ? 'Yes' : 'No' }}
+                            @if ($user->resource_id)
+                                <a href="{{ route('resources.show', $user->resource_id) }}">Yes</a>
+                            @else
+                                No
+                            @endif
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Reports to:</strong>

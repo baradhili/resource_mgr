@@ -96,11 +96,11 @@ class Resource extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id', 'id')->withDefault();
+        return $this->hasOne(\App\Models\User::class, 'resource_id', 'id')->withDefault();
     }
 
     /**

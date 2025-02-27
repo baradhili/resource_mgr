@@ -73,6 +73,7 @@ class TeamController extends Controller
         $team = $teamModel::create([
             'name' => $request->name,
             'owner_id' => $request->user()->getKey(),
+            'resource_type' => $request->resource_type,
         ]);
         $request->user()->attachTeam($team);
 
@@ -176,6 +177,7 @@ class TeamController extends Controller
 
         $team = $teamModel::findOrFail($id);
         $team->name = $request->name;
+        $team->resource_type = $request->resource_type;
         $team->save();
 
         return redirect(route('teams.index'));
@@ -214,7 +216,7 @@ class TeamController extends Controller
      */
     public function makeLeader($teamId, $userId)
     {
-        Log::info("Team ID: $teamId, User ID: $userId");
+        // Log::info("Team ID: $teamId, User ID: $userId");
 
         $team = Team::findOrFail($teamId);
         $user = User::findOrFail($userId);

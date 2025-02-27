@@ -83,8 +83,8 @@ class ResourceController extends Controller
             ->get();
         $resourceTypes = ResourceType::all();
         $users = User::all();
-        
-        return view('resource.create', compact('resource', 'locations', 'skills', 'resourceSkills','users','resourceTypes'));
+
+        return view('resource.create', compact('resource', 'locations', 'skills', 'resourceSkills', 'users', 'resourceTypes'));
     }
 
 
@@ -108,7 +108,7 @@ class ResourceController extends Controller
         $users = User::all();
         $resourceTypes = ResourceType::all();
 
-        return view('resource.edit', compact('resource', 'locations', 'skills', 'resourceSkills','users','resourceTypes'));
+        return view('resource.edit', compact('resource', 'locations', 'skills', 'resourceSkills', 'users', 'resourceTypes'));
     }
 
     /**
@@ -127,7 +127,7 @@ class ResourceController extends Controller
      */
     public function show($id): View
     {
-        $resource = Resource::with(['location', 'skills', 'contracts', 'allocations', 'leaves','user','resourceType'])->find($id);
+        $resource = Resource::with(['location', 'skills', 'contracts', 'allocations', 'leaves', 'user', 'resourceType'])->find($id);
 
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resources_id', $id)
@@ -143,8 +143,8 @@ class ResourceController extends Controller
             ];
         }
         $skills = $resourceSkills;
-        
 
+        // Log::info("resource: ".json_encode($resource));
         return view('resource.show', compact('resource', 'skills'));
     }
 
@@ -201,17 +201,17 @@ class ResourceController extends Controller
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Get the availability for the current month
-                $availability = isset($resourceAvailability[$key]) ? (float)$resourceAvailability[$key] : 0.0;
+                $availability = isset($resourceAvailability[$key]) ? (float) $resourceAvailability[$key] : 0.0;
 
-                
+
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
                     // $allocationArray[$project->id]['allocation'][$key] = $totalAllocation;
-                // }
-                // Calculate the percentage allocation
+                    // }
+                    // Calculate the percentage allocation
                     if ($availability > 0 && $totalAllocation !== null) {
                         $percentageAllocation = ($totalAllocation / $availability) * 100;
-                        
+
                         // Add the calculated percentage allocation to the resource availability array
                         $allocationArray[$project->id]['allocation'][$key] = [
                             'fte' => $totalAllocation,
@@ -253,13 +253,20 @@ class ResourceController extends Controller
             ];
         }
 
+        //    //Get teh requested resource type
+        //    $resourceType = $request->input('resource_type');
+        //    //check if they are already a member of a team
+        //    $currentTeam = $user->currentTeam->name;
+        //    if ($currentTeam !== $resourceType) {
+        //        Log::info("change team");
+        //    }
         // Update resource details
         $resource->full_name = $request->validated()['full_name'];
         $resource->empowerID = $request->validated()['empowerID'];
         if (array_key_exists('userID', $request->validated()) && $request->validated()['userID'] !== null) {
             $resource->user_id = $request->validated()['userID'];
         }
-        $resource->resource_type = $request->validated()['resource_type'];
+        // $resource->resource_type = $request->validated()['resource_type'];
         $resource->location_id = $request->validated()['location_id'];
         $location = Location::find($request->validated()['location_id']);
         $resource->region_id = $location->region_id;

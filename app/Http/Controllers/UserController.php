@@ -34,7 +34,7 @@ class UserController extends Controller
         $users = User::all();
         $teams = Team::all();
         $resources = Resource::all();
-        return view('user.create', compact('user','users', 'teams', 'resources'));
+        return view('user.create', compact('user', 'users', 'teams', 'resources'));
     }
 
     /**
@@ -54,9 +54,9 @@ class UserController extends Controller
     public function show($id): View
     {
         $user = User::find($id);
-	$reportees = $user->reportees; // Get the people who report to this user
-Log::info("Reportees: ". json_encode($reportees));
-    return view('user.show', compact('user', 'reportees'));
+        $reportees = $user->reportees; // Get the people who report to this user
+
+        return view('user.show', compact('user', 'reportees'));
     }
 
     /**
@@ -68,7 +68,7 @@ Log::info("Reportees: ". json_encode($reportees));
         $users = User::all();
         $teams = Team::all();
         $resources = Resource::all();
-        return view('user.edit', compact('user','users','teams','resources'));
+        return view('user.edit', compact('user', 'users', 'teams', 'resources'));
     }
 
     /**
@@ -76,7 +76,23 @@ Log::info("Reportees: ". json_encode($reportees));
      */
     public function update(UserRequest $request, User $user): RedirectResponse
     {
+        $current_team = $user->currentTeam;
         $user->update($request->validated());
+        //Make sure resource types are synced and or updated
+        //get resource team/type
+        $team = Team::find($request->validated()['current_team_id']);
+        $resource = Resource::find($request->validated()['resource_id']);
+
+        if ($team->id !== $current_team->id) {
+            $user->attachTeam($team);
+            // $user->teams()->attach($team->id);
+            $user->detachTeam($current_team);
+            // $user->teams()->detach($current_team->id);
+        }
+        if (is_null($resource->resource_type) || $resource->resource_type !== $user->currentTeam->resource_type) {
+            $resource->resource_type = $user->currentTeam->resource_type;
+        }
+
 
         return Redirect::route('users.index')
             ->with('success', 'User updated successfully');
