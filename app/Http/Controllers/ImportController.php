@@ -109,6 +109,11 @@ class ImportController extends Controller
                                             'source' => 'Imported'
                                         ]
                                     );
+                                } elseif ($fte == 0) {
+                                    Allocation::where('projects_id', $projectID)
+                                        ->where('resources_id', $resourceID)
+                                        ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                                        ->delete();
                                 }
                             }
                         }
@@ -137,6 +142,11 @@ class ImportController extends Controller
                                         'source' => 'Imported'
                                     ]
                                 );
+                            } elseif ($fte == 0) {
+                                Demand::where('projects_id', $projectID)
+                                    ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                                    ->delete();
+
                             }
                         }
                     }

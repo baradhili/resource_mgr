@@ -117,11 +117,11 @@ class UserController extends Controller
         $reportees = $user->reportees; // Get the people who report to this user
         $reports = $user->reports;
         $resource = $user->resource;
-        $regionObj = Region::find($resource->region_id);
+        $regionObj = $resource ? Region::find($resource->region_id) : null;
         $region = $regionObj ? $regionObj->name : 'Unknown Region';
-        $locationObj = Location::find($resource->location_id);
+        $locationObj = $resource ?Location::find($resource->location_id) : null;
         $location = $locationObj ? $locationObj->name : 'Unknown Location';
-        $skills = $resource->skills;
+        $skills = $resource ? $resource->skills : [(object)['skill_name' => 'Unknown Skills']];
 Log::info('User Profile Data:', [
     'user' => json_encode($user),
     'reportees' => json_encode($reportees),
