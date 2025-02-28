@@ -39,8 +39,9 @@
 
                                         <th>Name</th>
                                         <th>Email</th>
-                                        <th>Team</th>
-                                        <th>Resource</th>
+                                        <th>Resource Group</th>
+                                        <th>Resource?</th>
+                                        <th>Reports to</th>
 
                                         <th></th>
                                     </tr>
@@ -52,8 +53,10 @@
 
                                             <td>{{ $user->name }}</td>
                                             <td>{{ $user->email }}</td>
-                                            <td>{{ $user->currentTeam->name ?? 'No Team' }}</td>
-                                            <td>{{ isset($user->resource_id) ? 'Y' : 'N' }}</td>
+                                            <td>{{ $user->currentTeam->name ?? '' }}</td>
+                                            <td>{{ $user->resource_id ? 'Yes' : '' }}</td>
+
+                                            <td>{{ $user->reportingLine?->name ?? 'None' }}</td>
 
                                             <td>
                                                 <form action="{{ route('users.destroy', $user->id) }}" method="POST">

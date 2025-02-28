@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Request;
+use App\Models\DemandRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\RequestRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
-class RequestController extends Controller
+class DemandRequestController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
-        $requests = Request::paginate();
+        $requests = DemandRequest::paginate();
 
         return view('request.index', compact('requests'))
             ->with('i', ($request->input('page', 1) - 1) * $requests->perPage());
@@ -27,7 +27,7 @@ class RequestController extends Controller
      */
     public function create(): View
     {
-        $request = new Request();
+        $request = new DemandRequest();
 
         return view('request.create', compact('request'));
     }
@@ -37,7 +37,7 @@ class RequestController extends Controller
      */
     public function store(RequestRequest $request): RedirectResponse
     {
-        Request::create($request->validated());
+        DemandRequest::create($request->validated());
 
         return Redirect::route('requests.index')
             ->with('success', 'Request created successfully.');
@@ -48,7 +48,7 @@ class RequestController extends Controller
      */
     public function show($id): View
     {
-        $request = Request::find($id);
+        $request = DemandRequest::find($id);
 
         return view('request.show', compact('request'));
     }
@@ -58,7 +58,7 @@ class RequestController extends Controller
      */
     public function edit($id): View
     {
-        $request = Request::find($id);
+        $request = DemandRequest::find($id);
 
         return view('request.edit', compact('request'));
     }
@@ -66,9 +66,9 @@ class RequestController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(RequestRequest $request, Request $request): RedirectResponse
+    public function update(DemandRequest $demandRequest): RedirectResponse
     {
-        $request->update($request->validated());
+        $demandRequest->update($demandRequest->validated());
 
         return Redirect::route('requests.index')
             ->with('success', 'Request updated successfully');
@@ -76,7 +76,7 @@ class RequestController extends Controller
 
     public function destroy($id): RedirectResponse
     {
-        Request::find($id)->delete();
+        DemandRequest::find($id)->delete();
 
         return Redirect::route('requests.index')
             ->with('success', 'Request deleted successfully');

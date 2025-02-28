@@ -75,15 +75,7 @@ class ImportController extends Controller
                     $resourceName = $rowData['A'] ?? $resourceName;
 
                     $resourceNameLower = strtolower($resourceName);
-                    // Check if any of the resource types are contained within the resource name
-                    $contains = false;
-                    foreach ($resourceTypes as $type) {
-                        if (Str::contains($resourceNameLower, $type)) {
-                            $contains = true;
-                            // Log::info("its a demand");
-                            break;
-                        }
-                    }
+                    $contains = in_array($resourceNameLower, $resourceTypes);
 
                     if (!$contains) {
                         $resource = Resource::where('empowerID', $resourceName)->first();
@@ -92,7 +84,7 @@ class ImportController extends Controller
                             $missingResources[] = $resourceName;
                         } else {
                             $projectID = $this->checkProject($rowData);
-
+                            //check the month allocations
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(71 + $i); // 'G' + i
                                 $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
@@ -102,22 +94,36 @@ class ImportController extends Controller
                                     ->first();
                                 if ($existingAllocation && $existingAllocation->fte != $fte) {
                                     Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
+                                    ChangeRequest::create([
+                                        'record_type' => 'allocation',
+                                        'record_id' => $existingAllocation->id,
+                                        'field' => 'fte',
+                                        'old_value' => $existingAllocation->fte,
+                                        'new_value' => $fte,
+                                        'status' => 'pending',
+                                        'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                    ]);
                                 }
 
-                                if ($fte > 0) {
-                                    Allocation::updateOrCreate(
-                                        [
-                                            'resources_id' => $resourceID,
-                                            'projects_id' => $projectID,
-                                            'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
-                                        ],
-                                        [
-                                            'fte' => $fte,
-                                            'status' => 'Proposed',
-                                            'source' => 'Imported'
-                                        ]
-                                    );
-                                }
+                                // if ($fte > 0) {
+                                //     Allocation::updateOrCreate(
+                                //         [
+                                //             'resources_id' => $resourceID,
+                                //             'projects_id' => $projectID,
+                                //             'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
+                                //         ],
+                                //         [
+                                //             'fte' => $fte,
+                                //             'status' => 'Proposed',
+                                //             'source' => 'Imported'
+                                //         ]
+                                //     );
+                                // } elseif ($fte == 0) {
+                                //     Allocation::where('projects_id', $projectID)
+                                //         ->where('resources_id', $resourceID)
+                                //         ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                                //         ->delete();
+                                // }
                             }
                         }
                     } else { // Insert these into demand
@@ -131,21 +137,35 @@ class ImportController extends Controller
                                 ->first();
                             if ($existingDemand && $existingDemand->fte != $fte) {
                                 Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
+                                ChangeRequest::create([
+                                    'record_type' => 'allocation',
+                                    'record_id' => $existingAllocation->id,
+                                    'field' => 'fte',
+                                    'old_value' => $existingAllocation->fte,
+                                    'new_value' => $fte,
+                                    'status' => 'pending',
+                                    'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                ]);
                             }
-                            if ($fte > 0) {
-                                Demand::updateOrCreate(
-                                    [
-                                        'projects_id' => $projectID,
-                                        'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
-                                    ],
-                                    [
-                                        'fte' => $fte,
-                                        'status' => 'Proposed',
-                                        'resource_type' => $resourceName,
-                                        'source' => 'Imported'
-                                    ]
-                                );
-                            }
+                            // if ($fte > 0) {
+                            //     Demand::updateOrCreate(
+                            //         [
+                            //             'projects_id' => $projectID,
+                            //             'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
+                            //         ],
+                            //         [
+                            //             'fte' => $fte,
+                            //             'status' => 'Proposed',
+                            //             'resource_type' => $resourceName,
+                            //             'source' => 'Imported'
+                            //         ]
+                            //     );
+                            // } elseif ($fte == 0) {
+                            //     Demand::where('projects_id', $projectID)
+                            //         ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                            //         ->delete();
+
+                            // }
                         }
                     }
                 }

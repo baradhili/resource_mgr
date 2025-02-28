@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AllocationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
@@ -13,7 +14,7 @@ use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\RequestController;
+use App\Http\Controllers\DemandRequestController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ResourceSkillController;
 use App\Http\Controllers\RoleController;
@@ -69,7 +70,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/skills/upload', [SkillController::class, 'importRsd'])->name('skills.upload');
     Route::resource('skills', SkillController::class);
     Route::resource('resource-skills', ResourceSkillController::class);
-    Route::get('/users/profile', [UserController::class, 'profile'])->name('users.profile');
+    Route::get('/users/profile/{user}', [UserController::class, 'profile'])->name('users.profile');
     Route::get('/users/settings', [UserController::class, 'settings'])->name('users.settings');
     Route::resource('users', UserController::class);
     // Route::resource('teams', TeamController::class);
@@ -86,7 +87,7 @@ Route::middleware('auth')->group(function () {
         Route::get('roles/{roleId}/delete', [App\Http\Controllers\RoleController::class, 'destroy']);
         Route::get('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'addPermissionToRole']);
         Route::put('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'givePermissionToRole']);
-
+        Route::get('users/profile/{userId}', [App\Http\Controllers\UserController::class, 'profile']);
         Route::resource('users', App\Http\Controllers\UserController::class);
         Route::get('users/{userId}/delete', [App\Http\Controllers\UserController::class, 'destroy']);
         Route::resource('regions', RegionController::class);
@@ -102,7 +103,9 @@ Route::middleware('auth')->group(function () {
         Route::resource('sites', SiteController::class);
         Route::resource('domains', DomainController::class);
         Route::resource('funding-approval-stages', FundingApprovalStageController::class);
-        Route::resource('requests', RequestController::class);
+        Route::resource('requests', DemandRequestController::class);
+        Route::get('change-requests/{changeRequest}/approve', [ChangeRequestController::class, 'approve'])->name('change-requests.approve');
+        Route::resource('change-requests', ChangeRequestController::class);
     });
 });
 
