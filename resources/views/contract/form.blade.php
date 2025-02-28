@@ -33,6 +33,15 @@
             </select>
             {!! $errors->first('resource_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
+        <div class="form-group mb-2 mb20">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="permanent" id="permanent" 
+                @if (old('permanent', $contract?->permanent)) checked @endif>
+                <label class="form-check-label" for="permanent">
+                    {{ __('Perm staff') }}
+                </label>
+            </div>
+        </div>
 
     </div>
     
