@@ -94,6 +94,15 @@ class ImportController extends Controller
                                     ->first();
                                 if ($existingAllocation && $existingAllocation->fte != $fte) {
                                     Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
+                                    ChangeRequest::create([
+                                        'record_type' => 'allocation',
+                                        'record_id' => $existingAllocation->id,
+                                        'field' => 'fte',
+                                        'old_value' => $existingAllocation->fte,
+                                        'new_value' => $fte,
+                                        'status' => 'pending',
+                                        'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                    ]);
                                 }
 
                                 if ($fte > 0) {
@@ -128,6 +137,15 @@ class ImportController extends Controller
                                 ->first();
                             if ($existingDemand && $existingDemand->fte != $fte) {
                                 Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
+                                ChangeRequest::create([
+                                    'record_type' => 'allocation',
+                                    'record_id' => $existingAllocation->id,
+                                    'field' => 'fte',
+                                    'old_value' => $existingAllocation->fte,
+                                    'new_value' => $fte,
+                                    'status' => 'pending',
+                                    'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                ]);
                             }
                             if ($fte > 0) {
                                 Demand::updateOrCreate(

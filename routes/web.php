@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AllocationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
@@ -103,6 +104,8 @@ Route::middleware('auth')->group(function () {
         Route::resource('domains', DomainController::class);
         Route::resource('funding-approval-stages', FundingApprovalStageController::class);
         Route::resource('requests', DemandRequestController::class);
+        Route::get('change-requests/{changeRequest}/approve', [ChangeRequestController::class, 'approve'])->name('change-requests.approve');
+        Route::resource('change-requests', ChangeRequestController::class);
     });
 });
 
