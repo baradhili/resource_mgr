@@ -21,16 +21,17 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                var permissionTags = new Tagify(document.getElementById("role_permissions"), {
-                    whitelist: [
-                        @foreach ($permissions as $permission)
-                            "{{ $permission->name }}",
-                        @endforeach
-                    ],
+                permissionTags = new Tagify(document.getElementById("role_permissions"), {
+                    whitelist: {!! json_encode($permissions->pluck('name')->toArray()) !!},
                     originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
                     dropdown: {
-                        enabled: 0,
+                        enabled: 0, // Enables the dropdown
                         classname: "tagify--dropdown__permissions",
+                        position: "all", // Shows the dropdown in a way that fits the viewport
+                        closeOnSelect: true,
+                        overlay: true,
+                        height: 500, // Sets the height of the dropdown (adjust as needed)
+                        maxItems: 500 // Maximum number of items to show in dropdown
                     },
                     enforceWhitelist: true, // Ensure only items from the whitelist can be added
                 });

@@ -10,9 +10,10 @@
             <div class="col-md-6">
 
                 <div class="card card-default">
-                    
+
                     <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('roles.update', $role->id) }}"  role="form" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('roles.update', $role->id) }}" role="form"
+                            enctype="multipart/form-data">
                             {{ method_field('PATCH') }}
                             @csrf
 
