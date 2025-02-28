@@ -105,25 +105,25 @@ class ImportController extends Controller
                                     ]);
                                 }
 
-                                if ($fte > 0) {
-                                    Allocation::updateOrCreate(
-                                        [
-                                            'resources_id' => $resourceID,
-                                            'projects_id' => $projectID,
-                                            'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
-                                        ],
-                                        [
-                                            'fte' => $fte,
-                                            'status' => 'Proposed',
-                                            'source' => 'Imported'
-                                        ]
-                                    );
-                                } elseif ($fte == 0) {
-                                    Allocation::where('projects_id', $projectID)
-                                        ->where('resources_id', $resourceID)
-                                        ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
-                                        ->delete();
-                                }
+                                // if ($fte > 0) {
+                                //     Allocation::updateOrCreate(
+                                //         [
+                                //             'resources_id' => $resourceID,
+                                //             'projects_id' => $projectID,
+                                //             'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
+                                //         ],
+                                //         [
+                                //             'fte' => $fte,
+                                //             'status' => 'Proposed',
+                                //             'source' => 'Imported'
+                                //         ]
+                                //     );
+                                // } elseif ($fte == 0) {
+                                //     Allocation::where('projects_id', $projectID)
+                                //         ->where('resources_id', $resourceID)
+                                //         ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                                //         ->delete();
+                                // }
                             }
                         }
                     } else { // Insert these into demand
@@ -147,25 +147,25 @@ class ImportController extends Controller
                                     'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                 ]);
                             }
-                            if ($fte > 0) {
-                                Demand::updateOrCreate(
-                                    [
-                                        'projects_id' => $projectID,
-                                        'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
-                                    ],
-                                    [
-                                        'fte' => $fte,
-                                        'status' => 'Proposed',
-                                        'resource_type' => $resourceName,
-                                        'source' => 'Imported'
-                                    ]
-                                );
-                            } elseif ($fte == 0) {
-                                Demand::where('projects_id', $projectID)
-                                    ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
-                                    ->delete();
+                            // if ($fte > 0) {
+                            //     Demand::updateOrCreate(
+                            //         [
+                            //             'projects_id' => $projectID,
+                            //             'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
+                            //         ],
+                            //         [
+                            //             'fte' => $fte,
+                            //             'status' => 'Proposed',
+                            //             'resource_type' => $resourceName,
+                            //             'source' => 'Imported'
+                            //         ]
+                            //     );
+                            // } elseif ($fte == 0) {
+                            //     Demand::where('projects_id', $projectID)
+                            //         ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                            //         ->delete();
 
-                            }
+                            // }
                         }
                     }
                 }
