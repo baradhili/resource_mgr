@@ -122,5 +122,16 @@ class Resource extends Model
         return self::whereIn('resource_type', $resourceTypes)->get();
     }
 
+    /**
+     * Get the 'permanent' value for the resource's contracts.
+     *
+     * @return bool|null
+     */
+    public function employmentStatus()
+    {
+        return $this->contracts()->value('permanent');
+    }
+
+
 }
 

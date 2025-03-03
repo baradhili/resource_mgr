@@ -53,6 +53,13 @@ class ResourceController extends Controller
                 ->where('end_date', '>=', now());
         })->paginate();
 
+        // Modify resource names to add [c] if the resource is not permanent
+        foreach ($resources as $resource) {
+            if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+                $resource->full_name .= ' [c]';
+            }
+        }
+
         if (!Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
@@ -128,6 +135,13 @@ class ResourceController extends Controller
     public function show($id): View
     {
         $resource = Resource::with(['location', 'skills', 'contracts', 'allocations', 'leaves', 'user', 'resourceType'])->find($id);
+
+        // Modify resource names to add [c] if the resource is not permanent
+
+        Log::info("resource: " . json_encode($resource));
+        if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+            $resource->full_name .= ' [c]';
+        }
 
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resources_id', $id)
