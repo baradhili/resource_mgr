@@ -67,7 +67,14 @@ class AllocationController extends Controller
         $resources = Resource::whereHas('contracts', function ($query) {
             $query->where('start_date', '<=', now())
                 ->where('end_date', '>=', now());
-        })->paginate();
+        })->with('contracts')->paginate();
+
+        // Modify resource names to add [c] if the resource is not permanent
+        foreach ($resources as $resource) {
+            if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+                $resource->full_name .= ' [c]';
+            }
+        }
 
         if (!Cache::has('resourceAllocation')) {
             $this->cacheService->cacheResourceAllocation();

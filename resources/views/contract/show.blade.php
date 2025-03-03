@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ $contract->name ?? __('Show') . " " . __('Contract') }}
+    {{ $contract->name ?? __('Show') . ' ' . __('Contract') }}
 @endsection
 
 @section('content')
@@ -19,23 +19,27 @@
                     </div>
 
                     <div class="card-body bg-white">
-                        
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Start Date:</strong>
-                                    {{ $contract->start_date }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>End Date:</strong>
-                                    {{ $contract->end_date }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Availability:</strong>
-                                    {{ $contract->availability }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Resources Id:</strong>
-                                    {{ $contract->resources_id }}
-                                </div>
+
+                        <div class="form-group mb-2 mb20">
+                            <strong>Start Date:</strong>
+                            {{ $contract->start_date }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>End Date:</strong>
+                            {{ $contract->end_date }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Availability:</strong>
+                            {{ $contract->availability }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Resources Id:</strong>
+                            {{ $contract->resources_id }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong> Perm/Contract </strong>
+                            {{ $contract->permanent ? 'Permanent' : 'Contract' }}
+                        </div>
 
                     </div>
                 </div>

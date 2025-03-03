@@ -115,6 +115,13 @@ class UserController extends Controller
     {
         $user = User::find($id);
         $reportees = $user->reportees; // Get the people who report to this user
+
+                // Modify resource names to add [c] if the resource is not permanent
+                foreach ($reportees as $reportee) {
+                    if ($reportee->resource && isset($reportee->resource->contracts[0]) && !$reportee->resource->contracts[0]->permanent) {
+                        $reportee->name .= ' [c]';
+                    }
+                }
         $reports = $user->reports;
         $resource = $user->resource;
         $regionObj = $resource ? Region::find($resource->region_id) : null;
@@ -122,15 +129,15 @@ class UserController extends Controller
         $locationObj = $resource ?Location::find($resource->location_id) : null;
         $location = $locationObj ? $locationObj->name : 'Unknown Location';
         $skills = $resource ? $resource->skills : [(object)['skill_name' => 'Unknown Skills']];
-Log::info('User Profile Data:', [
-    'user' => json_encode($user),
-    'reportees' => json_encode($reportees),
-    'region' => json_encode($region),
-    'location' => json_encode($location),
-    'reports' => json_encode($reports),
-    'resource' => json_encode($resource),
-    'skills' => json_encode($skills),
-]);
+// Log::info('User Profile Data:', [
+//     'user' => json_encode($user),
+//     'reportees' => json_encode($reportees),
+//     'region' => json_encode($region),
+//     'location' => json_encode($location),
+//     'reports' => json_encode($reports),
+//     'resource' => json_encode($resource),
+//     'skills' => json_encode($skills),
+// ]);
 
 
         return view('user.profile', compact('user', 'reportees','region','location', 'reports', 'resource','skills'));

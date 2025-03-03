@@ -29,7 +29,7 @@ class Contract extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['start_date', 'end_date', 'availability', 'resources_id'];
+    protected $fillable = ['start_date', 'end_date', 'availability', 'resources_id', 'permanent'];
 
 
     /**

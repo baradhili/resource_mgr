@@ -61,7 +61,15 @@ class ContractController extends Controller
      */
     public function store(ContractRequest $request): RedirectResponse
     {
-        Contract::create($request->validated());
+        $validatedData = $request->validated();
+        if ($request->input('permanent')) {
+            $validatedData['end_date'] = now()->addYears(100)->format('Y-m-d');
+        }
+        $validatedData['permanent'] = $request->has('permanent');
+
+        Contract::create($validatedData);
+
+        $this->cacheService->cacheResourceAvailability();
 
         return Redirect::route('contracts.index')
             ->with('success', 'Contract created successfully.');
@@ -94,7 +102,15 @@ class ContractController extends Controller
      */
     public function update(ContractRequest $request, Contract $contract): RedirectResponse
     {
-        $contract->update($request->validated());
+        $existingContract = Contract::find($contract->id);
+
+        if ($request->input('permanent')) {
+            $request->merge(['end_date' => now()->addYears(100)->format('Y-m-d')]);
+        } 
+        $validatedData = $request->validated();
+        $validatedData['permanent'] = $request->has('permanent');
+
+        $contract->update($validatedData);
         $this->cacheService->cacheResourceAvailability();
         return Redirect::route('contracts.index')
             ->with('success', 'Contract updated successfully');
