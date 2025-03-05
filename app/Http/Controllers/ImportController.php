@@ -7,8 +7,7 @@ use App\Models\Resource;
 use App\Models\Project;
 use App\Models\Demand;
 use App\Models\Allocation;
-use App\Models\StagingAllocation;
-use App\Models\StagingDemand;
+use App\Models\ChangeRequest;
 use App\Models\ResourceType;
 use App\Models\Region;
 use App\Models\PublicHoliday;
@@ -94,14 +93,15 @@ class ImportController extends Controller
                                     ->first();
                                 if ($existingAllocation && $existingAllocation->fte != $fte) {
                                     Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
+                                    //'user' = Importer
                                     ChangeRequest::create([
-                                        'record_type' => 'allocation',
+                                        'record_type' => Allocation::class,
                                         'record_id' => $existingAllocation->id,
                                         'field' => 'fte',
                                         'old_value' => $existingAllocation->fte,
                                         'new_value' => $fte,
                                         'status' => 'pending',
-                                        'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                        // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                     ]);
                                 }
 
@@ -138,13 +138,13 @@ class ImportController extends Controller
                             if ($existingDemand && $existingDemand->fte != $fte) {
                                 Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
                                 ChangeRequest::create([
-                                    'record_type' => 'allocation',
-                                    'record_id' => $existingAllocation->id,
+                                    'record_type' => Demand::class,
+                                    'record_id' => $existingDemand->id,
                                     'field' => 'fte',
-                                    'old_value' => $existingAllocation->fte,
+                                    'old_value' => $existingDemand->fte,
                                     'new_value' => $fte,
                                     'status' => 'pending',
-                                    'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                    // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                 ]);
                             }
                             // if ($fte > 0) {
