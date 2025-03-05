@@ -36,8 +36,8 @@
                                     <tr>
                                         <th>No</th>
                                         
-									<th >Record Type</th>
-									<th >Record Id</th>
+									<th >Subject</th>
+
 									<th >Field</th>
 									<th >Old Value</th>
 									<th >New Value</th>
@@ -52,8 +52,8 @@
                                         <tr>
                                             <td>{{ ++$i }}</td>
                                             
-										<td >{{ $changeRequest->record_type }}</td>
-										<td >{{ $changeRequest->record_id }}</td>
+										<td >{{ $changeRequest->subject }}</td>
+
 										<td >{{ $changeRequest->field }}</td>
 										<td >{{ $changeRequest->old_value }}</td>
 										<td >{{ $changeRequest->new_value }}</td>

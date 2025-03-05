@@ -24,17 +24,7 @@ class ChangeRequest extends Model
 
     public function record()
     {
-        return $this->morphTo();
-    }
-
-    public function allocation()
-    {
-        return $this->relation('record', Allocation::class);
-    }
-
-    public function demand()
-    {
-        return $this->relation('record', Demand::class);
+        return $this->morphTo(null, 'record_type');
     }
 
     public function requester()
