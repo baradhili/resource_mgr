@@ -78,6 +78,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('estimates', EstimateController::class);
     Route::resource('clients', ClientController::class);
     Route::resource('terms-and-conditions', TermsAndConditionController::class);
+    Route::get('change-password', [AuthController::class, 'showChangePasswordForm'])->name('auth.change-password');
+    Route::post('change-password', [AuthController::class, 'changePassword'])->name('auth.change-password.update');
     Route::group(['middleware' => ['role:super-admin|admin']], function () {
 
         Route::resource('permissions', App\Http\Controllers\PermissionController::class);
