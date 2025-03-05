@@ -29,6 +29,10 @@
                             {{ $user->email }}
                         </div>
                         <div class="form-group mb-2 mb20">
+                            <strong>Roles:</strong>
+                            {{ $user->roles->pluck('name')->implode(', ') }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
                             <strong>Resource Group:</strong>
                             {{ $user->currentTeam->name ?? 'None' }}
                         </div>
