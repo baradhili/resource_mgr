@@ -91,6 +91,7 @@ class ImportController extends Controller
                                     ->where('projects_id', $projectID)
                                     ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
                                     ->first();
+                                //if its a change
                                 if ($existingAllocation && $existingAllocation->fte != $fte) {
                                     Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
                                     //'user' = Importer
@@ -102,6 +103,15 @@ class ImportController extends Controller
                                         'new_value' => $fte,
                                         'status' => 'pending',
                                         // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                    ]);
+                                } elseif (!$existingAllocation) {
+                                    Allocation::create([
+                                        'resources_id' => $resourceID,
+                                        'projects_id' => $projectID,
+                                        'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'),
+                                        'fte' => $fte,
+                                        'status' => 'Proposed',
+                                        'source' => 'Imported'
                                     ]);
                                 }
 
@@ -135,6 +145,7 @@ class ImportController extends Controller
                             $existingDemand = Demand::where('projects_id', $projectID)
                                 ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
                                 ->first();
+                            //if its a change
                             if ($existingDemand && $existingDemand->fte != $fte) {
                                 Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
                                 ChangeRequest::create([
@@ -145,6 +156,19 @@ class ImportController extends Controller
                                     'new_value' => $fte,
                                     'status' => 'pending',
                                     // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                ]);
+                            } elseif (!$existingDemand) {
+
+                                $resourceType = ResourceType::where('name', 'like', "$resourceName%")->first();
+                                $resourceTypeId = $resourceType ? $resourceType->id : $resourceName;
+
+                                Demand::create([
+                                    'projects_id' => $projectID,
+                                    'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'),
+                                    'fte' => $fte,
+                                    'resource_type' => $resourceTypeId,
+                                    'status' => 'Proposed',
+                                    'source' => 'Imported'
                                 ]);
                             }
                             // if ($fte > 0) {

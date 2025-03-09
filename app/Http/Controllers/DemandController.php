@@ -17,13 +17,18 @@ use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Services\CacheService;
+use App\Services\ResourceService;
 use App\Models\ResourceType;
 
 class DemandController extends Controller
 {
-    public function __construct(CacheService $cacheService)
+    protected $cacheService;
+    protected $resourceService;
+
+    public function __construct(CacheService $cacheService, ResourceService $resourceService)
     {
         $this->cacheService = $cacheService;
+        $this->resourceService = $resourceService;
     }
 
     /**
@@ -48,19 +53,20 @@ class DemandController extends Controller
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
         // Collect resources with contracts in the next 12 months
-        $resources = Resource::whereIn(
-            'id',
-            Contract::where(function ($q) use ($startDate, $endDate) {
-                $q->where('start_date', '<=', $endDate)
-                    ->where(function ($q) use ($startDate) {
-                        $q->where('end_date', '>=', $startDate)
-                            ->orWhereNull('end_date');
-                    });
-            })
-                ->pluck('resources_id')
-                ->unique()
-                ->values()
-        )->get();
+        $resources = $this->resourceService->getResourceList();
+        // $resources = Resource::whereIn(
+        //     'id',
+        //     Contract::where(function ($q) use ($startDate, $endDate) {
+        //         $q->where('start_date', '<=', $endDate)
+        //             ->where(function ($q) use ($startDate) {
+        //                 $q->where('end_date', '>=', $startDate)
+        //                     ->orWhereNull('end_date');
+        //             });
+        //     })
+        //         ->pluck('resources_id')
+        //         ->unique()
+        //         ->values()
+        // )->get();
 
         // Collect the projects_id from demands in our window
         $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
@@ -80,6 +86,10 @@ class DemandController extends Controller
         foreach ($projects as $project) {
 
             $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
+            //TODO - once we migrate to a numeric value for resource type, remove this
+            if (is_numeric($resource_type)) {
+                $resource_type = ResourceType::findOrFail($resource_type)->name;
+            }  
             if ($resource_type) {
                 $words = explode(' ', trim($resource_type));
                 $acronym = '';
@@ -258,7 +268,7 @@ class DemandController extends Controller
         //         $projects_id = $project->id;
         //     }
         // } else {
-            // $projects_id = $request->input('projects_id');
+        // $projects_id = $request->input('projects_id');
         // }
         $request->validate([
             'start_date' => 'required|date',
