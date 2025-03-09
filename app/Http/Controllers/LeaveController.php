@@ -17,7 +17,27 @@ class LeaveController extends Controller
      */
     public function index(Request $request): View
     {
-        $leaves = Leave::paginate();
+        $old = $request->query('old');
+        $search = $request->query('search');
+
+        // if old then don't filter by end_date 
+        // if search then filter by leave->resource->full_name
+        // if not old then end_date >=now
+        // assemble the query based on old and search values
+
+        $query = Leave::query();
+
+        if (!$old) {
+            $query->where('end_date', '>=', now());
+        }
+
+        if ($search) {
+            $query->whereHas('resource', function ($resourceQuery) use ($search) {
+                $resourceQuery->where('full_name', 'like', "%$search%");
+            });
+        }
+
+        $leaves = $query->paginate();
 
         return view('leave.index', compact('leaves'))
             ->with('i', ($request->input('page', 1) - 1) * $leaves->perPage());

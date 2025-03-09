@@ -16,9 +16,17 @@ Leaves
                             {{ __('Leaves') }}
                         </span>
 
-                        <div class="float-right">
-                            <a href="{{ route('leaves.create') }}" class="btn btn-primary btn-sm float-right"
-                                data-placement="left">
+                        <div class="float-right d-flex align-items-center">
+                            <form action="{{ route('leaves.index') }}" method="get" class="d-inline-flex align-items-center" id="filterForm">
+                                <div class="custom-control custom-checkbox mr-2">
+                                    <input type="checkbox" class="custom-control-input" id="showOld" name="old" value="1" {{ request('old') == 1 ? 'checked' : '' }} onchange="document.getElementById('filterForm').submit()">
+                                    <label class="custom-control-label" for="showOld">Show Old</label>
+                                </div>
+                                &nbsp;
+                                <input type="text" class="form-control" id="search" name="search" placeholder="Search..." style="width: auto;" value="{{ request('search') }}" onkeydown="if (event.keyCode == 13) { document.getElementById('filterForm').submit(); return false; }">
+                            </form>
+                            &nbsp;
+                            <a href="{{ route('leaves.create') }}" class="btn btn-primary btn-sm">
                                 {{ __('Create New') }}
                             </a>
                         </div>
