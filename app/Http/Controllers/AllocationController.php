@@ -164,7 +164,9 @@ class AllocationController extends Controller
 
             $allocation->delete();
         }
-
+        //refresh teh cache
+        $this->cacheService->cacheResourceAllocation();
+        
         return Redirect::route('allocations.index');
     }
     /**
