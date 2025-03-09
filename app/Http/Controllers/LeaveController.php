@@ -9,23 +9,31 @@ use Illuminate\Http\Request;
 use App\Http\Requests\LeaveRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Services\ResourceService;
 
 class LeaveController extends Controller
 {
+    private $resourceService;
+
+    public function __construct(ResourceService $resourceService)
+    {
+        $this->resourceService = $resourceService;
+    }
+    
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
+        $resources = $this->resourceService->getResourceList();
+
         $old = $request->query('old');
         $search = $request->query('search');
 
-        // if old then don't filter by end_date 
-        // if search then filter by leave->resource->full_name
-        // if not old then end_date >=now
         // assemble the query based on old and search values
 
-        $query = Leave::query();
+        $query = Leave::query()
+            ->whereIn('resources_id', $resources->pluck('id'));
 
         if (!$old) {
             $query->where('end_date', '>=', now());
