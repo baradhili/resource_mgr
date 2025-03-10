@@ -16,7 +16,9 @@
                     <img src="{{ auth()->user()->settings()->get('avatar', '/img/avatar/default.jpg') }}"
                         alt="{{ auth()->user()->name }}" class="img-fluid rounded-circle mb-2" width="128" height="128">
                     <h5 class="card-title mb-0">{{ $user->name }}</h5>
-                    <div class="text-muted mb-2">{{ $user->role }}</div>
+                    <div class="text-muted mb-2">
+                        {{ $user->roles->pluck('name')->implode(', ') ?: 'No roles assigned' }}
+                    </div>
 
                     <div class="form-group mb-2 mb20">
                         <strong>Project Resource?:</strong>

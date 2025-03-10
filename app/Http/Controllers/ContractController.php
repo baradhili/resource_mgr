@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 use App\Services\CacheService;
+use App\Services\ResourceService;
 
 class ContractController extends Controller
 {
@@ -23,9 +24,14 @@ class ContractController extends Controller
      * The middleware configured here will be assigned to this controller's
      * routes.
      */
-    public function __construct(CacheService $cacheService)
+
+     protected $cacheService;
+    protected $resourceService;
+
+    public function __construct(CacheService $cacheService, ResourceService $resourceService)
     {
         $this->cacheService = $cacheService;
+        $this->resourceService = $resourceService;
         // $this->middleware('teamowner', ['only' => ['create','store','update','edit','destroy']]);  
         // $this->middleware('contract:view', ['only' => ['index']]);
         // $this->middleware('contract:create', ['only' => ['create','store']]);
@@ -38,7 +44,10 @@ class ContractController extends Controller
      */
     public function index(Request $request): View
     {
-        $contracts = Contract::orderBy('end_date', 'asc')->paginate();
+        $resources = $this->resourceService->getResourceList();
+        $contracts = Contract::whereIn('resources_id', $resources->pluck('id'))
+            ->orderBy('end_date', 'asc')
+            ->paginate();
 
         return view('contract.index', compact('contracts'))
             ->with('i', ($request->input('page', 1) - 1) * $contracts->perPage());

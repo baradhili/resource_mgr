@@ -22,14 +22,17 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Services\CacheService;
+use App\Services\ResourceService;
 
 class ResourceController extends Controller
 {
     protected $cacheService;
+    protected $resourceService;
 
-    public function __construct(CacheService $cacheService)
+    public function __construct(CacheService $cacheService, ResourceService $resourceService)
     {
         $this->cacheService = $cacheService;
+        $this->resourceService = $resourceService;
     }
     /**
      * Display a listing of the resource.
@@ -48,10 +51,12 @@ class ResourceController extends Controller
             ];
         }
 
-        $resources = Resource::whereHas('contracts', function ($query) {
-            $query->where('start_date', '<=', now())
-                ->where('end_date', '>=', now());
-        })->paginate();
+        // $resources = Resource::whereHas('contracts', function ($query) {
+        //     $query->where('start_date', '<=', now())
+        //         ->where('end_date', '>=', now());
+        // })->paginate();
+        // Collect our resources who have a current contract
+        $resources = $this->resourceService->getResourceList();
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
@@ -66,6 +71,9 @@ class ResourceController extends Controller
         } else {
             $resourceAvailability = Cache::get('resourceAvailability');
         }
+
+        // filter resourceAvailability by $resources
+        $resourceAvailability = array_intersect_key($resourceAvailability, array_flip($resources->pluck('id')->toArray()));
 
         //return to the view
         return view('resource.index', compact('resources', 'resourceAvailability', 'nextTwelveMonths'))
