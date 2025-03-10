@@ -64,8 +64,8 @@
                                                     method="GET">
                                                     @csrf
                                                     <input type="hidden" name="resource_id" value="{{ $resource->id }}">
-                                                    <button type="submit" class="btn btn-sm btn-danger"><i
-                                                            class="fa fa-fw fa-edit"></i> {{ __('Return') }}</button>
+                                                    @can('allocations.edit')<button type="submit" class="btn btn-sm btn-danger"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Return') }}</button>@endcan
                                                 </form>
                                             </td>
                                         </tr>

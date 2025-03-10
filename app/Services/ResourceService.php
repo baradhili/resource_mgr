@@ -36,14 +36,30 @@ class ResourceService
             // Log::info("resources: " . json_encode($resources));
         } elseif ($user->reportees->count() > 0) {
             // check if the user is a manager
-            // Log::info("User is a manager");
+            Log::info("User is a manager");
             $reportees = $user->reportees;
-            //for each linked resource contract, check if the start date is before now and the end date is after now
             $resourceIDs = $user->reportees->pluck('resource.id')->toArray();
-            $resources = Resource::whereIn('id', $resourceIDs)->whereHas('contracts', function ($query) {
-                $query->where('start_date', '<=', now())
-                    ->where('end_date', '>=', now());
-            })->with('contracts')->paginate();
+            foreach ($reportees as $reportee) {
+                if ($reportee->reportees->count() > 0) {
+                    $resourceIDs = array_merge($resourceIDs, $reportee->reportees->pluck('resource.id')->toArray());
+                }
+            }
+            
+            Log::info("resourceids: " . json_encode($resourceIDs));
+            //for each linked resource contract, check if the start date is before now and the end date is after now
+
+            $resources = Resource::whereIn('id', $resourceIDs)
+                ->whereHas('contracts', function ($query) use ($regionID) {
+                    $query->where('start_date', '<=', now())
+                        ->where('end_date', '>=', now())
+                        ->when($regionID, function ($query) use ($regionID) {
+                            return $query->whereHas('region', function ($query) use ($regionID) {
+                                $query->where('id', $regionID);
+                            });
+                        });
+                })
+                ->with('contracts')->paginate();
+            Log::info("resources: " . json_encode($resources));
         } else {
             // Log::info("User is not an owner of a team or a manager");
             // otherwise just return the user's resource

@@ -141,8 +141,8 @@ class UserController extends Controller
         $locationObj = $resource ? Location::find($resource->location_id) : null;
         $location = $locationObj ? $locationObj->name : 'Unknown Location';
         $skills = $resource ? $resource->skills : [(object) ['skill_name' => 'Unknown Skills']];
-        Log::info("roles available: " . json_encode($roles));
-        Log::info("current roles" . json_encode($userRoles));
+        // Log::info("roles available: " . json_encode($roles));
+        // Log::info("current roles" . json_encode($userRoles));
 
 
         return view('user.profile', compact('user', 'userRoles', 'reportees', 'region', 'location', 'reports', 'resource', 'skills'));

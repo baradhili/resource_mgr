@@ -65,17 +65,17 @@
                                             <td>
                                                 <form action="{{ route('resources.destroy', $resource->id) }}"
                                                     method="POST">
-                                                    <a class="btn btn-sm btn-primary "
+                                                    @can('allocations.show')<a class="btn btn-sm btn-primary "
                                                         href="{{ route('resources.show', $resource->id) }}"><i
-                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success"
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>@endcan
+                                                    @can('allocations.edit')<a class="btn btn-sm btn-success"
                                                         href="{{ route('resources.edit', $resource->id) }}"><i
-                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>@endcan
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                    @can('allocations.destroy')<button type="submit" class="btn btn-danger btn-sm"
                                                         onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>@endcan
                                                 </form>
                                             </td>
                                         </tr>

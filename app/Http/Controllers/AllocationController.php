@@ -73,11 +73,9 @@ class AllocationController extends Controller
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
         // Collect our resources who have a current contract
-        //$resources = $this->ResourceList();
         $resources = $this->resourceService->getResourceList($regionID);
         // collect teh regions from teh resources->region
         $regions = $resources->pluck('region')->filter()->unique()->values()->all();
-
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
@@ -92,6 +90,11 @@ class AllocationController extends Controller
         } else {
             $resourceAllocation = Cache::get('resourceAllocation');
         }
+
+        // // filter resourceAllocation by $resources
+        // $resourceAllocation = $resourceAllocation->filter(function ($allocation) use ($resources) {
+        //     return $resources->contains('id', $allocation->resource_id);
+        // });
 
         return view('allocation.index', compact('resources', 'resourceAllocation', 'nextTwelveMonths', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());

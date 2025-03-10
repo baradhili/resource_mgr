@@ -49,10 +49,10 @@
                                     @foreach ($contracts as $contract)
                                         <tr>
                                             <td>{{ $contract->resource->full_name }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($contract->start_date)->format('Y-m-d') }}</td>
-                                            <td>{{ \Carbon\Carbon::parse($contract->end_date)->format('Y-m-d') }}</td>
+                                            <td>{{ $contract->permanent ? 'N/A' : \Carbon\Carbon::parse($contract->start_date)->format('Y-m-d') }}</td>
+                                            <td>{{ $contract->permanent ? 'N/A' : \Carbon\Carbon::parse($contract->end_date)->format('Y-m-d') }}</td>
                                             <td>{{ $contract->availability }}</td>
-                                            <td>{{ number_format(\Carbon\Carbon::parse($contract->end_date)->floatDiffInYears(\Carbon\Carbon::parse($contract->start_date)), 1) }}
+                                            <td>{{ $contract->permanent ? 'N/A' : number_format(\Carbon\Carbon::parse($contract->end_date)->floatDiffInYears(\Carbon\Carbon::parse($contract->start_date)), 1) }}
                                             </td>
                                             <td>{{ $contract->permanent ? 'P' : 'C' }}</td>
                                             <td>
