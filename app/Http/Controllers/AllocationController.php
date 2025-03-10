@@ -52,6 +52,10 @@ class AllocationController extends Controller
         if (!$user->can('allocations.index')) {
             return view('home')->with('warning', 'You do not have the necessary permissions to view the allocations page.');
         }
+
+        // check if they are asking for a region
+        $regionID = $request->input('region_id');
+
         // Build our next twelve month array
         $nextTwelveMonths = [];
 
@@ -70,7 +74,10 @@ class AllocationController extends Controller
 
         // Collect our resources who have a current contract
         //$resources = $this->ResourceList();
-        $resources = $this->resourceService->getResourceList();
+        $resources = $this->resourceService->getResourceList($regionID);
+        // collect teh regions from teh resources->region
+        $regions = $resources->pluck('region')->filter()->unique()->values()->all();
+
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
@@ -86,7 +93,7 @@ class AllocationController extends Controller
             $resourceAllocation = Cache::get('resourceAllocation');
         }
 
-        return view('allocation.index', compact('resources', 'resourceAllocation', 'nextTwelveMonths'))
+        return view('allocation.index', compact('resources', 'resourceAllocation', 'nextTwelveMonths', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
 

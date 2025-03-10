@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class ResourceService
 {
-    public function getResourceList()
+    public function getResourceList($regionID = null)
     {
         //get user 
         $user = Auth::user();
@@ -23,7 +23,16 @@ class ResourceService
                     ->where('end_date', '>=', now());
             })
                 ->where('resource_type', $resource_type)
-                ->with('contracts')->paginate();
+                ->when($regionID, function ($query, $regionID) {
+                    return $query->whereHas('region', function ($query) use ($regionID) {
+                        $query->where('id', $regionID);
+                    });
+                })
+                
+                ->with(['contracts' => function ($query) {
+                    $query->where('start_date', '<=', now())
+                        ->where('end_date', '>=', now());
+                }, 'region'])->paginate();
             // Log::info("resources: " . json_encode($resources));
         } elseif ($user->reportees->count() > 0) {
             // check if the user is a manager
