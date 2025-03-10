@@ -16,7 +16,21 @@
                                 {{ __('Resource Allocations (%)') }}
                             </span>
 
-                            <div class="float-right">
+                            <div class="float-right d-flex align-items-center">
+                                <form action="{{ route('allocations.index') }}" method="get"
+                                    class="d-inline-flex align-items-center" id="filterForm">
+                                    
+                                    <select class="form-control" id="region_id" name="region_id" style="width: auto;"
+                                        onchange="document.getElementById('filterForm').submit(); return false;">
+                                        <option value="" selected>All</option>
+                                        @foreach ($regions as $region)
+                                            @if ($region->id !== null)
+                                                <option value="{{ $region->id }}" {{ request('region_id') == $region->id ? 'selected' : '' }}>{{ $region->name }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
+                                </form>
+                                &nbsp;
                                 <a href="{{ route('allocations.create') }}" class="btn btn-primary btn-sm float-right"
                                     data-placement="left">
                                     {{ __('Create New') }}
@@ -65,8 +79,8 @@
                                                     href="{{ route('resources.allocations', $resource->id) }}"><i
                                                         class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
                                                 <!-- <a class="btn btn-sm btn-success"
-                                                    href="{{ route('resources.edit', $resource->id) }}"><i
-                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a> -->
+                                                        href="{{ route('resources.edit', $resource->id) }}"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a> -->
                                             </td>
                                         </tr>
                                     @endforeach
