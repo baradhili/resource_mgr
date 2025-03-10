@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ $project->name ?? __('Show') . " " . __('Project') }}
+    {{ $project->name ?? __('Show') . ' ' . __('Project') }}
 @endsection
 
 @section('content')
@@ -19,32 +19,40 @@
                     </div>
 
                     <div class="card-body bg-white">
-                        
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Start Date:</strong>
-                                    {{ $project->start_date }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>End Date:</strong>
-                                    {{ $project->end_date }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Empowerid:</strong>
-                                    {{ $project->empowerID }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Name:</strong>
-                                    {{ $project->name }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Projectmanager:</strong>
-                                    {{ $project->projectManager }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Status:</strong>
-                                    {{ $project->status }}
-                                </div>
 
+                        <div class="form-group mb-2 mb20">
+                            <strong>Start Date:</strong>
+                            {{ $project->start_date }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>End Date:</strong>
+                            {{ $project->end_date }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Empowerid:</strong>
+                            {{ $project->empowerID }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Name:</strong>
+                            {{ $project->name }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Projectmanager:</strong>
+                            {{ $project->projectManager }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Status:</strong>
+                            {{ $project->status }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Assigned resources:</strong><small>* means currently allocated to this project</small>
+                            <ul>
+                                @foreach ($resources as $resource)
+                                    <li>{{ $resource->current ? '*' : '' }} {{ $resource->full_name }}
+                                        ({{ $resource->resourceType_name }})</li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
