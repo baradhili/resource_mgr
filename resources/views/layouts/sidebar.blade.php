@@ -39,10 +39,10 @@
                                     <ul id="resources" class="sidebar-dropdown list-unstyled collapse show">
                                         <li class="sidebar-item"><a class="sidebar-link"
                                                 href="{{ route('resources.index') }}">Resources</a></li>
-                                        <li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('contracts.index') }}">Contracts </a></li>
-                                        <li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('leaves.index') }}">Leave </a></li>
+                                        @can('contracts.*')<li class="sidebar-item"><a class="sidebar-link"
+                                                href="{{ route('contracts.index') }}">Contracts </a></li>@endcan
+                                        @can('leaves.*')<li class="sidebar-item"><a class="sidebar-link"
+                                                href="{{ route('leaves.index') }}">Leave </a></li>@endcan
                                     </ul>
                                 </li>
 
@@ -58,10 +58,10 @@
                                         </svg><span class="align-middle">Skills and Services</span>
                                     </a>
                                     <ul id="skills-services" class="sidebar-dropdown list-unstyled collapse">
-                                        <li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('skills.index') }}">Skills</a></li>
-                                        <li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('services.index') }}">Services </a></li>
+                                        @can('skills.*')<li class="sidebar-item"><a class="sidebar-link"
+                                                href="{{ route('skills.index') }}">Skills</a></li>@endcan
+                                        @can('services.*')<li class="sidebar-item"><a class="sidebar-link"
+                                                href="{{ route('services.index') }}">Services </a></li>@endcan
                                     </ul>
                                 </li>
                                 <li class="sidebar-item">
@@ -85,7 +85,7 @@
                                         </svg> <span class="align-middle">Projects</span>
                                     </a>
                                 </li>
-                                <li class="sidebar-item">
+                                @can('allocations.*')<li class="sidebar-item">
                                     <a class="sidebar-link" href="{{ route('allocations.index') }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -101,8 +101,8 @@
                                             </line>
                                         </svg> <span class="align-middle">Allocations</span>
                                     </a>
-                                </li>
-                                <li class="sidebar-item">
+                                </li>@endcan
+                                @can('demands.*')<li class="sidebar-item">
                                     <a class="sidebar-link" href="{{ route('demands.index') }}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -116,7 +116,8 @@
                                         </svg> <span class="align-middle">Demands</span>
                                     </a>
                                 </li>
-                                <li class="sidebar-item">
+                                @endcan
+                                @can('estimates.*')<li class="sidebar-item">
                                     <a data-bs-target="#estimates" data-bs-toggle="collapse" class="sidebar-link"
                                         aria-expanded="false">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
@@ -135,6 +136,7 @@
                                                 href="{{ route('estimates.index') }}">Estimates </a></li>
                                     </ul>
                                 </li>
+                                @endcan
                             </ul>
                         </div>
                     </div>
