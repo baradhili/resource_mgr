@@ -71,7 +71,7 @@ class ProjectController extends Controller
                 $resource->resourceType_name = $resource->resourceType->name;
                 return $resource;
             });
-            Log::info("resources: " . json_encode($resources));
+
         return view('project.show', compact('project', 'resources'));
     }
 

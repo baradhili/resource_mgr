@@ -51,7 +51,7 @@
                                 <tbody>
                                     @foreach ($projects as $project)
                                         <tr>
-                                            <td>{{ $project->empowerID ?? '' }} - {{ $project->name ?? '' }}</td>
+                                            <td><a href="{{ route('projects.show', $project->id) }}">{{ $project->empowerID ?? '' }} - {{ $project->name ?? '' }}</a></td>
                                             <td>{{ $demandArray[$project['id']]['type'] ?? '-' }} </td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)

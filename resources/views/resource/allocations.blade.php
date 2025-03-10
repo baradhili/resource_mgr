@@ -36,7 +36,7 @@
                                 <tbody>
                                     @foreach ($projects as $project)
                                         <tr>
-                                            <td>{{ $project->empowerID ?? '' }} - {{ $project->name }}</td>
+                                            <td><a href="{{ route('projects.show', $project->id) }}">{{ $project->name }}</a></td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php
