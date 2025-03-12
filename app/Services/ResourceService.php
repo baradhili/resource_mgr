@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 
 class ResourceService
 {
-    public function getResourceList($regionID = null)
+    public function getResourceList($regionID = null, $all = false)
     {
         //get user 
         $user = Auth::user();
@@ -29,11 +29,14 @@ class ResourceService
                         $query->where('id', $regionID);
                     });
                 })
-                
-                ->with(['contracts' => function ($query) {
-                    $query->where('start_date', '<=', now())
-                        ->where('end_date', '>=', now());
-                }, 'region'])->paginate();
+
+                ->with([
+                    'contracts' => function ($query) {
+                        $query->where('start_date', '<=', now())
+                            ->where('end_date', '>=', now());
+                    },
+                    'region'
+                ])->paginate();
             // Log::info("resources: " . json_encode($resources));
         } elseif ($user->reportees->count() > 0) {
             // check if the user is a manager
@@ -45,7 +48,7 @@ class ResourceService
                     $resourceIDs = array_merge($resourceIDs, $reportee->reportees->pluck('resource.id')->toArray());
                 }
             }
-            
+
             // Log::info("resourceids: " . json_encode($resourceIDs));
             //for each linked resource contract, check if the start date is before now and the end date is after now
 
@@ -64,7 +67,15 @@ class ResourceService
         } else {
             // Log::info("User is not an owner of a team or a manager");
             // otherwise just return the user's resource
-            $resources = Resource::where('id', $user->resource_id)->with('contracts')->paginate();
+            if ($all) {
+                $resources = Resource::whereHas('contracts', function ($query) {
+                    $query->where('start_date', '<=', now())
+                        ->where('end_date', '>=', now());
+                })->paginate();
+            } else {
+                $resources = Resource::where('id', $user->resource_id)->with('contracts')->paginate();
+            }
+            // Log::info("resources: " . json_encode($resources));
         }
         return $resources;
     }

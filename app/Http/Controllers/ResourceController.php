@@ -51,12 +51,8 @@ class ResourceController extends Controller
             ];
         }
 
-        // $resources = Resource::whereHas('contracts', function ($query) {
-        //     $query->where('start_date', '<=', now())
-        //         ->where('end_date', '>=', now());
-        // })->paginate();
         // Collect our resources who have a current contract
-        $resources = $this->resourceService->getResourceList();
+        $resources = $this->resourceService->getResourceList(null, true);
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
@@ -145,8 +141,6 @@ class ResourceController extends Controller
         $resource = Resource::with(['location', 'skills', 'contracts', 'allocations', 'leaves', 'user', 'resourceType'])->find($id);
 
         // Modify resource names to add [c] if the resource is not permanent
-
-        Log::info("resource: " . json_encode($resource));
         if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
             $resource->full_name .= ' [c]';
         }
@@ -166,8 +160,16 @@ class ResourceController extends Controller
         }
         $skills = $resourceSkills;
 
+
+        $projects = Project::whereIn('id', function($query) use ($resource) {
+            $query->select('projects_id')
+                ->from('allocations')
+                ->where('resources_id', $resource->id)
+                ->distinct();
+        })->get();
+
         // Log::info("resource: ".json_encode($resource));
-        return view('resource.show', compact('resource', 'skills'));
+        return view('resource.show', compact('resource', 'skills','projects'));
     }
 
     /**
