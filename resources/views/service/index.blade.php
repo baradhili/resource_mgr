@@ -17,10 +17,12 @@
                             </span>
 
                             <div class="float-right">
-                                <a href="{{ route('services.create') }}" class="btn btn-primary btn-sm float-right"
-                                    data-placement="left">
-                                    {{ __('Create New') }}
-                                </a>
+                                @can('services.create')
+                                    <a href="{{ route('services.create') }}" class="btn btn-primary btn-sm float-right"
+                                        data-placement="left">
+                                        {{ __('Create New') }}
+                                    </a>
+                                @endcan
                             </div>
                         </div>
                     </div>
@@ -37,7 +39,7 @@
                                     <tr>
 
                                         <th>Service Name</th>
-                                        
+
                                         <th>Required Skills</th>
                                         <th>Hours Cost</th>
 
@@ -49,23 +51,29 @@
                                         <tr>
 
                                             <td>{{ $service->service_name }}</td>
-                                            <td>{{ implode(', ',$service->required_skills) }}</td>
+                                            <td>{{ implode(', ', $service->required_skills) }}</td>
 
                                             <td>{{ $service->hours_cost }}</td>
 
                                             <td>
                                                 <form action="{{ route('services.destroy', $service->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary "
-                                                        href="{{ route('services.show', $service->id) }}"><i
-                                                            class="fas fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success"
-                                                        href="{{ route('services.edit', $service->id) }}"><i
-                                                            class="fas fa-edit"></i> {{ __('Edit') }}</a>
+                                                    @can('services.show')
+                                                        <a class="btn btn-sm btn-primary "
+                                                            href="{{ route('services.show', $service->id) }}"><i
+                                                                class="fas fa-eye"></i> {{ __('Show') }}</a>
+                                                    @endcan
+                                                    @can('services.create')
+                                                        <a class="btn btn-sm btn-success"
+                                                            href="{{ route('services.edit', $service->id) }}"><i
+                                                                class="fas fa-edit"></i> {{ __('Edit') }}</a>
+                                                    @endcan
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                            class="fas fa-trash"></i> {{ __('Delete') }}</button>
+                                                    @can('services.create')
+                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                            onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                                class="fas fa-trash"></i> {{ __('Delete') }}</button>
+                                                    @endcan
                                                 </form>
                                             </td>
                                         </tr>

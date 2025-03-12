@@ -16,11 +16,14 @@
                                 {{ __('Change Requests') }}
                             </span>
 
-                             <div class="float-right">
-                                <a href="{{ route('change-requests.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
-                                </a>
-                              </div>
+                            <div class="float-right">
+                                @can('change-requests.create')
+                                    <a href="{{ route('change-requests.create') }}" class="btn btn-primary btn-sm float-right"
+                                        data-placement="left">
+                                        {{ __('Create New') }}
+                                    </a>
+                                @endcan
+                            </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -35,13 +38,13 @@
                                 <thead class="thead">
                                     <tr>
                                         <th>No</th>
-                                        
-									<th >Subject</th>
 
-									<th >Field</th>
-									<th >Old Value</th>
-									<th >New Value</th>
-									<th >Status</th>
+                                        <th>Subject</th>
+
+                                        <th>Field</th>
+                                        <th>Old Value</th>
+                                        <th>New Value</th>
+                                        <th>Status</th>
 
 
                                         <th></th>
@@ -51,21 +54,30 @@
                                     @foreach ($changeRequests as $changeRequest)
                                         <tr>
                                             <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $changeRequest->subject }}</td>
 
-										<td >{{ $changeRequest->field }}</td>
-										<td >{{ $changeRequest->old_value }}</td>
-										<td >{{ $changeRequest->new_value }}</td>
-										<td >{{ $changeRequest->status }}</td>
+                                            <td>{{ $changeRequest->subject }}</td>
+
+                                            <td>{{ $changeRequest->field }}</td>
+                                            <td>{{ $changeRequest->old_value }}</td>
+                                            <td>{{ $changeRequest->new_value }}</td>
+                                            <td>{{ $changeRequest->status }}</td>
 
                                             <td>
-                                                <form action="{{ route('change-requests.destroy', $changeRequest->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('change-requests.show', $changeRequest->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('change-requests.approve', $changeRequest->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Approve') }}</a>
+                                                <form action="{{ route('change-requests.destroy', $changeRequest->id) }}"
+                                                    method="POST">
+                                                    <a class="btn btn-sm btn-primary "
+                                                        href="{{ route('change-requests.show', $changeRequest->id) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success"
+                                                        href="{{ route('change-requests.approve', $changeRequest->id) }}"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Approve') }}</a>
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Reject') }}</button>
+                                                    @can('change-requests.destroy')
+                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                            onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                                class="fa fa-fw fa-trash"></i> {{ __('Reject') }}</button>
+                                                    @endcan
                                                 </form>
                                             </td>
                                         </tr>

@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    
+
                     <div class="card-body bg-white">
 
                         <div class="form-group mb-2 mb20">
@@ -36,7 +36,15 @@
                                 <tbody>
                                     @foreach ($projects as $project)
                                         <tr>
-                                            <td><a href="{{ route('projects.show', $project->id) }}">{{ $project->name }}</a></td>
+                                            <td>
+                                                @can('projects.show')
+                                                    <a href="{{ route('projects.show', $project->id) }}">
+                                                    @endcan
+                                                    {{ $project->name }}
+                                                    @can('projects.show')
+                                                    </a>
+                                                @endcan
+                                            </td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php
@@ -45,27 +53,34 @@
                                                         '-' .
                                                         str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                                                     $demandFTE =
-                                                        $allocationArray[$project['id']]['allocation'][$monthKey]['fte'] ??
-                                                        '-';
+                                                        $allocationArray[$project['id']]['allocation'][$monthKey][
+                                                            'fte'
+                                                        ] ?? '-';
                                                 @endphp
                                                 <td>
                                                     @if ($demandFTE !== '-')
-                                                        <a href="{{ route('allocations.editOne', ['projectId' => $project->id, 'resourceId' => $resource->id, 'monthKey' => $monthKey]) }}">
+                                                        @can('allocations.editOne')
+                                                            <a
+                                                                href="{{ route('allocations.editOne', ['projectId' => $project->id, 'resourceId' => $resource->id, 'monthKey' => $monthKey]) }}">
+                                                            @endcan
                                                             {{ $demandFTE }}
-                                                        </a>
+                                                            @can('allocations.editOne')
+                                                            </a>
+                                                        @endcan
                                                     @else
                                                         {{ $demandFTE }}
                                                     @endif
                                                 </td>
                                             @endforeach
                                             <td>
-                                                <form
-                                                    action="{{ route('allocations.edit', $project->id) }}"
+                                                <form action="{{ route('allocations.edit', $project->id) }}"
                                                     method="GET">
                                                     @csrf
                                                     <input type="hidden" name="resource_id" value="{{ $resource->id }}">
-                                                    @can('allocations.edit')<button type="submit" class="btn btn-sm btn-danger"><i
-                                                            class="fa fa-fw fa-edit"></i> {{ __('Return') }}</button>@endcan
+                                                    @can('allocations.edit')
+                                                        <button type="submit" class="btn btn-sm btn-danger"><i
+                                                                class="fa fa-fw fa-edit"></i> {{ __('Return') }}</button>
+                                                    @endcan
                                                 </form>
                                             </td>
                                         </tr>
@@ -75,17 +90,19 @@
                                         <td> <strong>Percent of availability allocated</strong> </td>
                                         @foreach ($nextTwelveMonths as $month)
                                             <td>
-                                            @php
-                                                $sumPercentage = 0;
-                                                foreach ($projects as $project) {
-                                                    $monthKey =
-                                                        $month['year'] .
-                                                        '-' .
-                                                        str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                                                    $sumPercentage +=
-                                                        $allocationArray[$project->id]['allocation'][$monthKey]['percentage'] ?? 0;
-                                                }
-                                            @endphp
+                                                @php
+                                                    $sumPercentage = 0;
+                                                    foreach ($projects as $project) {
+                                                        $monthKey =
+                                                            $month['year'] .
+                                                            '-' .
+                                                            str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                                                        $sumPercentage +=
+                                                            $allocationArray[$project->id]['allocation'][$monthKey][
+                                                                'percentage'
+                                                            ] ?? 0;
+                                                    }
+                                                @endphp
                                                 <strong>{{ number_format($sumPercentage, 0) }}%</strong>
                                             </td>
                                         @endforeach

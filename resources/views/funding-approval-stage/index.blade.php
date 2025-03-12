@@ -16,11 +16,12 @@
                                 {{ __('Funding Approval Stages') }}
                             </span>
 
-                             <div class="float-right">
-                                <a href="{{ route('funding-approval-stages.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
+                            <div class="float-right">
+                                @can('funding-approval-stages.create')<a href="{{ route('funding-approval-stages.create') }}"
+                                    class="btn btn-primary btn-sm float-right" data-placement="left">
+                                    {{ __('Create New') }}@endcan
                                 </a>
-                              </div>
+                            </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -35,9 +36,9 @@
                                 <thead class="thead">
                                     <tr>
                                         <th>No</th>
-                                        
-									<th >Stage Name</th>
-									<th >Description</th>
+
+                                        <th>Stage Name</th>
+                                        <th>Description</th>
 
                                         <th></th>
                                     </tr>
@@ -46,17 +47,25 @@
                                     @foreach ($fundingApprovalStages as $fundingApprovalStage)
                                         <tr>
                                             <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $fundingApprovalStage->stage_name }}</td>
-										<td >{{ $fundingApprovalStage->description }}</td>
+
+                                            <td>{{ $fundingApprovalStage->stage_name }}</td>
+                                            <td>{{ $fundingApprovalStage->description }}</td>
 
                                             <td>
-                                                <form action="{{ route('funding-approval-stages.destroy', $fundingApprovalStage->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('funding-approval-stages.show', $fundingApprovalStage->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('funding-approval-stages.edit', $fundingApprovalStage->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form
+                                                    action="{{ route('funding-approval-stages.destroy', $fundingApprovalStage->id) }}"
+                                                    method="POST">
+                                                    <!-- <a class="btn btn-sm btn-primary "
+                                                        href="{{ route('funding-approval-stages.show', $fundingApprovalStage->id) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a> -->
+                                                   @can('funding-approval-stages.edit') <a class="btn btn-sm btn-success"
+                                                        href="{{ route('funding-approval-stages.edit', $fundingApprovalStage->id) }}"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>@endcan
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    @can('funding-approval-stages.destory')<button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>@endcan
                                                 </form>
                                             </td>
                                         </tr>

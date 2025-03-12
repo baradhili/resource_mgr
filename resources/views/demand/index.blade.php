@@ -17,14 +17,18 @@
                             </span>
 
                             <div class="float-right">
-                                <a href="{{ route('demands.create') }}" class="btn btn-primary btn-sm float-right"
-                                    data-placement="left">
-                                    {{ __('Create New') }}
-                                </a>
-                                <a href="{{ route('demands.export') }}" class="btn btn-success btn-sm float-right"
-                                    data-placement="left">
-                                    {{ __('Export') }}
-                                </a>
+                                @can('demands.create')
+                                    <a href="{{ route('demands.create') }}" class="btn btn-primary btn-sm float-right"
+                                        data-placement="left">
+                                        {{ __('Create New') }}
+                                    </a>
+                                @endcan
+                                @can('demands.export')
+                                    <a href="{{ route('demands.export') }}" class="btn btn-success btn-sm float-right"
+                                        data-placement="left">
+                                        {{ __('Export') }}
+                                    </a>
+                                @endcan
                             </div>
                         </div>
                     </div>
@@ -51,7 +55,8 @@
                                 <tbody>
                                     @foreach ($projects as $project)
                                         <tr>
-                                            <td><a href="{{ route('projects.show', $project->id) }}">{{ $project->empowerID ?? '' }} - {{ $project->name ?? '' }}</a></td>
+                                            <td><a href="{{ route('projects.show', $project->id) }}">{{ $project->empowerID ?? '' }}
+                                                    - {{ $project->name ?? '' }}</a></td>
                                             <td>{{ $demandArray[$project['id']]['type'] ?? '-' }} </td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
@@ -66,28 +71,41 @@
                                                 <td>{{ $demandFTE }}</td>
                                             @endforeach
                                             <td>
-                                            <form action="{{ route('demands.edit', $project->id) }}" method="GET" style="display: flex;">
-    <select name="resource_id" class="form-control @error('resource_id') is-invalid @enderror" id="resource_id_{{ $project->id }}" onchange="toggleSubmitButton(this)">
-        <option value="">Select Resource</option>
-        @foreach ($resources as $resource)
-            <option value="{{ $resource->id }}">{{ $resource->full_name }}</option>
-        @endforeach
-    </select>
-    <button type="submit" class="btn btn-sm btn-success" id="assign_button_{{ $project->id }}" disabled><i class="fa fa-fw fa-edit"></i> {{ __('Assign') }}</button>
-</form>
+                                                @can('demands.edit')
+                                                    <form action="{{ route('demands.edit', $project->id) }}" method="GET"
+                                                        style="display: flex;">
+                                                        <select name="resource_id"
+                                                            class="form-control @error('resource_id') is-invalid @enderror"
+                                                            id="resource_id_{{ $project->id }}"
+                                                            onchange="toggleSubmitButton(this)">
+                                                            <option value="">Select Resource</option>
+                                                            @foreach ($resources as $resource)
+                                                                <option value="{{ $resource->id }}">{{ $resource->full_name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        <button type="submit" class="btn btn-sm btn-success"
+                                                            id="assign_button_{{ $project->id }}" disabled><i
+                                                                class="fa fa-fw fa-edit"></i> {{ __('Assign') }}</button>
+                                                    </form>
+                                                @endcan
                                                 <form action="{{ route('demands.destroy', $project->id) }}" method="POST">
-                                                <a class="btn btn-sm btn-primary "
-                                                    href="{{ route('demands.show', $project->id) }}"><i
-                                                        class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                <a class="btn btn-sm btn-success"
-                                                    href="{{ route('demands.editFullDemand', $project->id) }}"><i
-                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"
-                                                    onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                        class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
-                                            </form>
+                                                    <!-- <a class="btn btn-sm btn-primary "
+                                                            href="{{ route('demands.show', $project->id) }}"><i
+                                                                class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a> -->
+                                                    @can('demands.editFullDemand')
+                                                        <a class="btn btn-sm btn-success"
+                                                            href="{{ route('demands.editFullDemand', $project->id) }}"><i
+                                                                class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                    @endcan
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    @can('demands.destroy')
+                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                            onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                                class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    @endcan
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -100,26 +118,26 @@
             </div>
         </div>
         <script>
-function toggleSubmitButton(selectElement) {
-    var selectedValue = selectElement.value;
-    var buttonId = selectElement.id.replace('resource_id', 'assign_button');
-    var submitButton = document.getElementById(buttonId);
-    
-    // Check if a valid resource is selected
-    if (selectedValue !== "") {
-        submitButton.disabled = false;
-    } else {
-        submitButton.disabled = true;
-    }
-}
+            function toggleSubmitButton(selectElement) {
+                var selectedValue = selectElement.value;
+                var buttonId = selectElement.id.replace('resource_id', 'assign_button');
+                var submitButton = document.getElementById(buttonId);
 
-// Optionally, call the function on page load to ensure the button is initially disabled
-window.onload = function() {
-    var selectElements = document.querySelectorAll('select[name="resource_id"]');
-    selectElements.forEach(function(selectElement) {
-        toggleSubmitButton(selectElement);
-    });
-};
-</script>
+                // Check if a valid resource is selected
+                if (selectedValue !== "") {
+                    submitButton.disabled = false;
+                } else {
+                    submitButton.disabled = true;
+                }
+            }
+
+            // Optionally, call the function on page load to ensure the button is initially disabled
+            window.onload = function() {
+                var selectElements = document.querySelectorAll('select[name="resource_id"]');
+                selectElements.forEach(function(selectElement) {
+                    toggleSubmitButton(selectElement);
+                });
+            };
+        </script>
     </div>
 @endsection

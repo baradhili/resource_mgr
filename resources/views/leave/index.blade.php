@@ -26,9 +26,9 @@ Leaves
                                 <input type="text" class="form-control" id="search" name="search" placeholder="Search..." style="width: auto;" value="{{ request('search') }}" onkeydown="if (event.keyCode == 13) { document.getElementById('filterForm').submit(); return false; }">
                             </form>
                             &nbsp;
-                            <a href="{{ route('leaves.create') }}" class="btn btn-primary btn-sm">
+                            @can('leaves.create')<a href="{{ route('leaves.create') }}" class="btn btn-primary btn-sm">
                                 {{ __('Create New') }}
-                            </a>
+                            </a>@endcan
                         </div>
                     </div>
                 </div>
@@ -63,17 +63,17 @@ Leaves
 
                                         <td>
                                             <form action="{{ route('leaves.destroy', $leave->id) }}" method="POST">
-                                                <a class="btn btn-sm btn-primary "
+                                                <!-- <a class="btn btn-sm btn-primary "
                                                     href="{{ route('leaves.show', $leave->id) }}"><i
-                                                        class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                <a class="btn btn-sm btn-success"
+                                                        class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a> -->
+                                                @can('leaves.edit')<a class="btn btn-sm btn-success"
                                                     href="{{ route('leaves.edit', $leave->id) }}"><i
-                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                        class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>@endcan
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"
+                                                @can('leaves.destroy')<button type="submit" class="btn btn-danger btn-sm"
                                                     onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                        class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                        class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>@endcan
                                             </form>
                                         </td>
                                     </tr>

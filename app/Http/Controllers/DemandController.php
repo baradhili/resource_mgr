@@ -58,6 +58,7 @@ class DemandController extends Controller
         $resource_types = $user->ownedTeams->pluck('resource_type')->toArray();
         if (empty($resource_types)) {
             return view('home');
+        }
         // Log::info("User is an owner of a team with resource types: " . json_encode($resource_types));
         $resource_types = ResourceType::whereIn('name', $resource_types)->pluck('id')->toArray();
         // Log::info("resources: ".json_encode($resource_types));
