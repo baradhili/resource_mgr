@@ -11,11 +11,9 @@
                 <div class="card">
                     <div class="card-header">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-
                             <span id="card_title">
                                 {{ __('Resources and Availability') }}
                             </span>
-
                             <div class="float-right">
                                 @can('resources.create')
                                     <a href="{{ route('resources.create') }}" class="btn btn-primary btn-sm float-right"
@@ -48,7 +46,6 @@
                                 <tbody>
                                     @foreach ($resources as $resource)
                                         <tr>
-
                                             <td>{{ $resource->full_name }}</td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
@@ -62,24 +59,28 @@
                                                             $monthKey
                                                         ] ?? '-';
                                                 @endphp
-                                                <td>{{ $availability }}</td>
+                                                <td>
+                                                    @if (Auth::user()->resource_id == $resource['id'])
+                                                        {{ $availability }}
+                                                    @endif
+                                                </td>
                                             @endforeach
                                             <td>
                                                 <form action="{{ route('resources.destroy', $resource->id) }}"
                                                     method="POST">
-                                                    @can('allocations.show')
+                                                    @can('resources.show')
                                                         <a class="btn btn-sm btn-primary "
                                                             href="{{ route('resources.show', $resource->id) }}"><i
                                                                 class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
                                                     @endcan
-                                                    @can('allocations.edit')
+                                                    @can('resources.edit')
                                                         <a class="btn btn-sm btn-success"
                                                             href="{{ route('resources.edit', $resource->id) }}"><i
                                                                 class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @endcan
                                                     @csrf
                                                     @method('DELETE')
-                                                    @can('allocations.destroy')
+                                                    @can('resources.destroy')
                                                         <button type="submit" class="btn btn-danger btn-sm"
                                                             onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
                                                                 class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>

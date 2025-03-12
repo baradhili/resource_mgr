@@ -67,7 +67,25 @@
                         @endif
                     </div>
                 </div>
+                <div class="card mt-4">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="float-left">
+                            <span class="card-title">{{ __('Recent Projects') }}</span>
+                        </div>
+                    </div>
 
+                    <div class="card-body bg-white">
+                        @if (count($projects) > 0)
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    {{ htmlspecialchars($projects->pluck('name')->implode(', '), ENT_QUOTES, 'UTF-8') }}
+                                </li>
+                            </ul>
+                        @else
+                            <p>{{ __('No projects allocated.') }}</p>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </section>

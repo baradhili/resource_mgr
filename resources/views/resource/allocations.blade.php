@@ -45,6 +45,7 @@
                                                     </a>
                                                 @endcan
                                             </td>
+                                            
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php
