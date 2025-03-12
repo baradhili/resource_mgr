@@ -37,7 +37,7 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>Empower Data</td>
+                                        @can('import.empower')<td>Empower Data</td>
                                         <td>
                                             <!-- Button to open the dialog -->
                                             <button type="button" class="btn btn-primary btn-sm float-right"
@@ -63,9 +63,9 @@
                                                     </div>
                                                 </form>
                                             </dialog>
-                                        </td>
-                                        <td><a href="{{ route('import.review.demands') }}" class="btn btn-primary btn-sm float-right">Review Demands</a> </td>
-                                        <td><a  href="{{ route('import.review.allocations') }}" class="btn btn-primary btn-sm float-right">Review Allocations</td>
+                                        </td>@endcan
+                                       @can('change-requests.index') <td><a href="{{ route('change-requests.index') }}"
+                                                class="btn btn-primary btn-sm float-right">Review Demands</a> </td>@endcan
                                     </tr>
                                     <tr>
                                         <td>Public Holidays</td>

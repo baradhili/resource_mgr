@@ -24,9 +24,9 @@
                                         onkeydown="if (event.keyCode == 13) { document.getElementById('filterForm').submit(); return false; }">
                                 </form>
                                 &nbsp;
-                                <a href="{{ route('projects.create') }}" class="btn btn-primary btn-sm">
+                                @can('projects.create')<a href="{{ route('projects.create') }}" class="btn btn-primary btn-sm">
                                     {{ __('Create New') }}
-                                </a>
+                                </a>@endcan
                             </div>
                         </div>
                     </div>
@@ -68,17 +68,17 @@
                                             <td>
                                                 <form action="{{ route('projects.destroy', $project->id) }}"
                                                     method="POST">
-                                                    <a class="btn btn-sm btn-primary "
+                                                    @can('projects.show')<a class="btn btn-sm btn-primary "
                                                         href="{{ route('projects.show', $project->id) }}"><i
-                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success"
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>@endcan
+                                                    @can('projects.edit')<a class="btn btn-sm btn-success"
                                                         href="{{ route('projects.edit', $project->id) }}"><i
-                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>@endcan
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                    @can('projects.destroy')<button type="submit" class="btn btn-danger btn-sm"
                                                         onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>@endcan
                                                 </form>
                                             </td>
                                         </tr>

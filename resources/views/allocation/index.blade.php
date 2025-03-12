@@ -31,10 +31,11 @@
                                     </select>
                                 </form>
                                 &nbsp;
-                                <a href="{{ route('allocations.create') }}" class="btn btn-primary btn-sm float-right"
+                                @can('allocations.create')<a href="{{ route('allocations.create') }}" class="btn btn-primary btn-sm float-right"
                                     data-placement="left">
                                     {{ __('Create New') }}
                                 </a>
+                                @endcan
                             </div>
                         </div>
                     </div>
