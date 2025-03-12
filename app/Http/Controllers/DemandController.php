@@ -19,6 +19,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Services\CacheService;
 use App\Services\ResourceService;
 use App\Models\ResourceType;
+use Illuminate\Support\Facades\Auth;
 
 class DemandController extends Controller
 {
@@ -52,24 +53,21 @@ class DemandController extends Controller
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
+        //get user 
+        $user = Auth::user();
+        $resource_types = $user->ownedTeams->pluck('resource_type')->toArray();
+        if (empty($resource_types)) {
+            return view('home');
+        // Log::info("User is an owner of a team with resource types: " . json_encode($resource_types));
+        $resource_types = ResourceType::whereIn('name', $resource_types)->pluck('id')->toArray();
+        // Log::info("resources: ".json_encode($resource_types));
         // Collect resources with contracts in the next 12 months
         $resources = $this->resourceService->getResourceList();
-        // $resources = Resource::whereIn(
-        //     'id',
-        //     Contract::where(function ($q) use ($startDate, $endDate) {
-        //         $q->where('start_date', '<=', $endDate)
-        //             ->where(function ($q) use ($startDate) {
-        //                 $q->where('end_date', '>=', $startDate)
-        //                     ->orWhereNull('end_date');
-        //             });
-        //     })
-        //         ->pluck('resources_id')
-        //         ->unique()
-        //         ->values()
-        // )->get();
+        // Log::info("resources: ".json_encode($resources));
 
         // Collect the projects_id from demands in our window
         $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
+            ->whereIn('resource_type', $resource_types)
             ->pluck('projects_id')
             ->unique()
             ->values()
@@ -89,7 +87,7 @@ class DemandController extends Controller
             //TODO - once we migrate to a numeric value for resource type, remove this
             if (is_numeric($resource_type)) {
                 $resource_type = ResourceType::findOrFail($resource_type)->name;
-            }  
+            }
             if ($resource_type) {
                 $words = explode(' ', trim($resource_type));
                 $acronym = '';

@@ -15,14 +15,15 @@ class ResourceService
         // Check if the user is an owner of a team
         if ($user->ownedTeams()->count() > 0) {
             // Get the team's resources
-            // Log::info("User is an owner of a team with resource type: " . $user->ownedTeams()->first()->resource_type);
-            $resource_type = ResourceType::where('name', $user->ownedTeams()->first()->resource_type)->first()->id;
-            // Log::info("resource type: " . json_encode($resource_type));
+            $resource_types = $user->ownedTeams->pluck('resource_type')->toArray();
+            // Log::info("User is an owner of a team with resource types: " . json_encode($resource_types));
+            $resource_types = ResourceType::whereIn('name', $resource_types)->pluck('id')->toArray();
+            // Log::info("resource types: " . json_encode($resource_types));
             $resources = Resource::whereHas('contracts', function ($query) {
                 $query->where('start_date', '<=', now())
                     ->where('end_date', '>=', now());
             })
-                ->where('resource_type', $resource_type)
+                ->whereIn('resource_type', $resource_types)
                 ->when($regionID, function ($query, $regionID) {
                     return $query->whereHas('region', function ($query) use ($regionID) {
                         $query->where('id', $regionID);
@@ -36,7 +37,7 @@ class ResourceService
             // Log::info("resources: " . json_encode($resources));
         } elseif ($user->reportees->count() > 0) {
             // check if the user is a manager
-            Log::info("User is a manager");
+            // Log::info("User is a manager");
             $reportees = $user->reportees;
             $resourceIDs = $user->reportees->pluck('resource.id')->toArray();
             foreach ($reportees as $reportee) {
@@ -45,7 +46,7 @@ class ResourceService
                 }
             }
             
-            Log::info("resourceids: " . json_encode($resourceIDs));
+            // Log::info("resourceids: " . json_encode($resourceIDs));
             //for each linked resource contract, check if the start date is before now and the end date is after now
 
             $resources = Resource::whereIn('id', $resourceIDs)
@@ -59,7 +60,7 @@ class ResourceService
                         });
                 })
                 ->with('contracts')->paginate();
-            Log::info("resources: " . json_encode($resources));
+            // Log::info("resources: " . json_encode($resources));
         } else {
             // Log::info("User is not an owner of a team or a manager");
             // otherwise just return the user's resource
