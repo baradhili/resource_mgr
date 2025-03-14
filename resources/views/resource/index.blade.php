@@ -60,9 +60,14 @@
                                                         ] ?? '-';
                                                 @endphp
                                                 <td>
+                                                    @cannot('resources.index')
                                                     @if (Auth::user()->resource_id == $resource['id'])
                                                         {{ $availability }}
                                                     @endif
+                                                    @endcannot
+                                                    @can('resources.index')
+                                                        {{ $availability }}
+                                                    @endcan
                                                 </td>
                                             @endforeach
                                             <td>
