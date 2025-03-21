@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Teamwork;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\ResourceType;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\TeamRequest;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Routing\Controller;
 use Mpociot\Teamwork\Exceptions\UserNotInTeamException;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class TeamController extends Controller
@@ -23,18 +27,19 @@ class TeamController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         //TODO based on privs either show teams wher ethe user is a member, or show all teams
 
         /**
-         * old
-         *  $teams = Team::with('owner')->paginate();
-         *         return view('team.index', compact('teams'))
-         *             ->with('i', ($request->input('page', 1) - 1) * $teams->perPage());
-         */
-        return view('teamwork.index')
-            ->with('teams', auth()->user()->teams);
+         * old */
+        $teams = Team::with('owner')->paginate();
+
+        return view('teamwork.index', compact('teams'))
+            ->with('i', ($request->input('page', 1) - 1) * $teams->perPage());
+
+        // return view('teamwork.index')
+        //     ->with('teams', auth()->user()->teams);
     }
 
     /**
@@ -48,7 +53,7 @@ class TeamController extends Controller
         $team = new Team();
         $users = User::all()->map(function ($user) {
             return ['value' => $user->id, 'name' => $user->name];
-        })->toArray();
+        })->sortBy('name')->values()->toArray();
         $resource_types = ResourceType::all()->map(function ($resource_type) {
             return ['name' => $resource_type->name];
         })->toArray();
@@ -90,6 +95,7 @@ class TeamController extends Controller
         $team = Team::with(['owner'])->find($id);
         $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
             ->where('team_user.team_id', $team->id)
+            ->orderBy('users.name', 'asc')
             ->get();
         $team->owner = User::find($team->owner_id);
 
@@ -125,6 +131,9 @@ class TeamController extends Controller
     {
         $teamModel = config('teamwork.team_model');
         $team = $teamModel::findOrFail($id);
+        if (!auth()->user()->isOwnerOfTeam($team)) {
+            return redirect(route('teams.index'))->with('error', 'You do not have permission to edit this team');
+        }
 
         $team->members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
             ->where('team_user.team_id', $team->id)
@@ -132,15 +141,11 @@ class TeamController extends Controller
 
         $users = User::all()->map(function ($user) {
             return ['value' => $user->id, 'name' => $user->name];
-        })->toArray();
+        })->sortBy('name')->values()->toArray();
 
         $resource_types = ResourceType::all()->map(function ($resource_type) {
             return ['name' => $resource_type->name];
         })->toArray();
-
-        if (!auth()->user()->isOwnerOfTeam($team)) {
-            abort(403);
-        }
 
         //return view('teamwork.edit')->withTeam($team);
         return view('teamwork.edit', compact('team', 'users', 'resource_types'));
@@ -151,36 +156,60 @@ class TeamController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $id)
     {
-        // $team->update($request->validated());
-
-        // $existing_members = User::join('team_user', 'users.id', '=', 'team_user.user_id')
-        //     ->where('team_user.team_id', $team->id)
-        //     ->pluck('id')
-        //     ->toArray();
-
-        // $members = [];
-        // $members_data = json_decode($request->input('members'), true);
-        // $members = array_column($members_data, 'value');
-        // $team->users()->sync($members);
-
-        // return Redirect::route('teams.index')
-        //     ->with('success', 'Team updated successfully');
-        $request->validate([
-            'name' => 'required|string',
-        ]);
 
         $teamModel = config('teamwork.team_model');
-
         $team = $teamModel::findOrFail($id);
+        $request->validate([
+            'name' => 'required|string',
+            'resource_type' => 'nullable|string',
+        ]);
         $team->name = $request->name;
         $team->resource_type = $request->resource_type;
         $team->save();
 
-        return redirect(route('teams.index'));
+        $existing_members = $team->users->pluck('id')->toArray();
+
+        $members = [];
+        $members_data = json_decode($request->input('members'), true);
+        // $members = array_column($members_data, 'value');
+        // $team->users()->sync($members);
+        Log::info("Members: " . json_encode($members_data));
+        Log::info("existing members: " . json_encode($existing_members));
+        foreach ($members_data as $member) {
+            $user = User::find($member['value']);
+            if (!in_array($user->id, $existing_members)) {
+                $user->attachTeam($team);
+            }
+        }
+        foreach ($existing_members as $existing_member_id) {
+            if (!in_array($existing_member_id, array_column($members_data, 'value'))) {
+                $user = User::find($existing_member_id);
+                $user->detachTeam($team);
+            }
+        }
+        
+        
+        // $members = array_column($members_data, 'value');
+        // $team->users()->sync(array_map('strval', array_diff($members, $existing_members)));
+
+        return Redirect::route('teams.index')
+            ->with('success', 'Team updated successfully');
+        // $request->validate([
+        //     'name' => 'required|string',
+        // ]);
+
+        // $teamModel = config('teamwork.team_model');
+
+        // $team = $teamModel::findOrFail($id);
+        // $team->name = $request->name;
+        // $team->resource_type = $request->resource_type;
+        // $team->save();
+
+        // return redirect(route('teams.index'));
     }
 
     /**
