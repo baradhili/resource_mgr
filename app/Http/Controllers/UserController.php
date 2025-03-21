@@ -36,8 +36,9 @@ class UserController extends Controller
         $user = new User();
         $users = User::all();
         $teams = Team::all();
+        $roles = Role::all();
         $resources = Resource::all();
-        return view('user.create', compact('user', 'users', 'teams', 'resources'));
+        return view('user.create', compact('user', 'users', 'teams', 'resources','roles'));
     }
 
     /**
@@ -45,7 +46,13 @@ class UserController extends Controller
      */
     public function store(UserRequest $request): RedirectResponse
     {
-        User::create($request->validated());
+        $data = $request->validated();
+        $data['password'] = $data['password'] ?? bcrypt('password');
+        if (User::where('email', $data['email'])->count() > 0) {
+            return Redirect::route('users.index')
+                ->with('error', 'Email already exists.');
+        }
+        User::create($data);
 
         return Redirect::route('users.index')
             ->with('success', 'User created successfully.');
