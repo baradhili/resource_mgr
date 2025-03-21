@@ -146,6 +146,9 @@ class AllocationController extends Controller
      */
     public function edit($project_id, Request $request): RedirectResponse
     {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
         if ($request->input('start_date')) {
             if ($request->input('end_date')) {
                 $allocationArray = Allocation::where('projects_id', $project_id)
@@ -164,12 +167,14 @@ class AllocationController extends Controller
                 ->get();
         }
 
+        $resource = Resource::find($request->resource_id);
+        $resourceType = $resource->pluck('resource_type')->first();
         foreach ($allocationArray as $allocation) {
             $demand = new Demand();
             $demand->demand_date = $allocation->allocation_date;
             $demand->fte = $allocation->fte;
             $demand->projects_id = $allocation->projects_id;
-            $demand->resource_type = "Solution Architect";
+            $demand->resource_type = $resourceType;
             $demand->save();
 
             $allocation->delete();

@@ -279,7 +279,9 @@ class DemandController extends Controller
         ]);
 
         $demand = Demand::findOrFail($request->input('demand_id'));
+
         $oldProjects_id = $demand->projects_id;
+
         $storedDemand = Demand::where('projects_id', $demand->oldProjects_id)
             ->get()
             ->keyBy('demand_date')
@@ -316,7 +318,7 @@ class DemandController extends Controller
                 'status' => $request->input('status'),
                 'resource_type' => $request->input('resource_type'),
                 'fte' => $request->input('fte'),
-                'projects_id' => $projects_id,
+                'projects_id' => $oldProjects_id,
             ]);
 
         return Redirect::route('demands.index')

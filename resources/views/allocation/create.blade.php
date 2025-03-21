@@ -12,7 +12,7 @@
                 <div class="card card-default">
                     
                     <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('allocations.populate') }}"  role="form" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('allocations.store') }}"  role="form" enctype="multipart/form-data">
                             @csrf
 
                             @include('allocation.form')
