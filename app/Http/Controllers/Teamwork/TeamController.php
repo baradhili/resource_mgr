@@ -175,10 +175,7 @@ class TeamController extends Controller
 
         $members = [];
         $members_data = json_decode($request->input('members'), true);
-        // $members = array_column($members_data, 'value');
-        // $team->users()->sync($members);
-        Log::info("Members: " . json_encode($members_data));
-        Log::info("existing members: " . json_encode($existing_members));
+
         foreach ($members_data as $member) {
             $user = User::find($member['value']);
             if (!in_array($user->id, $existing_members)) {
@@ -191,25 +188,9 @@ class TeamController extends Controller
                 $user->detachTeam($team);
             }
         }
-        
-        
-        // $members = array_column($members_data, 'value');
-        // $team->users()->sync(array_map('strval', array_diff($members, $existing_members)));
 
         return Redirect::route('teams.index')
             ->with('success', 'Team updated successfully');
-        // $request->validate([
-        //     'name' => 'required|string',
-        // ]);
-
-        // $teamModel = config('teamwork.team_model');
-
-        // $team = $teamModel::findOrFail($id);
-        // $team->name = $request->name;
-        // $team->resource_type = $request->resource_type;
-        // $team->save();
-
-        // return redirect(route('teams.index'));
     }
 
     /**
@@ -241,7 +222,7 @@ class TeamController extends Controller
      * Make the given user the leader of the current team.
      *
      * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function makeLeader($teamId, $userId)
     {
