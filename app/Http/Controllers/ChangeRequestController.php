@@ -30,12 +30,24 @@ class ChangeRequestController extends Controller
      */
     public function index(Request $request): View
     {
-        $changeRequests = ChangeRequest::with(['record'])
-            ->whereHasMorph(
-                'record',
-                [Allocation::class, Demand::class]
-            )
-            ->paginate();
+        $showHistory = (int) $request->query('history', 0);
+        if ($showHistory === 1) {
+            $changeRequests = ChangeRequest::with(['record'])
+                ->whereHasMorph(
+                    'record',
+                    [Allocation::class, Demand::class]
+                )
+                ->where('status', '!=', 'pending')
+                ->paginate();
+        } else {
+            $changeRequests = ChangeRequest::with(['record'])
+                ->whereHasMorph(
+                    'record',
+                    [Allocation::class, Demand::class]
+                )
+                ->where('status', 'pending')
+                ->paginate();
+        }
         //if the record type is allocation, get the allocation resource->full_name and insert into a new parameter "subject"
         foreach ($changeRequests as $changeRequest) {
             if ($changeRequest->record_type === Allocation::class) {
