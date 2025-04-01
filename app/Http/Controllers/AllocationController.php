@@ -22,6 +22,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Services\CacheService;
 use App\Services\ResourceService;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AllocationController extends Controller
 {
@@ -91,12 +92,27 @@ class AllocationController extends Controller
             $resourceAllocation = Cache::get('resourceAllocation');
         }
 
+         // Convert the array to a collection
+        $resourceAllocationCollection = collect($resourceAllocation);
+    
+        // Get the current page from the request
+        $page = $request->input('page', 1);
+        $perPage = 10; // Define the number of items per page
+    
+        // Paginate the collection
+        $paginatedResourceAllocation = new LengthAwarePaginator(
+            $resourceAllocationCollection->forPage($page, $perPage),
+            $resourceAllocationCollection->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
         // // filter resourceAllocation by $resources
         // $resourceAllocation = $resourceAllocation->filter(function ($allocation) use ($resources) {
         //     return $resources->contains('id', $allocation->resource_id);
         // });
 
-        return view('allocation.index', compact('resources', 'resourceAllocation', 'nextTwelveMonths', 'regions'))
+        return view('allocation.index', compact('resources', 'paginatedResourceAllocation', 'nextTwelveMonths', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
 
