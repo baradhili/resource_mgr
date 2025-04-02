@@ -30,7 +30,11 @@
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Linked User:</strong>
-                                    <a href="{{ route('users.show', $resource->user->id) }}">{{ $resource->user ? $resource->user->name : 'No Linked User' }}</a>
+                                    @if(isset($resource->user) && $resource->user && $resource->user->id)
+                                        <a href="{{ route('users.show', ['user' => $resource->user->id]) }}">{{ $resource->user->name }}</a>
+                                    @else
+                                        No Linked User
+                                    @endif
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Resource Type:</strong>
