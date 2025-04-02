@@ -70,7 +70,7 @@
                                                         '-' .
                                                         str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                                                     $availability =
-                                                        $resourceAllocation[$resource['id']]['allocation'][$monthKey] ??
+                                                        $paginatedResourceAllocation[$resource['id']]['allocation'][$monthKey] ??
                                                         '-';
                                                 @endphp
                                                 <td>{{ $availability }}</td>
@@ -90,7 +90,7 @@
                         </div>
                     </div>
                 </div>
-
+                {!! $paginatedResourceAllocation->withQueryString()->links() !!}
             </div>
         </div>
     </div>

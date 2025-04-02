@@ -112,6 +112,7 @@ class AllocationController extends Controller
         //     return $resources->contains('id', $allocation->resource_id);
         // });
 
+        Log::info("Resource Allocation: " . json_encode($paginatedResourceAllocation));
         return view('allocation.index', compact('resources', 'paginatedResourceAllocation', 'nextTwelveMonths', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
     }
