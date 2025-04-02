@@ -7,6 +7,7 @@ use App\Models\Resource;
 use App\Models\Project;
 use App\Models\Demand;
 use App\Models\ResourceType;
+use App\Models\Location;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -95,6 +96,38 @@ class AllocationController extends Controller
         // Convert the array to a collection
         $resourceAllocationCollection = collect($resourceAllocation);
 
+        foreach ($resourceAllocationCollection as $key => $allocation) {
+
+            $resource = Resource::find($key);
+            //check if region_id is set
+            if (!$resource->region_id) {
+                //if not then check if location_id is set
+                if ($resource->location_id) {
+                    $location = Location::find($resource->location_id);
+                    //if $location then collect region_id from Location and insert into resourceAllocationCollection
+                    if ($location) {
+                        $resource->region_id = $location->region_id;
+                    }
+                }
+            }
+
+            if ($resource) {
+                $resourceAllocationCollection = $resourceAllocationCollection->mapWithKeys(function ($allocation, $key) use ($resource) {
+                    if ($key == $resource->id) {
+                        $allocation['resource'] = $resource;
+                    }
+                    return [$key => $allocation];
+                });
+            }
+        }
+
+        //filter the collection by resource->region_id
+        if ($regionID) {
+            $resourceAllocationCollection = $resourceAllocationCollection->filter(function ($value, $key) use ($regionID) {
+                return $value['resource']->region_id == $regionID;
+            });
+        }
+
         // Get the current page from the request
         $page = $request->input('page', 1);
         $perPage = 10; // Define the number of items per page
@@ -108,7 +141,8 @@ class AllocationController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('allocation.index', compact( 'paginatedResourceAllocation', 'nextTwelveMonths', 'regions'))
+        // Log::info("paginated allocations " . json_encode($paginatedResourceAllocation));
+        return view('allocation.index', compact('paginatedResourceAllocation', 'nextTwelveMonths', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $paginatedResourceAllocation->perPage());
     }
 
