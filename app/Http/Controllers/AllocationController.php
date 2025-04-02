@@ -92,13 +92,13 @@ class AllocationController extends Controller
             $resourceAllocation = Cache::get('resourceAllocation');
         }
 
-         // Convert the array to a collection
+        // Convert the array to a collection
         $resourceAllocationCollection = collect($resourceAllocation);
-    
+
         // Get the current page from the request
         $page = $request->input('page', 1);
         $perPage = 10; // Define the number of items per page
-    
+
         // Paginate the collection
         $paginatedResourceAllocation = new LengthAwarePaginator(
             $resourceAllocationCollection->forPage($page, $perPage),
@@ -107,14 +107,9 @@ class AllocationController extends Controller
             $page,
             ['path' => $request->url(), 'query' => $request->query()]
         );
-        // // filter resourceAllocation by $resources
-        // $resourceAllocation = $resourceAllocation->filter(function ($allocation) use ($resources) {
-        //     return $resources->contains('id', $allocation->resource_id);
-        // });
 
-        // Log::info("Resource Allocation: " . json_encode($paginatedResourceAllocation));
-        return view('allocation.index', compact('resources', 'paginatedResourceAllocation', 'nextTwelveMonths', 'regions'))
-            ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
+        return view('allocation.index', compact( 'paginatedResourceAllocation', 'nextTwelveMonths', 'regions'))
+            ->with('i', ($request->input('page', 1) - 1) * $paginatedResourceAllocation->perPage());
     }
 
     /**
@@ -198,7 +193,7 @@ class AllocationController extends Controller
         }
         //refresh teh cache
         $this->cacheService->cacheResourceAllocation();
-        
+
         return Redirect::route('allocations.index');
     }
     /**
