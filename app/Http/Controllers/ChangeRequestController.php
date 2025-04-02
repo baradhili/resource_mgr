@@ -68,8 +68,6 @@ class ChangeRequestController extends Controller
             })
             ->paginate();
 
-        Log::info("change requests before: " . json_encode($changeRequests));
-
         //if the record type is allocation, get the allocation resource->full_name and insert into a new parameter "subject"
         $changeRequestsToRemove = [];
         foreach ($changeRequests as $changeRequest) {
@@ -91,11 +89,6 @@ class ChangeRequestController extends Controller
 
             }
         }
-        Log::info("removing these items: " . json_encode($changeRequestsToRemove));
-        $changeRequests->forget($changeRequestsToRemove);
-
-        Log::info("change requests after: " . json_encode($changeRequests));
-
 
         return view('change-request.index', compact('changeRequests'))
             ->with('i', ($request->input('page', 1) - 1) * $changeRequests->perPage());
