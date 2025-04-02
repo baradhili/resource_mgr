@@ -13,15 +13,9 @@
             <div class="row text-muted">
                 <div class="col-6 text-start">
                     <p class="mb-0">
-                        <strong>Resource Manager</strong> © 2024
+                        <p class="mb-0" style="color: inherit;">
+                        <strong><a href="https://github.com/baradhili/resource_mgr" target="_blank" style="color: inherit;">Resource Manager</a></strong> 
                     </p>
-                </div>
-                <div class="col-6 text-end">
-                    <ul class="list-inline">
-                        <li class="list-inline-item">
-                            <a class="text-muted" href="https://adminkit.io/" target="_blank">_</a>
-                        </li>
-                    </ul>
                 </div>
             </div>
         </div>

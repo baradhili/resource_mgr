@@ -138,7 +138,10 @@ class ImportController extends Controller
                         }
                     } else { // Insert these into demand
                         $projectID = $this->checkProject($rowData);
-
+                        // first replace the "resource name" with a resource_type id
+                        $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
+                        $rowData['A'] = $resourceType->id;
+                        Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(71 + $i); // 'G' + i
                             $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
