@@ -18,7 +18,6 @@
         "arrilot/laravel-widgets": "^3.14",
         "avadim/fast-excel-laravel": "^2.7",
         "brunocfalcao/blade-feather-icons": "^4.0",
-        "codegreencreative/laravel-samlidp": "^5.2",
         "deployer/deployer": "^7.5",
         "filament/filament": "*",
         "glorand/laravel-model-settings": "^7.0",
