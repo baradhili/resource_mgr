@@ -1,0 +1,4 @@
+override:
+  - PHP: "*.php"
+  - PHP: "*.blade.php"
+language: PHP
