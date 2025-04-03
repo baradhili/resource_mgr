@@ -41,7 +41,7 @@ class ChangeRequestController extends Controller
 
         //get the resources we manage
         $resources = $this->resourceService->getResourceList()->pluck('id')->toArray();
-        Log::info("resources: " . json_encode($resources));
+        // Log::info("resources: " . json_encode($resources));
 
         $showHistory = (int) $request->query('history', 0);
 
@@ -78,7 +78,7 @@ class ChangeRequestController extends Controller
 
             } elseif ($changeRequest->record_type === Demand::class) {
                 $demand = $changeRequest->record;
-                Log::info("checking if its one of our resource types - {$demand->resource_type}");
+                // Log::info("checking if its one of our resource types - {$demand->resource_type}");
                 //if this isn't one of our $resource_types then remove from $changeRequests
 
                 //if $demand->resource_type is a number then find ResourceType->name
