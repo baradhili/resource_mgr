@@ -36,7 +36,7 @@ class ResourceService
                             ->where('end_date', '>=', now());
                     },
                     'region'
-                ])->paginate();
+                ])->get();
             // Log::info("resources: " . json_encode($resources));
         } elseif ($user->reportees->count() > 0) {
             // check if the user is a manager
@@ -62,7 +62,7 @@ class ResourceService
                             });
                         });
                 })
-                ->with('contracts')->paginate();
+                ->with('contracts')->get();
             // Log::info("resources: " . json_encode($resources));
         } else {
             // Log::info("User is not an owner of a team or a manager");
@@ -71,9 +71,9 @@ class ResourceService
                 $resources = Resource::whereHas('contracts', function ($query) {
                     $query->where('start_date', '<=', now())
                         ->where('end_date', '>=', now());
-                })->paginate();
+                })->get();
             } else {
-                $resources = Resource::where('id', $user->resource_id)->with('contracts')->paginate();
+                $resources = Resource::where('id', $user->resource_id)->with('contracts')->get();
             }
             // Log::info("resources: " . json_encode($resources));
         }
