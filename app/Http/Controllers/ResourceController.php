@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Services\CacheService;
 use App\Services\ResourceService;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ResourceController extends Controller
 {
@@ -39,6 +40,10 @@ class ResourceController extends Controller
      */
     public function index(Request $request): View
     {
+        $user = auth()->user();
+        // check if they are asking for a region
+        $regionID = $request->input('region_id');
+        
         $nextTwelveMonths = [];
 
         for ($i = 0; $i < 12; $i++) {
@@ -61,19 +66,34 @@ class ResourceController extends Controller
             }
         }
 
-        if (!Cache::has('resourceAvailability')) {
+        // if (!Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
-        } else {
-            $resourceAvailability = Cache::get('resourceAvailability');
-        }
-
+        // } else {
+        //     $resourceAvailability = Cache::get('resourceAvailability');
+        // }
         // filter resourceAvailability by $resources
         $resourceAvailability = array_intersect_key($resourceAvailability, array_flip($resources->pluck('id')->toArray()));
 
+        // Convert the array to a collection
+        $resourceAvailabilityCollection = collect($resourceAvailability);
+
+        // Get the current page from the request
+        $page = $request->input('page', 1);
+        $perPage = 10; // Define the number of items per page
+
+        // Paginate the collection
+        $paginatedResourceAvailability = new LengthAwarePaginator(
+            $resourceAvailabilityCollection->forPage($page, $perPage),
+            $resourceAvailabilityCollection->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
         //return to the view
-        return view('resource.index', compact('resources', 'resourceAvailability', 'nextTwelveMonths'))
-            ->with('i', ($request->input('page', 1) - 1) * $resources->perPage());
+        return view('resource.index', compact('resources', 'paginatedResourceAvailability', 'nextTwelveMonths'))
+            ->with('i', ($request->input('page', 1) - 1) * $paginatedResourceAvailability->perPage());
     }
 
     /**
