@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Services\ResourceService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 
 class LeaveController extends Controller
 {
@@ -31,6 +32,7 @@ class LeaveController extends Controller
         $regionID = $request->input('region_id');
         // Collect our resources who have a current contract
         $resources = $this->resourceService->getResourceList($regionID);
+    
         // collect teh regions from teh resources->region
         $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
@@ -54,8 +56,6 @@ class LeaveController extends Controller
 
         $leaveResult = $query->get();
 
-        // return view('leave.index', compact('leaves'))
-        //     ->with('i', ($request->input('page', 1) - 1) * $leaves->perPage());
         // Get the current page from the request
         $page = $request->input('page', 1);
         $perPage = 10; // Define the number of items per page
