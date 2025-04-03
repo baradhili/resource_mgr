@@ -15,6 +15,10 @@
                     @endif
                     <form method="POST" action="{{ route('auth.change-password.update') }}">
                         @csrf
+                        @if (isset($user))
+                            <input type="hidden" name="id" value="{{ $user }}">
+                        @endif
+                        
 
                         <div class="row mb-3">
                             <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>

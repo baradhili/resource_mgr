@@ -58,10 +58,12 @@ class AuthController extends Controller
         return redirect('/');
     }
 
-    
-    public function showChangePasswordForm()
+
+    public function showChangePasswordForm(Request $request)
     {
-        return view('auth.change-password');
+        $id = $request->query('id');
+        // Log::info("received password change for id = " . $id);
+        return view('auth.change-password', ['user' => $id]);
     }
 
     public function changePassword(Request $request)
@@ -71,7 +73,12 @@ class AuthController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = Auth::user();
+        if ($request->has('id')) {
+            $id = $request->input('id');
+            $user = User::find($id);
+        } else {
+            $user = Auth::user();
+        }
 
         if (!$user) {
             return redirect('/login')->withErrors([

@@ -21,6 +21,11 @@
                             @include('user.form')
 
                         </form>
+                            @if (auth()->user()->hasRole('super-admin'))
+                                <div class="mt-3">
+                                    <a class="btn btn-primary" href="{{ route('auth.change-password', ['id' => $user->id]) }}">{{ __('Change Password') }}</a>
+                                </div>
+                            @endif
                     </div>
                 </div>
             </div>
