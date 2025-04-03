@@ -15,6 +15,13 @@
                                 {{ __('Resources and Availability') }}
                             </span>
                             <div class="float-right">
+                                {{-- <form action="{{ route('resources.index') }}" method="get"
+                                    class="d-inline-flex align-items-center" id="filterForm">
+                                    <input type="text" class="form-control" id="search" name="search"
+                                        placeholder="Search..." style="width: auto;" value="{{ request('search') }}"
+                                        onkeydown="if (event.keyCode == 13) { document.getElementById('filterForm').submit(); return false; }">
+                                </form>
+                                &nbsp; --}}
                                 @can('resources.create')
                                     <a href="{{ route('resources.create') }}" class="btn btn-primary btn-sm float-right"
                                         data-placement="left">
@@ -48,10 +55,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                     @if ($paginatedResourceAvailability->isNotEmpty())
+                                    @if ($paginatedResourceAvailability->isNotEmpty())
                                         @foreach ($paginatedResourceAvailability as $key => $resource)
                                             <tr>
-                                                 <td>{{ $resource['name'] }}</td>
+                                                <td>{{ $resource['name'] }}</td>
                                                 <!-- Populate availability for each month -->
                                                 @foreach ($nextTwelveMonths as $month)
                                                     @php
@@ -71,8 +78,8 @@
                                                         href="{{ route('resources.allocations', $key) }}"><i
                                                             class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
                                                     <!-- <a class="btn btn-sm btn-success"
-                                                        href="{{ route('resources.edit', $key) }}"><i
-                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a> -->
+                                                            href="{{ route('resources.edit', $key) }}"><i
+                                                                class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a> -->
                                                 </td>
                                             </tr>
                                         @endforeach

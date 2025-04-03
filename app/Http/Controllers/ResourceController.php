@@ -43,7 +43,7 @@ class ResourceController extends Controller
         $user = auth()->user();
         // check if they are asking for a region
         $regionID = $request->input('region_id');
-        
+        $search = $request->query('search');
         $nextTwelveMonths = [];
 
         for ($i = 0; $i < 12; $i++) {
@@ -66,12 +66,16 @@ class ResourceController extends Controller
             }
         }
 
-        // if (!Cache::has('resourceAvailability')) {
+        if (!Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
-        // } else {
-        //     $resourceAvailability = Cache::get('resourceAvailability');
-        // }
+        } else {
+            $resourceAvailability = Cache::get('resourceAvailability');
+        }
+
+        if ($search) {
+            $resources = $resources->where('full_name', 'like', "%$search%");
+        }
         // filter resourceAvailability by $resources
         $resourceAvailability = array_intersect_key($resourceAvailability, array_flip($resources->pluck('id')->toArray()));
 
