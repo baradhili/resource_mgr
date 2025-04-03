@@ -143,7 +143,7 @@ class CacheService
                 $query->where('start_date', '>', now())
                     ->where('start_date', '<=', Carbon::now()->addMonth());
             });
-        })->paginate();
+        })->get();
 
         //Collect the availability
         $resourceAvailability = Cache::get('resourceAvailability');
