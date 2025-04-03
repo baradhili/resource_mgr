@@ -10,6 +10,7 @@ use App\Http\Requests\LeaveRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use App\Services\ResourceService;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class LeaveController extends Controller
 {
@@ -25,7 +26,13 @@ class LeaveController extends Controller
      */
     public function index(Request $request): View
     {
-        $resources = $this->resourceService->getResourceList();
+        $user = auth()->user();
+        // check if they are asking for a region
+        $regionID = $request->input('region_id');
+        // Collect our resources who have a current contract
+        $resources = $this->resourceService->getResourceList($regionID);
+        // collect teh regions from teh resources->region
+        $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
         $old = $request->query('old');
         $search = $request->query('search');
@@ -45,10 +52,26 @@ class LeaveController extends Controller
             });
         }
 
-        $leaves = $query->paginate();
+        $leaveResult = $query->get();
 
-        return view('leave.index', compact('leaves'))
+        // return view('leave.index', compact('leaves'))
+        //     ->with('i', ($request->input('page', 1) - 1) * $leaves->perPage());
+        // Get the current page from the request
+        $page = $request->input('page', 1);
+        $perPage = 10; // Define the number of items per page
+
+        // Paginate the collection
+        $leaves = new LengthAwarePaginator(
+            $leaveResult->forPage($page, $perPage),
+            $leaveResult->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('leave.index', compact('leaves','regions'))
             ->with('i', ($request->input('page', 1) - 1) * $leaves->perPage());
+
     }
 
     /**

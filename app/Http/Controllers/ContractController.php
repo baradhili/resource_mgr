@@ -14,6 +14,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
 use App\Services\CacheService;
 use App\Services\ResourceService;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ContractController extends Controller
 {
@@ -25,7 +26,7 @@ class ContractController extends Controller
      * routes.
      */
 
-     protected $cacheService;
+    protected $cacheService;
     protected $resourceService;
 
     public function __construct(CacheService $cacheService, ResourceService $resourceService)
@@ -38,19 +39,61 @@ class ContractController extends Controller
         // $this->middleware('contract:update', ['only' => ['update','edit']]);
         // $this->middleware('contract:delete', ['only' => ['destroy']]);
     }
-    
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
-        $resources = $this->resourceService->getResourceList();
-        $contracts = Contract::whereIn('resources_id', $resources->pluck('id'))
-            ->orderBy('end_date', 'asc')
-            ->paginate();
+        $user = auth()->user();
+        // check if they are asking for a region
+        $regionID = $request->input('region_id');
+        // Collect our resources who have a current contract
+        $resources = $this->resourceService->getResourceList($regionID);
+        // collect teh regions from teh resources->region
+        $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
-        return view('contract.index', compact('contracts'))
+        $old = $request->query('old');
+        $search = $request->query('search');
+        
+        // assemble the query based on old and search values
+
+        $query = Contract::query()
+            ->whereIn('resources_id', $resources->pluck('id'))
+            ->orderBy('end_date', 'asc');
+
+        if (!$old) {
+            $query->where('end_date', '>=', now());
+        }
+
+        if ($search) {
+            $query->whereHas('resource', function ($resourceQuery) use ($search) {
+                $resourceQuery->where('full_name', 'like', "%$search%");
+            });
+        }
+
+        $contractResult = $query->get();
+
+        // $contractResult = Contract::whereIn('resources_id', $resources->pluck('id'))
+        //     ->orderBy('end_date', 'asc')
+        //     ->get();
+
+        // Get the current page from the request
+        $page = $request->input('page', 1);
+        $perPage = 10; // Define the number of items per page
+
+        // Paginate the collection
+        $contracts = new LengthAwarePaginator(
+            $contractResult->forPage($page, $perPage),
+            $contractResult->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('contract.index', compact('contracts', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $contracts->perPage());
+
     }
 
     /**
@@ -115,7 +158,7 @@ class ContractController extends Controller
 
         if ($request->input('permanent')) {
             $request->merge(['end_date' => now()->addYears(100)->format('Y-m-d')]);
-        } 
+        }
         $validatedData = $request->validated();
         $validatedData['permanent'] = $request->has('permanent');
 
@@ -133,7 +176,7 @@ class ContractController extends Controller
             ->with('success', 'Contract deleted successfully');
     }
 
-    public function cleanProjects(Request $request) :RedirectResponse
+    public function cleanProjects(Request $request): RedirectResponse
     {
         $resourceID = $request->resource_id;
         $end_date = $request->end_date;

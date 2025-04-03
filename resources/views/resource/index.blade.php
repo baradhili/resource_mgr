@@ -15,6 +15,13 @@
                                 {{ __('Resources and Availability') }}
                             </span>
                             <div class="float-right">
+                                {{-- <form action="{{ route('resources.index') }}" method="get"
+                                    class="d-inline-flex align-items-center" id="filterForm">
+                                    <input type="text" class="form-control" id="search" name="search"
+                                        placeholder="Search..." style="width: auto;" value="{{ request('search') }}"
+                                        onkeydown="if (event.keyCode == 13) { document.getElementById('filterForm').submit(); return false; }">
+                                </form>
+                                &nbsp; --}}
                                 @can('resources.create')
                                     <a href="{{ route('resources.create') }}" class="btn btn-primary btn-sm float-right"
                                         data-placement="left">
@@ -48,62 +55,47 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($resources as $resource)
-                                        <tr>
-                                            <td>{{ $resource->full_name }}</td>
-                                            <!-- Populate availability for each month -->
-                                            @foreach ($nextTwelveMonths as $month)
-                                                @php
-                                                    $monthKey =
-                                                        $month['year'] .
-                                                        '-' .
-                                                        str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                                                    $availability =
-                                                        $resourceAvailability[$resource['id']]['availability'][
-                                                            $monthKey
-                                                        ] ?? '-';
-                                                @endphp
+                                    @if ($paginatedResourceAvailability->isNotEmpty())
+                                        @foreach ($paginatedResourceAvailability as $key => $resource)
+                                            <tr>
+                                                <td>{{ $resource['name'] }}</td>
+                                                <!-- Populate availability for each month -->
+                                                @foreach ($nextTwelveMonths as $month)
+                                                    @php
+                                                        $monthKey =
+                                                            $month['year'] .
+                                                            '-' .
+                                                            str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                                                        $availability =
+                                                            $paginatedResourceAvailability[$key]['availability'][
+                                                                $monthKey
+                                                            ] ?? '-';
+                                                    @endphp
+                                                    <td>{{ $availability }}</td>
+                                                @endforeach
                                                 <td>
-                                                    @cannot('resources.index')
-                                                    @if (Auth::user()->resource_id == $resource['id'])
-                                                        {{ $availability }}
-                                                    @endif
-                                                    @endcannot
-                                                    @can('resources.index')
-                                                        {{ $availability }}
-                                                    @endcan
+                                                    <a class="btn btn-sm btn-primary"
+                                                        href="{{ route('resources.allocations', $key) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <!-- <a class="btn btn-sm btn-success"
+                                                            href="{{ route('resources.edit', $key) }}"><i
+                                                                class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a> -->
                                                 </td>
-                                            @endforeach
-                                            <td>
-                                                <form action="{{ route('resources.destroy', $resource->id) }}"
-                                                    method="POST">
-                                                    @can('resources.show')
-                                                        <a class="btn btn-sm btn-primary "
-                                                            href="{{ route('resources.show', $resource->id) }}"><i
-                                                                class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    @endcan
-                                                    @can('resources.edit')
-                                                        <a class="btn btn-sm btn-success"
-                                                            href="{{ route('resources.edit', $resource->id) }}"><i
-                                                                class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
-                                                    @endcan
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    @can('resources.destroy')
-                                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                            onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                                class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
-                                                    @endcan
-                                                </form>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="{{ count($nextTwelveMonths) + 2 }}" class="text-center">
+                                                No data available
                                             </td>
                                         </tr>
-                                    @endforeach
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-                {!! $resources->withQueryString()->links() !!}
+                {!! $paginatedResourceAvailability->withQueryString()->links() !!}
             </div>
         </div>
     </div>

@@ -75,7 +75,8 @@ class AllocationController extends Controller
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
         // Collect our resources who have a current contract
-        $resources = $this->resourceService->getResourceList($regionID);
+        $resources = $this->resourceService->getResourceList($regionID,true);
+
         // collect teh regions from teh resources->region
         $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 

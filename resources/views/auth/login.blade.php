@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@samlidp
+
 
 @section('content')
     <div class="container">
@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <form method="POST" action="{{ route('login') }}">
                             @csrf
-                            @samlidp
+
 
                             <div class="row mb-3">
                                 <label for="email"
