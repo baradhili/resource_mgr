@@ -17,10 +17,16 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Artisan;
-
+use App\Services\CacheService;
 
 class ImportController extends Controller
 {
+    protected $cacheService;
+
+    public function __construct(CacheService $cacheService)
+    {
+        $this->cacheService = $cacheService;
+    }
 
     public function index()
     {
@@ -198,6 +204,9 @@ class ImportController extends Controller
                 }
             }
         }
+
+        //update the cache
+        $this->cacheService->cacheResourceAllocation();
 
         if (!empty($missingResources)) {
             $missingResourceList = implode(', ', $missingResources);
