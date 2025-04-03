@@ -93,7 +93,7 @@ class ImportController extends Controller
                                     ->first();
                                 //if its a change
                                 if ($existingAllocation && $existingAllocation->fte != $fte) {
-                                    Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
+                                    // Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
                                     //'user' = Importer
                                     ChangeRequest::create([
                                         'record_type' => Allocation::class,
@@ -141,7 +141,7 @@ class ImportController extends Controller
                         // first replace the "resource name" with a resource_type id
                         $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
                         $rowData['A'] = $resourceType->id;
-                        Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
+                        // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(71 + $i); // 'G' + i
                             $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
@@ -150,7 +150,7 @@ class ImportController extends Controller
                                 ->first();
                             //if its a change
                             if ($existingDemand && $existingDemand->fte != $fte) {
-                                Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
+                                // Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
                                 ChangeRequest::create([
                                     'record_type' => Demand::class,
                                     'record_id' => $existingDemand->id,
@@ -222,9 +222,9 @@ class ImportController extends Controller
         if (!is_null($projectID)) {
             $projectInDB = Project::find($projectID);
             if ($projectInDB->start_date != $projectStart || $projectInDB->end_date != $projectEnd) {
-                Log::info("Project start or end date does not match for projectID: $projectID");
-                Log::info("starts: " . $projectInDB->start_date . " " . $projectStart);
-                Log::info("ends: " . $projectInDB->end_date . " " . $projectEnd);
+                // Log::info("Project start or end date does not match for projectID: $projectID");
+                // Log::info("starts: " . $projectInDB->start_date . " " . $projectStart);
+                // Log::info("ends: " . $projectInDB->end_date . " " . $projectEnd);
             }
         }
         //for the moment we won't handle changes
