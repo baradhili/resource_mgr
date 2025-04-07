@@ -22,6 +22,15 @@ use App\Services\CacheService;
 class ImportController extends Controller
 {
     protected $cacheService;
+    //excel columns
+    private $columnResourceName = 'A';
+    private $columnEmpowerID = 'B';
+    private $columnProjectName = 'C';
+    private $columnProjectOwner = 'D';
+    private $columnProjectStatus = 'E';
+    private $columnProjectStart = 'F';
+    private $columnProjectEnd = 'G';
+    private $columnDataStart = 'H';
 
     public function __construct(CacheService $cacheService)
     {
@@ -32,6 +41,26 @@ class ImportController extends Controller
     {
         return view('import.index');
     }
+    /**
+     * This function is used to populate the allocations table with data from an uploaded
+     * Excel file. The Excel file should have the following columns:
+     * - Resource name
+     * - Empower ID
+     * - Project name
+     * - Project owner
+     * - Project status
+     * - Project start date
+     * - Project end date
+     * - Data start date
+     * - Columns for each month of data (in the format 'YYYY-MM')
+     *
+     * The function will check if the resource type exists in the ResourceType table, and
+     * if so, it will insert the data into the Demand table. If the resource type does not
+     * exist, it will insert the data into the Allocations table.
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     */
     public function populateAllocations(Request $request)
     {
         if ($request->hasFile('file')) {
@@ -55,10 +84,6 @@ class ImportController extends Controller
             // Open XLSX-file
             $excel = Excel::open(Storage::path($path));
 
-            $result = [
-                'sheets' => $excel->getSheetNames() // get all sheet names
-            ];
-
             $sheet = $excel->getSheet('Dataset_Empower');
 
             // Collect up the dates in row 5
@@ -67,17 +92,16 @@ class ImportController extends Controller
                     // Step through columns 'G' on until blank, capture each filled column into array as monthYear
                     $monthYear = [];
                     foreach ($rowData as $columnLetter => $columnValue) {
-                        if ($columnLetter >= 'G' && !is_null($columnValue)) {
+                        if ($columnLetter >= $this->columnDataStart && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
                         }
                     }
-                    // Log::info("months " . print_r($monthYear, true));
                 }
                 if ($rowNum < 6) { // Skip first 5 rows
                     continue;
-                } elseif ($rowData['B'] != null) { // Ignore empty lines
-                    $resourceName = $rowData['A'] ?? $resourceName;
+                } elseif ($rowData[$this->columnEmpowerID] != null) { // Ignore empty lines
+                    $resourceName = $rowData[$this->columnResourceName] ?? $resourceName;
 
                     $resourceNameLower = strtolower($resourceName);
                     $contains = in_array($resourceNameLower, $resourceTypes);
@@ -91,7 +115,7 @@ class ImportController extends Controller
                             $projectID = $this->checkProject($rowData);
                             //check the month allocations
                             for ($i = 0; $i < count($monthYear); $i++) {
-                                $columnLetter = chr(71 + $i); // 'G' + i
+                                $columnLetter = chr(ord($this->columnDataStart) + $i);
                                 $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
                                 $existingAllocation = Allocation::where('resources_id', $resourceID)
                                     ->where('projects_id', $projectID)
@@ -121,35 +145,17 @@ class ImportController extends Controller
                                     ]);
                                 }
 
-                                // if ($fte > 0) {
-                                //     Allocation::updateOrCreate(
-                                //         [
-                                //             'resources_id' => $resourceID,
-                                //             'projects_id' => $projectID,
-                                //             'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
-                                //         ],
-                                //         [
-                                //             'fte' => $fte,
-                                //             'status' => 'Proposed',
-                                //             'source' => 'Imported'
-                                //         ]
-                                //     );
-                                // } elseif ($fte == 0) {
-                                //     Allocation::where('projects_id', $projectID)
-                                //         ->where('resources_id', $resourceID)
-                                //         ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
-                                //         ->delete();
-                                // }
+
                             }
                         }
                     } else { // Insert these into demand
                         $projectID = $this->checkProject($rowData);
                         // first replace the "resource name" with a resource_type id
                         $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
-                        $rowData['A'] = $resourceType->id;
+                        $rowData[$this->columnResourceName] = $resourceType->id;
                         // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
                         for ($i = 0; $i < count($monthYear); $i++) {
-                            $columnLetter = chr(71 + $i); // 'G' + i
+                            $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
                             $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
                             $existingDemand = Demand::where('projects_id', $projectID)
                                 ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
@@ -180,25 +186,7 @@ class ImportController extends Controller
                                     'source' => 'Imported'
                                 ]);
                             }
-                            // if ($fte > 0) {
-                            //     Demand::updateOrCreate(
-                            //         [
-                            //             'projects_id' => $projectID,
-                            //             'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d')
-                            //         ],
-                            //         [
-                            //             'fte' => $fte,
-                            //             'status' => 'Proposed',
-                            //             'resource_type' => $resourceName,
-                            //             'source' => 'Imported'
-                            //         ]
-                            //     );
-                            // } elseif ($fte == 0) {
-                            //     Demand::where('projects_id', $projectID)
-                            //         ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
-                            //         ->delete();
 
-                            // }
                         }
                     }
                 }
@@ -216,24 +204,34 @@ class ImportController extends Controller
         }
     }
 
+        /**
+         * Given a row of data from the import file, this function checks if the project exists,
+         * and if it does, checks if the start and end dates have changed. It then creates or
+         * updates the project in the database.
+         *
+         * @param array $rowData the row of data from the import file
+         *
+         * @return int the id of the project in the database
+         */
     private function checkProject($rowData)
     {
-        $empowerID = $rowData['B'];
-        $projectName = preg_replace('/[^\x00-\x7F]/', '', $rowData['C']);
+        $empowerID = $rowData[$this->columnEmpowerID];
+        $projectName = preg_replace('/[^\x00-\x7F]/', '', $rowData[$this->columnProjectName]);
         $project = Project::where('empowerID', $empowerID)->first();
         $projectID = $project->id ?? null;
-        $projectStatus = $rowData['D'];
+        $projectStatus = $rowData[$this->columnProjectStatus];
+        $projectOwner = $rowData[$this->columnProjectOwner];
+        //clean up projectOwner - truncate any org suffix that may be in there
+        $projectOwner = preg_replace('/\s*\([^)]*\)\s*$/', '', $projectOwner);
+        $projectOwner = trim($projectOwner);
         //data is in excel like 15/05/24 needs to be in 2024-05-15
-        $projectStart = Carbon::createFromFormat('d/m/y', $rowData['E'])->format('Y-m-d');
-        $projectEnd = Carbon::createFromFormat('d/m/y', $rowData['F'])->format('Y-m-d');
-        // Log::info("project data: " . $projectID . " " . $projectName . " " . $projectStart . " " . $projectEnd);
+        $projectStart = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectStart])->format('Y-m-d');
+        $projectEnd = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectEnd])->format('Y-m-d');
         //check if project exists and check start and end for changes
         if (!is_null($projectID)) {
             $projectInDB = Project::find($projectID);
             if ($projectInDB->start_date != $projectStart || $projectInDB->end_date != $projectEnd) {
-                // Log::info("Project start or end date does not match for projectID: $projectID");
-                // Log::info("starts: " . $projectInDB->start_date . " " . $projectStart);
-                // Log::info("ends: " . $projectInDB->end_date . " " . $projectEnd);
+                // do stuff later if we need to
             }
         }
         //for the moment we won't handle changes
@@ -242,7 +240,8 @@ class ImportController extends Controller
             [
                 'name' => $projectName,
                 'start_date' => $projectStart,
-                'end_date' => $projectEnd
+                'end_date' => $projectEnd,
+                'projectManager' => $projectOwner
             ]
         );
         $projectID = $project->id;
