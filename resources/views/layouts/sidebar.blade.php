@@ -39,10 +39,14 @@
                                     <ul id="resources" class="sidebar-dropdown list-unstyled collapse show">
                                         <li class="sidebar-item"><a class="sidebar-link"
                                                 href="{{ route('resources.index') }}">Resources</a></li>
-                                        @can('contracts.index')<li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('contracts.index') }}">Contracts </a></li>@endcan
-                                        @can('leaves.index')<li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('leaves.index') }}">Leave </a></li>@endcan
+                                        @can('contracts.index')
+                                            <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('contracts.index') }}">Contracts </a></li>
+                                        @endcan
+                                        @can('leaves.index')
+                                            <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('leaves.index') }}">Leave </a></li>
+                                        @endcan
                                     </ul>
                                 </li>
 
@@ -58,10 +62,14 @@
                                         </svg><span class="align-middle">Skills and Services</span>
                                     </a>
                                     <ul id="skills-services" class="sidebar-dropdown list-unstyled collapse">
-                                        @can('skills.index')<li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('skills.index') }}">Skills</a></li>@endcan
-                                        @can('services.index')<li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('services.index') }}">Services </a></li>@endcan
+                                        @can('skills.index')
+                                            <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('skills.index') }}">Skills</a></li>
+                                        @endcan
+                                        @can('services.index')
+                                            <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('services.index') }}">Services </a></li>
+                                        @endcan
                                     </ul>
                                 </li>
                                 <li class="sidebar-item">
@@ -85,57 +93,79 @@
                                         </svg> <span class="align-middle">Projects</span>
                                     </a>
                                 </li>
-                                @can('allocations.index')<li class="sidebar-item">
-                                    <a class="sidebar-link" href="{{ route('allocations.index') }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            class="feather feather-calendar align-middle">
-                                            <rect x="3" y="4" width="18" height="18" rx="2"
-                                                ry="2"></rect>
-                                            <line x1="16" y1="2" x2="16" y2="6">
-                                            </line>
-                                            <line x1="8" y1="2" x2="8" y2="6">
-                                            </line>
-                                            <line x1="3" y1="10" x2="21" y2="10">
-                                            </line>
-                                        </svg> <span class="align-middle">Allocations</span>
-                                    </a>
-                                </li>@endcan
-                                @can('demands.index')<li class="sidebar-item">
-                                    <a class="sidebar-link" href="{{ route('demands.index') }}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            class="feather feather-git-pull-request">
-                                            <circle cx="18" cy="18" r="3"></circle>
-                                            <circle cx="6" cy="6" r="3"></circle>
-                                            <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
-                                            <line x1="6" y1="9" x2="6" y2="21">
-                                            </line>
-                                        </svg> <span class="align-middle">Demands</span>
-                                    </a>
-                                </li>
+                                @can('allocations.index')
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ route('allocations.index') }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="feather feather-calendar align-middle">
+                                                <rect x="3" y="4" width="18" height="18" rx="2"
+                                                    ry="2"></rect>
+                                                <line x1="16" y1="2" x2="16" y2="6">
+                                                </line>
+                                                <line x1="8" y1="2" x2="8" y2="6">
+                                                </line>
+                                                <line x1="3" y1="10" x2="21" y2="10">
+                                                </line>
+                                            </svg> <span class="align-middle">Allocations</span>
+                                        </a>
+                                    </li>
                                 @endcan
-                                @can('estimates.index')<li class="sidebar-item">
-                                    <a data-bs-target="#estimates" data-bs-toggle="collapse" class="sidebar-link"
-                                        aria-expanded="false">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            class="feather feather-key">
-                                            <path
-                                                d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4">
-                                            </path>
-                                        </svg> <span class="align-middle">Estimates</span>
-                                    </a>
-                                    <ul id="estimates" class="sidebar-dropdown list-unstyled collapse">
-                                        <li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('clients.index') }}">Clients</a></li>
-                                        <li class="sidebar-item"><a class="sidebar-link"
-                                                href="{{ route('estimates.index') }}">Estimates </a></li>
-                                    </ul>
-                                </li>
+                                @can('demands.index')
+                                    <li class="sidebar-item">
+                                        <a class="sidebar-link" href="{{ route('demands.index') }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="feather feather-git-pull-request">
+                                                <circle cx="18" cy="18" r="3"></circle>
+                                                <circle cx="6" cy="6" r="3"></circle>
+                                                <path d="M13 6h3a2 2 0 0 1 2 2v7"></path>
+                                                <line x1="6" y1="9" x2="6" y2="21">
+                                                </line>
+                                            </svg> <span class="align-middle">Demands</span>
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('estimates.index')
+                                    <li class="sidebar-item">
+                                        <a data-bs-target="#estimates" data-bs-toggle="collapse" class="sidebar-link"
+                                            aria-expanded="false">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="feather feather-key">
+                                                <path
+                                                    d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4">
+                                                </path>
+                                            </svg> <span class="align-middle">Estimates</span>
+                                        </a>
+                                        <ul id="estimates" class="sidebar-dropdown list-unstyled collapse">
+                                            <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('clients.index') }}">Clients</a></li>
+                                            <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('estimates.index') }}">Estimates </a></li>
+                                        </ul>
+                                    </li>
+                                @endcan
+                                @can('reports.index')
+                                    <li class="sidebar-item">
+                                        <a data-bs-target="#reports" data-bs-toggle="collapse" class="sidebar-link"
+                                            aria-expanded="false">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="feather feather-pie-chart">
+                                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                                                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                                            </svg> <span class="align-middle">Reports</span>
+                                        </a>
+                                        <ul id="estimates" class="sidebar-dropdown list-unstyled collapse">
+                                            <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('clients.index') }}">Org</a></li>
+                                        </ul>
+                                    </li>
                                 @endcan
                             </ul>
                         </div>

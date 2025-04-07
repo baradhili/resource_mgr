@@ -14,6 +14,7 @@ use App\Http\Requests\UserRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserController extends Controller
 {
@@ -22,10 +23,26 @@ class UserController extends Controller
      */
     public function index(Request $request): View
     {
-        $users = User::with('reportingLine')->paginate();
+        $usersQuery = User::with('reportingLine')
+            ->get()
+            ->sortBy(function ($user) {
+                return $user->reportingLine ? $user->reportingLine->name : '';
+            })
+            ->values();
+
+        // Get the current page from the request
+        $page = $request->input('page', 1);
+        $perPage = 10;
+        $users = new LengthAwarePaginator(
+            $usersQuery->forPage($request->input('page', 1), $perPage),
+            $usersQuery->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
 
         return view('user.index', compact('users'))
-            ->with('i', ($request->input('page', 1) - 1) * $users->perPage());
+            ->with('i', $users->currentPage() * $users->perPage() - $users->perPage());
     }
 
     /**

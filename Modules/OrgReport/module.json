@@ -1,0 +1,11 @@
+{
+    "name": "OrgReport",
+    "alias": "orgreport",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\OrgReport\\App\\Providers\\OrgReportServiceProvider"
+    ],
+    "files": []
+}
