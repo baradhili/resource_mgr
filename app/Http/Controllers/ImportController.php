@@ -41,6 +41,26 @@ class ImportController extends Controller
     {
         return view('import.index');
     }
+    /**
+     * This function is used to populate the allocations table with data from an uploaded
+     * Excel file. The Excel file should have the following columns:
+     * - Resource name
+     * - Empower ID
+     * - Project name
+     * - Project owner
+     * - Project status
+     * - Project start date
+     * - Project end date
+     * - Data start date
+     * - Columns for each month of data (in the format 'YYYY-MM')
+     *
+     * The function will check if the resource type exists in the ResourceType table, and
+     * if so, it will insert the data into the Demand table. If the resource type does not
+     * exist, it will insert the data into the Allocations table.
+     *
+     * @param Request $request
+     * @return RedirectResponse
+     */
     public function populateAllocations(Request $request)
     {
         if ($request->hasFile('file')) {
@@ -63,10 +83,6 @@ class ImportController extends Controller
 
             // Open XLSX-file
             $excel = Excel::open(Storage::path($path));
-
-            $result = [
-                'sheets' => $excel->getSheetNames() // get all sheet names
-            ];
 
             $sheet = $excel->getSheet('Dataset_Empower');
 
@@ -188,6 +204,15 @@ class ImportController extends Controller
         }
     }
 
+        /**
+         * Given a row of data from the import file, this function checks if the project exists,
+         * and if it does, checks if the start and end dates have changed. It then creates or
+         * updates the project in the database.
+         *
+         * @param array $rowData the row of data from the import file
+         *
+         * @return int the id of the project in the database
+         */
     private function checkProject($rowData)
     {
         $empowerID = $rowData[$this->columnEmpowerID];
