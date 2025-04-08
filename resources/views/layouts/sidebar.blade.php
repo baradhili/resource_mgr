@@ -149,7 +149,7 @@
                                         </ul>
                                     </li>
                                 @endcan
-                                @can('reports.index')
+                               
                                     <li class="sidebar-item">
                                         <a data-bs-target="#reports" data-bs-toggle="collapse" class="sidebar-link"
                                             aria-expanded="false">
@@ -166,7 +166,7 @@
                                                     href="{{ route('clients.index') }}">Org</a></li>
                                         </ul>
                                     </li>
-                                @endcan
+                              
                             </ul>
                         </div>
                     </div>
