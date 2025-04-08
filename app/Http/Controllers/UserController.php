@@ -106,6 +106,11 @@ class UserController extends Controller
         $current_team = $user->currentTeam;
         $roles = $request->input('roles');
         $user->update($request->validated());
+        if ($user->save() === false) {
+            Log::info('Error updating user: ' . json_encode($request->all()));
+            exit;
+        }
+        
         //Make sure resource types are synced and or updated
         //get resource team/type
         $team = Team::find($request->validated()['current_team_id']);
