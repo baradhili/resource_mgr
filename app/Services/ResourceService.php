@@ -17,7 +17,7 @@ class ResourceService
             // Get the team's resources
             $resource_types = $user->ownedTeams->pluck('resource_type')->toArray();
             // Log::info("User is an owner of a team with resource types: " . json_encode($resource_types));
-            $resource_types = ResourceType::whereIn('name', $resource_types)->pluck('id')->toArray();
+            $resource_types = ResourceType::whereIn('id', $resource_types)->pluck('id')->toArray();
             // Log::info("resource types: " . json_encode($resource_types));
             $resources = Resource::whereHas('contracts', function ($query) {
                 $query->where('start_date', '<=', now())
