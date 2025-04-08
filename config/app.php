@@ -170,6 +170,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         Spatie\Menu\Laravel\MenuServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
+        App\Providers\ModuleServiceProvider::class,
     ])->toArray(),
 
     /*

@@ -1,7 +1,8 @@
 {
     "name": "OrgReport",
     "alias": "orgreport",
-    "description": "",
+    "description": "A module for generating reports",
+    "type": "Report",
     "keywords": [],
     "priority": 0,
     "providers": [
