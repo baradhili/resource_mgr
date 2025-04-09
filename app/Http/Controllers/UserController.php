@@ -55,7 +55,7 @@ class UserController extends Controller
         $teams = Team::all();
         $roles = Role::all();
         $resources = Resource::all();
-        return view('user.create', compact('user', 'users', 'teams', 'resources','roles'));
+        return view('user.create', compact('user', 'users', 'teams', 'resources', 'roles'));
     }
 
     /**
@@ -107,14 +107,16 @@ class UserController extends Controller
         $roles = $request->input('roles');
         $user->update($request->validated());
         if ($user->save() === false) {
-            Log::info('Error updating user: ' . json_encode($request->all()));
-            exit;
+            return Redirect::back()
+                ->withInput()
+                ->with('error', 'Failed to update user. Please try again.');
         }
-        
+
         //Make sure resource types are synced and or updated
         //get resource team/type
         $team = Team::find($request->validated()['current_team_id']);
         $resource = Resource::find($request->validated()['resource_id']);
+
 
         if (is_null($current_team) || $team->id !== $current_team->id) {
             // user is not a member of a team, so attach
@@ -127,7 +129,7 @@ class UserController extends Controller
             $user->attachTeam($team);
             // $user->teams()->attach($team->id);
         }
-        if (!is_null($resource)) {
+        if (!$resource) {
             if (is_null($resource->resource_type) || $resource->resource_type !== $user->currentTeam->resource_type) {
                 $resource->resource_type = $user->currentTeam->resource_type;
             }
