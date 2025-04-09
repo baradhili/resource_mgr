@@ -55,6 +55,17 @@ class OrgReportController extends Controller
                     $resource->tenure = round($endDate->diffInDays($startDate) / 365, 1);
                 }
             }
+            // find the project ids from teh resource's current allocations
+            $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $resource->contracts->first()->end_date])->get();
+            $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
+            $projects = Project::whereIn('id', $uniqueProjectIds)->get();
+            $currentProjects = $projects;
+            //filter all projects where the project end date is after or at the resource's contract end date
+            $currentProjects = $currentProjects->filter(function ($project) use ($resource) {
+                return $project->end_date >= $resource->contracts->first()->end_date;
+            });
+            $resource->currentProjects = $currentProjects;
+
         }
         //sort by tenure decending
         $resources = $resources->sortByDesc('tenure');

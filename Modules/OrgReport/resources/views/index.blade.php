@@ -36,7 +36,7 @@
                                         <th>End Date</th>
 <th>Supervisor</th>
 <th>Tenure</th>
-
+<th>Projects overlapping end date</th>
 
                                         <th></th>
                                     </tr>
@@ -51,6 +51,7 @@
                                             <td>{{ optional($resource->contracts->first())->end_date ? \Carbon\Carbon::parse($resource->contracts->first()->end_date)->format('d/m/Y') : '' }}</td>
                                             <td>{{ $resource->user->reports_to->name ?? '' }}</td>
                                             <td>{{ $resource->tenure }}</td>
+                                            <td>{{ $resource->currentProjects ? collect($resource->currentProjects)->map(fn($p) => $p->empowerID . ' - ' . $p->name)->implode(', ') : '' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
