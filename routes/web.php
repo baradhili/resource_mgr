@@ -15,6 +15,7 @@ use App\Http\Controllers\LeaveController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\DemandRequestController;
+use App\Http\Controllers\PluginController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ResourceSkillController;
 use App\Http\Controllers\RoleController;
@@ -84,7 +85,7 @@ Route::middleware('auth')->group(function () {
 
         Route::resource('permissions', App\Http\Controllers\PermissionController::class);
         Route::get('permissions/{permissionId}/delete', [App\Http\Controllers\PermissionController::class, 'destroy']);
-
+        Route::resource('plugins', PluginController::class);
         Route::resource('roles', App\Http\Controllers\RoleController::class);
         Route::get('roles/{roleId}/delete', [App\Http\Controllers\RoleController::class, 'destroy']);
         Route::get('roles/{roleId}/give-permissions', [App\Http\Controllers\RoleController::class, 'addPermissionToRole']);
