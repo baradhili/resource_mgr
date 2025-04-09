@@ -149,7 +149,7 @@
                                         </ul>
                                     </li>
                                 @endcan
-                               
+                                @can('reports.index')
                                     <li class="sidebar-item">
                                         <a data-bs-target="#reports" data-bs-toggle="collapse" class="sidebar-link"
                                             aria-expanded="false">
@@ -161,12 +161,13 @@
                                                 <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
                                             </svg> <span class="align-middle">Reports</span>
                                         </a>
-                                        <ul id="estimates" class="sidebar-dropdown list-unstyled collapse">
+                                        <ul id="reports" class="sidebar-dropdown list-unstyled collapse">
                                             <li class="sidebar-item"><a class="sidebar-link"
-                                                    href="{{ route('clients.index') }}">Org</a></li>
+                                                    href="{{ route('orgreport.index') }}">Tenure</a></li>
                                         </ul>
+ 
                                     </li>
-                              
+                                @endcan
                             </ul>
                         </div>
                     </div>
