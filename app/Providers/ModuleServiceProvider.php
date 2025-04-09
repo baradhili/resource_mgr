@@ -27,6 +27,10 @@ class ModuleServiceProvider extends ServiceProvider
         $moduleType = $module->get('type'); // Assuming each module has a type in its module.json
         $moduleDescription = $module->get('description'); // Assuming each module has a description in its module.json
 
+        if (!\Schema::hasTable('plugins')) {
+            return;
+        }
+
         Plugin::updateOrCreate(
             ['name' => $moduleName],
             ['type' => $moduleType, 'description' => $moduleDescription]

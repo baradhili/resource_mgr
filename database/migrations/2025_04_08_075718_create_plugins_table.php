@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('plugins', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('type'); // Report, Import, Export, Other
+            $table->enum('type', ['Report', 'Import', 'Export', 'Other']);
             $table->string('description')->nullable();
             $table->timestamps();
         });

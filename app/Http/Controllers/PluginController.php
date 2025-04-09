@@ -49,36 +49,66 @@ class PluginController extends Controller
     public function show($id): View
     {
         $plugin = Plugin::find($id);
+        if (!$plugin) {
+            abort(404, 'Plugin not found');
+        }
 
         return view('plugin.show', compact('plugin'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id): View
-    {
-        $plugin = Plugin::find($id);
-
-        return view('plugin.edit', compact('plugin'));
-    }
 
     /**
-     * Update the specified resource in storage.
+     * Remove the specified plugin from the disk.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function update(PluginRequest $request, Plugin $plugin): RedirectResponse
-    {
-        $plugin->update($request->validated());
-
-        return Redirect::route('plugins.index')
-            ->with('success', 'Plugin updated successfully');
-    }
-
     public function destroy($id): RedirectResponse
     {
-        Plugin::find($id)->delete();
+        $plugin = Plugin::find($id);
+        if ($plugin) {
+            // Delete the plugin entry from the database
+            $plugin->delete();
+
+            // Construct the path to the module directory
+            $modulePath = base_path('Modules/' . $plugin->name);
+
+            // Delete the module directory
+            if (is_dir($modulePath)) {
+                $this->deleteDirectory($modulePath);
+            }
+
+            return Redirect::route('plugins.index')
+                ->with('success', 'Plugin deleted successfully');
+        }
 
         return Redirect::route('plugins.index')
-            ->with('success', 'Plugin deleted successfully');
+            ->with('error', 'Plugin not found');
+    }
+
+    /**
+     * Recursively delete a directory
+     */
+    protected function deleteDirectory($dir)
+    {
+        if (!file_exists($dir)) {
+            return true;
+        }
+
+        if (!is_dir($dir)) {
+            return unlink($dir);
+        }
+
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+
+            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+                return false;
+            }
+        }
+
+        return rmdir($dir);
     }
 }
