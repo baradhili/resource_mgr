@@ -60,9 +60,20 @@ class OrgReportController extends Controller
             $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
             $projects = Project::whereIn('id', $uniqueProjectIds)->get();
             $currentProjects = $projects;
-            //filter all projects where the project end date is after or at the resource's contract end date
+            //filter all projects where the project end date is after or within one month of the resource's contract end date
             $currentProjects = $currentProjects->filter(function ($project) use ($resource) {
-                return $project->end_date >= $resource->contracts->first()->end_date;
+                $contractEndDate = \Carbon\Carbon::parse($resource->contracts->first()->end_date);
+                $projectEndDate = \Carbon\Carbon::parse($project->end_date);
+                // first is project end date after contract end date?
+                $overlap = $contractEndDate->lt($projectEndDate);
+                //if true return
+                if ($overlap) {
+                    return $overlap;
+                } else {
+                    // second is project end date inside one month less of contract end date? 
+                    $overlap = $contractEndDate->copy()->subMonth()->lt($projectEndDate);
+                    return $overlap;
+                }
             });
             $resource->currentProjects = $currentProjects;
 
@@ -73,9 +84,7 @@ class OrgReportController extends Controller
         $resources = $resources->filter(function ($resource) {
             return $resource->tenure >= 1.5 && !$resource->contracts->first()->permanent;
         });
-
-
-        Log::info("resources: " . json_encode($resources));
+Log::info("resource: ".json_encode($resources));
         return view('orgreport::index', compact('resources', 'regions'));
     }
 

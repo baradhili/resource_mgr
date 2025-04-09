@@ -34,9 +34,9 @@
                                         <th>Role</th>
                                         <th>Start Date</th>
                                         <th>End Date</th>
-<th>Supervisor</th>
-<th>Tenure</th>
-<th>Projects overlapping end date</th>
+                                        <th>Supervisor</th>
+                                        <th>Tenure</th>
+                                        <th>Projects overlapping end date</th>
 
                                         <th></th>
                                     </tr>
@@ -47,11 +47,14 @@
                                             <td>{{ $resource->full_name }}</td>
                                             <td>{{ $resource->empowerID }}</td>
                                             <td>{{ $resource->resource_type_obj->name }}</td>
-                                            <td>{{ optional($resource->contracts->first())->start_date ? \Carbon\Carbon::parse($resource->contracts->first()->start_date)->format('d/m/Y') : '' }}</td>
-                                            <td>{{ optional($resource->contracts->first())->end_date ? \Carbon\Carbon::parse($resource->contracts->first()->end_date)->format('d/m/Y') : '' }}</td>
+                                            <td>{{ optional($resource->contracts->first())->start_date ? \Carbon\Carbon::parse($resource->contracts->first()->start_date)->format('d/m/Y') : '' }}
+                                            </td>
+                                            <td>{{ optional($resource->contracts->first())->end_date ? \Carbon\Carbon::parse($resource->contracts->first()->end_date)->format('d/m/Y') : '' }}
+                                            </td>
                                             <td>{{ $resource->user->reports_to->name ?? '' }}</td>
                                             <td>{{ $resource->tenure }}</td>
-                                            <td>{{ $resource->currentProjects ? collect($resource->currentProjects)->map(fn($p) => $p->empowerID . ' - ' . $p->name)->implode(', ') : '' }}</td>
+                                            <td>{{ $resource->currentProjects ? collect($resource->currentProjects)->map(fn($p) => $p->empowerID . ' - ' . $p->name . ' (' . $p->projectManager . ')')->implode(', ') : '' }}
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
