@@ -8,6 +8,7 @@ use App\Models\Contract;
 use App\Models\Demand;
 use App\Models\Project;
 use App\Models\Resource;
+use App\Models\ResourceType;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -18,7 +19,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Services\CacheService;
 use App\Services\ResourceService;
-use App\Models\ResourceType;
 use Illuminate\Support\Facades\Auth;
 
 class DemandController extends Controller
@@ -60,8 +60,8 @@ class DemandController extends Controller
             return view('home');
         }
         // Log::info("User is an owner of a team with resource types: " . json_encode($resource_types));
-        $resource_types = ResourceType::whereIn('name', $resource_types)->pluck('id')->toArray();
-        // Log::info("resources: ".json_encode($resource_types));
+        //$resource_types = ResourceType::whereIn('name', $resource_types)->pluck('id')->toArray();
+        // Log::info("resourcestypes: ".json_encode($resource_types));
         // Collect resources with contracts in the next 12 months
         $resources = $this->resourceService->getResourceList();
         // Log::info("resources: ".json_encode($resources));
@@ -85,10 +85,12 @@ class DemandController extends Controller
         foreach ($projects as $project) {
 
             $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
+            
             //TODO - once we migrate to a numeric value for resource type, remove this
-            if (is_numeric($resource_type)) {
-                $resource_type = ResourceType::findOrFail($resource_type)->name;
-            }
+            // if (is_numeric($resource_type)) {
+            //     $resource_type = ResourceType::findOrFail($resource_type)->name;
+            //     Log::info("resource tpe name = ".$resource_type);
+            // }
             if ($resource_type) {
                 $words = explode(' ', trim($resource_type));
                 $acronym = '';
