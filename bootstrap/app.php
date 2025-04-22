@@ -8,7 +8,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
         \Spatie\Menu\Laravel\MenuServiceProvider::class,
-        \Yajra\DataTables\DataTablesServiceProvider::class,
+
     ])
     ->withRouting(
         web: __DIR__.'/../routes/web.php',

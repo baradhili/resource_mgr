@@ -11,12 +11,16 @@
         {
             "type": "vcs",
             "url": "https://github.com/baradhili/laravel-dashboard.git"
+        },
+	{
+            "type": "vcs",
+            "url": "https://github.com/baradhili/fast-excel-laravel.git"
         }
     ],
     "require": {
         "php": "^8.2",
         "arrilot/laravel-widgets": "^3.14",
-        "avadim/fast-excel-laravel": "^2.8",
+        "avadim/fast-excel-laravel": "dev-main",
         "brunocfalcao/blade-feather-icons": "^4.0",
         "deployer/deployer": "^7.5",
         "filament/filament": "*",
@@ -24,7 +28,6 @@
         "graham-campbell/markdown": "^15.2",
         "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^11.44",
-        "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.5",
