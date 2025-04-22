@@ -4,11 +4,6 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Database\Seeders\ProjectSeeder;
-use Database\Seeders\ResourceSeeder;
-use Database\Seeders\ContractSeeder;
-use Database\Seeders\LeavesSeeder;
-use Database\Seeders\UserSeeder;
 
 class DatabaseSeeder extends Seeder
 {

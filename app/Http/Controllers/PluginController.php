@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PluginRequest;
 use App\Models\Plugin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\PluginRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -27,7 +27,7 @@ class PluginController extends Controller
      */
     public function create(): View
     {
-        $plugin = new Plugin();
+        $plugin = new Plugin;
 
         return view('plugin.create', compact('plugin'));
     }
@@ -49,13 +49,12 @@ class PluginController extends Controller
     public function show($id): View
     {
         $plugin = Plugin::find($id);
-        if (!$plugin) {
+        if (! $plugin) {
             abort(404, 'Plugin not found');
         }
 
         return view('plugin.show', compact('plugin'));
     }
-
 
     /**
      * Remove the specified plugin from the disk.
@@ -71,7 +70,7 @@ class PluginController extends Controller
             $plugin->delete();
 
             // Construct the path to the module directory
-            $modulePath = base_path('Modules/' . $plugin->name);
+            $modulePath = base_path('Modules/'.$plugin->name);
 
             // Delete the module directory
             if (is_dir($modulePath)) {
@@ -102,7 +101,7 @@ class PluginController extends Controller
             return true;
         }
 
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             return unlink($dir);
         }
 
@@ -111,7 +110,7 @@ class PluginController extends Controller
                 continue;
             }
 
-            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+            if (! $this->deleteDirectory($dir.DIRECTORY_SEPARATOR.$item)) {
                 return false;
             }
         }

@@ -22,9 +22,9 @@ class PublicHolidayRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'date' => 'required',
-			'name' => 'required|string',
-			'region_id' => 'required',
+            'date' => 'required',
+            'name' => 'required|string',
+            'region_id' => 'required',
         ];
     }
 }

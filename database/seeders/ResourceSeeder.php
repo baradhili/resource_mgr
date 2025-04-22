@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use JeroenZwart\CsvSeeder\CsvSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use JeroenZwart\CsvSeeder\CsvSeeder;
 
 class ResourceSeeder extends CsvSeeder
 {
@@ -18,10 +17,8 @@ class ResourceSeeder extends CsvSeeder
 
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         // Recommended when importing larger CSVs
         DB::disableQueryLog();
@@ -30,4 +27,3 @@ class ResourceSeeder extends CsvSeeder
         // Schema::enableForeignKeyConstraints();
     }
 }
-

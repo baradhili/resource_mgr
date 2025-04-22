@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
-use App\Models\Allocation;
 use App\Models\Resource;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\ProjectRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -37,7 +35,7 @@ class ProjectController extends Controller
      */
     public function create(): View
     {
-        $project = new Project();
+        $project = new Project;
 
         return view('project.create', compact('project'));
     }
@@ -69,6 +67,7 @@ class ProjectController extends Controller
                     ->where('allocation_date', '>=', now()->startOfMonth())
                     ->count() > 0;
                 $resource->resourceType_name = $resource->resourceType->name;
+
                 return $resource;
             });
 

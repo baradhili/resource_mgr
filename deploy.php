@@ -8,9 +8,9 @@ require 'recipe/laravel.php';
 require 'contrib/npm.php';
 require 'contrib/rsync.php';
 
-///////////////////////////////////
+// /////////////////////////////////
 // Config
-///////////////////////////////////
+// /////////////////////////////////
 
 set('application', 'Practice Manager');
 set('repository', '');
@@ -19,7 +19,7 @@ add('shared_files', []);
 add('shared_dirs', []);
 add('writable_dirs', []);
 set('ssh_multiplexing', true);  // Speed up deployment
-//set('default_timeout', 1000);
+// set('default_timeout', 1000);
 
 set('rsync_src', function () {
     return __DIR__; // If your project isn't in the root, you'll need to change this.
@@ -49,9 +49,9 @@ task('deploy:secrets', function () {
     run("echo \"$envContent\" > $deployPath/shared/.env"); // Write the content to the .env file in the shared directory
 })->desc('Deploy .env file');
 
-///////////////////////////////////
+// /////////////////////////////////
 // Hosts
-///////////////////////////////////
+// /////////////////////////////////
 
 host('dev.picsi.co')
     ->setHostname('103.6.171.211')
@@ -63,9 +63,9 @@ host('dev.picsi.co')
 
 after('deploy:failed', 'deploy:unlock');
 
-///////////////////////////////////
+// /////////////////////////////////
 // Tasks
-///////////////////////////////////
+// /////////////////////////////////
 
 desc('Start of Deploy the application');
 

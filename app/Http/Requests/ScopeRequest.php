@@ -22,10 +22,10 @@ class ScopeRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'tasks_deliverables' => 'required|string',
-			'timeline' => 'required',
-			'exclusions' => 'required|string',
-			'estimate_id' => 'required',
+            'tasks_deliverables' => 'required|string',
+            'timeline' => 'required',
+            'exclusions' => 'required|string',
+            'estimate_id' => 'required',
         ];
     }
 }

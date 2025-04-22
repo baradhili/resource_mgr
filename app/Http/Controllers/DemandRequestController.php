@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RequestRequest;
 use App\Models\DemandRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\RequestRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -27,7 +27,7 @@ class DemandRequestController extends Controller
      */
     public function create(): View
     {
-        $request = new DemandRequest();
+        $request = new DemandRequest;
 
         return view('request.create', compact('request'));
     }

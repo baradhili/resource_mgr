@@ -22,12 +22,12 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'name' => 'required|string',
-			'email' => 'required|string',
+            'name' => 'required|string',
+            'email' => 'required|string',
             'password' => 'nullable|string',
             'current_team_id' => 'nullable|integer',
             'resource_id' => 'nullable|integer',
-            'reports' => 'nullable|integer'
+            'reports' => 'nullable|integer',
         ];
     }
 }

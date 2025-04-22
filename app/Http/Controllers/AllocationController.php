@@ -2,35 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AllocationRequest;
 use App\Models\Allocation;
-use App\Models\Resource;
-use App\Models\Project;
 use App\Models\Demand;
-use App\Models\ResourceType;
 use App\Models\Location;
-
+use App\Models\Project;
+use App\Models\Resource;
+use App\Services\CacheService;
+use App\Services\ResourceService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\AllocationRequest;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use \avadim\FastExcelReader\Excel;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
-use App\Services\CacheService;
-use App\Services\ResourceService;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class AllocationController extends Controller
 {
-
     protected $cacheService;
-    private $resourceService;
 
+    private $resourceService;
 
     /**
      * Create a new controller instance.
@@ -51,7 +46,7 @@ class AllocationController extends Controller
     public function index(Request $request): View
     {
         $user = auth()->user();
-        if (!$user->can('allocations.index')) {
+        if (! $user->can('allocations.index')) {
             return view('home')->with('warning', 'You do not have the necessary permissions to view the allocations page.');
         }
 
@@ -67,7 +62,7 @@ class AllocationController extends Controller
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
-                'monthFullName' => $date->format('F')
+                'monthFullName' => $date->format('F'),
             ];
         }
         //  Start and end dates for the period
@@ -75,19 +70,19 @@ class AllocationController extends Controller
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
         // Collect our resources who have a current contract
-        $resources = $this->resourceService->getResourceList($regionID,true);
+        $resources = $this->resourceService->getResourceList($regionID, true);
 
         // collect teh regions from teh resources->region
         $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+            if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
                 $resource->full_name .= ' [c]';
             }
         }
 
-        if (!Cache::has('resourceAllocation')) {
+        if (! Cache::has('resourceAllocation')) {
             $this->cacheService->cacheResourceAllocation();
             $resourceAllocation = Cache::get('resourceAllocation');
         } else {
@@ -100,12 +95,12 @@ class AllocationController extends Controller
         foreach ($resourceAllocationCollection as $key => $allocation) {
 
             $resource = Resource::find($key);
-            //check if region_id is set
-            if (!$resource->region_id) {
-                //if not then check if location_id is set
+            // check if region_id is set
+            if (! $resource->region_id) {
+                // if not then check if location_id is set
                 if ($resource->location_id) {
                     $location = Location::find($resource->location_id);
-                    //if $location then collect region_id from Location and insert into resourceAllocationCollection
+                    // if $location then collect region_id from Location and insert into resourceAllocationCollection
                     if ($location) {
                         $resource->region_id = $location->region_id;
                     }
@@ -117,12 +112,13 @@ class AllocationController extends Controller
                     if ($key == $resource->id) {
                         $allocation['resource'] = $resource;
                     }
+
                     return [$key => $allocation];
                 });
             }
         }
 
-        //filter the collection by resource->region_id
+        // filter the collection by resource->region_id
         if ($regionID) {
             $resourceAllocationCollection = $resourceAllocationCollection->filter(function ($value, $key) use ($regionID) {
                 return $value['resource']->region_id == $regionID;
@@ -153,10 +149,10 @@ class AllocationController extends Controller
     public function create(): View
     {
         $user = Auth::user();
-        if (!$user->can('allocations.create')) {
+        if (! $user->can('allocations.create')) {
             return Redirect::route('allocations.index')->with('warning', 'You do not have the necessary permissions to view the allocations page.');
         }
-        $allocation = new Allocation();
+        $allocation = new Allocation;
         $resources = Resource::all(); // Retrieve all resources
         $projects = Project::all(); // Retrieve all projects
 
@@ -180,7 +176,7 @@ class AllocationController extends Controller
     public function show($id): View
     {
         $user = Auth::user();
-        if (!$user->can('allocations.show')) {
+        if (! $user->can('allocations.show')) {
             return Redirect::route('allocations.index')->with('warning', 'You do not have the necessary permissions to view the allocations page.');
         }
         $allocation = Allocation::find($id);
@@ -217,7 +213,7 @@ class AllocationController extends Controller
         $resource = Resource::find($request->resource_id);
         $resourceType = $resource->pluck('resource_type')->first();
         foreach ($allocationArray as $allocation) {
-            $demand = new Demand();
+            $demand = new Demand;
             $demand->demand_date = $allocation->allocation_date;
             $demand->fte = $allocation->fte;
             $demand->projects_id = $allocation->projects_id;
@@ -226,24 +222,25 @@ class AllocationController extends Controller
 
             $allocation->delete();
         }
-        //refresh teh cache
+        // refresh teh cache
         $this->cacheService->cacheResourceAllocation();
 
         return Redirect::route('allocations.index');
     }
+
     /**
      * Show the form for editing the specified resource.
      */
     public function editOne(Request $request): View
     {
-        $allocation_date = Carbon::parse($request->monthKey . '-01')->format('Y-m-d');
+        $allocation_date = Carbon::parse($request->monthKey.'-01')->format('Y-m-d');
         $allocation = Allocation::where('projects_id', $request->projectId)
             ->where('resources_id', $request->resourceId)
             ->where('allocation_date', $allocation_date)
             ->first();
         $resources = Resource::all();
         $projects = Project::all();
-        $form_type = "one";
+        $form_type = 'one';
 
         return view('allocation.edit', compact('allocation', 'resources', 'projects', 'form_type'));
     }
@@ -255,6 +252,7 @@ class AllocationController extends Controller
     {
         $allocation->update($request->validated());
         $this->cacheService->cacheResourceAllocation();
+
         return Redirect::route('allocations.index')
             ->with('success', 'Allocation updated successfully');
     }
@@ -262,7 +260,7 @@ class AllocationController extends Controller
     public function destroy($id): RedirectResponse
     {
         $user = Auth::user();
-        if (!$user->can('allocations.delete')) {
+        if (! $user->can('allocations.delete')) {
             return Redirect::route('allocations.index')->with('warning', 'You do not have the necessary permissions to view the allocations page.');
         }
         Allocation::find($id)->delete();
@@ -270,5 +268,4 @@ class AllocationController extends Controller
         return Redirect::route('allocations.index')
             ->with('success', 'Allocation deleted successfully');
     }
-
 }

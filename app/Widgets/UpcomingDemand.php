@@ -2,11 +2,10 @@
 
 namespace App\Widgets;
 
-use Arrilot\Widgets\AbstractWidget;
-use Carbon\Carbon;
 use App\Models\Demand;
 use App\Models\Project;
-use Illuminate\Support\Facades\Log;
+use Arrilot\Widgets\AbstractWidget;
+use Carbon\Carbon;
 
 class UpcomingDemand extends AbstractWidget
 {
@@ -65,7 +64,7 @@ class UpcomingDemand extends AbstractWidget
                     ->where('projects_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
-                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
@@ -76,7 +75,7 @@ class UpcomingDemand extends AbstractWidget
 
         $yearMonthSums = [];
         foreach ($nextThreeMonths as $month) {
-            $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+            $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
             $yearMonthSums[$key] = 0;
         }
         foreach ($demandArray as $projectId => $projectInfo) {
@@ -85,14 +84,14 @@ class UpcomingDemand extends AbstractWidget
                 // $date = Carbon::createFromFormat('Y-m', $yearMonth);
                 // $yearMonthShortName = $date->format('M');
 
-                if (!isset($yearMonthSums[$yearMonth])) {
+                if (! isset($yearMonthSums[$yearMonth])) {
                     $yearMonthSums[$yearMonth] = 0;
                 }
                 $yearMonthSums[$yearMonth] += (float) $demand;
             }
         }
 
-        //sort by month and then convert to month short name
+        // sort by month and then convert to month short name
         ksort($yearMonthSums);
         foreach ($yearMonthSums as $yearMonth => $sum) {
             $date = Carbon::createFromFormat('Y-m', $yearMonth);

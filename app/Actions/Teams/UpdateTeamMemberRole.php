@@ -42,9 +42,8 @@ class UpdateTeamMemberRole
     /**
      * Ensure that the team member is not the owner of the team.
      *
-     * @param  int  $teamMemberId The id member being removed
-     * @param  mixed  $team       The team to check ownership against
-     * @return void
+     * @param  int  $teamMemberId  The id member being removed
+     * @param  mixed  $team  The team to check ownership against
      *
      * @throws ValidationException
      */

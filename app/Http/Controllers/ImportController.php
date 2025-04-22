@@ -2,34 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Resource;
-use App\Models\Project;
-use App\Models\Demand;
 use App\Models\Allocation;
 use App\Models\ChangeRequest;
-use App\Models\ResourceType;
-use App\Models\Region;
+use App\Models\Demand;
+use App\Models\Project;
 use App\Models\PublicHoliday;
-use \avadim\FastExcelReader\Excel;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Artisan;
+use App\Models\Region;
+use App\Models\Resource;
+use App\Models\ResourceType;
 use App\Services\CacheService;
+use avadim\FastExcelReader\Excel;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ImportController extends Controller
 {
     protected $cacheService;
-    //excel columns
+
+    // excel columns
     private $columnResourceName = 'A';
+
     private $columnEmpowerID = 'B';
+
     private $columnProjectName = 'C';
+
     private $columnProjectOwner = 'D';
+
     private $columnProjectStatus = 'E';
+
     private $columnProjectStart = 'F';
+
     private $columnProjectEnd = 'G';
+
     private $columnDataStart = 'H';
 
     public function __construct(CacheService $cacheService)
@@ -41,6 +48,7 @@ class ImportController extends Controller
     {
         return view('import.index');
     }
+
     /**
      * This function is used to populate the allocations table with data from an uploaded
      * Excel file. The Excel file should have the following columns:
@@ -58,7 +66,6 @@ class ImportController extends Controller
      * if so, it will insert the data into the Demand table. If the resource type does not
      * exist, it will insert the data into the Allocations table.
      *
-     * @param Request $request
      * @return RedirectResponse
      */
     public function populateAllocations(Request $request)
@@ -92,7 +99,7 @@ class ImportController extends Controller
                     // Step through columns 'G' on until blank, capture each filled column into array as monthYear
                     $monthYear = [];
                     foreach ($rowData as $columnLetter => $columnValue) {
-                        if ($columnLetter >= $this->columnDataStart && !is_null($columnValue)) {
+                        if ($columnLetter >= $this->columnDataStart && ! is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
                         }
@@ -106,14 +113,14 @@ class ImportController extends Controller
                     $resourceNameLower = strtolower($resourceName);
                     $contains = in_array($resourceNameLower, $resourceTypes);
 
-                    if (!$contains) {
+                    if (! $contains) {
                         $resource = Resource::where('empowerID', $resourceName)->first();
                         $resourceID = $resource->id ?? null;
                         if (is_null($resourceID)) {
                             $missingResources[] = $resourceName;
                         } else {
                             $projectID = $this->checkProject($rowData);
-                            //check the month allocations
+                            // check the month allocations
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(ord($this->columnDataStart) + $i);
                                 $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
@@ -121,10 +128,10 @@ class ImportController extends Controller
                                     ->where('projects_id', $projectID)
                                     ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
                                     ->first();
-                                //if its a change
+                                // if its a change
                                 if ($existingAllocation && $existingAllocation->fte != $fte) {
                                     // Log::info("Warning: FTE for resource {$resourceName} on project {$projectID} on date {$monthYear[$i]} has changed from {$existingAllocation->fte} to $fte");
-                                    //'user' = Importer
+                                    // 'user' = Importer
                                     ChangeRequest::create([
                                         'record_type' => Allocation::class,
                                         'record_id' => $existingAllocation->id,
@@ -134,24 +141,23 @@ class ImportController extends Controller
                                         'status' => 'pending',
                                         // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                     ]);
-                                } elseif (!$existingAllocation) {
+                                } elseif (! $existingAllocation) {
                                     Allocation::create([
                                         'resources_id' => $resourceID,
                                         'projects_id' => $projectID,
                                         'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'),
                                         'fte' => $fte,
                                         'status' => 'Proposed',
-                                        'source' => 'Imported'
+                                        'source' => 'Imported',
                                     ]);
                                 }
-
 
                             }
                         }
                     } else { // Insert these into demand
                         $projectID = $this->checkProject($rowData);
                         // first replace the "resource name" with a resource_type id
-                        $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
+                        $resourceType = ResourceType::where('name', 'LIKE', $resourceName.'%')->first();
                         $rowData[$this->columnResourceName] = $resourceType->id;
                         // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
                         for ($i = 0; $i < count($monthYear); $i++) {
@@ -160,7 +166,7 @@ class ImportController extends Controller
                             $existingDemand = Demand::where('projects_id', $projectID)
                                 ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
                                 ->first();
-                            //if its a change
+                            // if its a change
                             if ($existingDemand && $existingDemand->fte != $fte) {
                                 // Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
                                 ChangeRequest::create([
@@ -172,7 +178,7 @@ class ImportController extends Controller
                                     'status' => 'pending',
                                     // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                 ]);
-                            } elseif (!$existingDemand) {
+                            } elseif (! $existingDemand) {
 
                                 $resourceType = ResourceType::where('name', 'like', "$resourceName%")->first();
                                 $resourceTypeId = $resourceType ? $resourceType->id : $resourceName;
@@ -183,7 +189,7 @@ class ImportController extends Controller
                                     'fte' => $fte,
                                     'resource_type' => $resourceTypeId,
                                     'status' => 'Proposed',
-                                    'source' => 'Imported'
+                                    'source' => 'Imported',
                                 ]);
                             }
 
@@ -193,26 +199,26 @@ class ImportController extends Controller
             }
         }
 
-        //update the cache
+        // update the cache
         $this->cacheService->cacheResourceAllocation();
 
-        if (!empty($missingResources)) {
+        if (! empty($missingResources)) {
             $missingResourceList = implode(', ', $missingResources);
+
             return redirect()->back()->with('error', "The following resources were not found: $missingResourceList");
         } else {
             return redirect()->back()->with('success', 'Data staged successfully for further processing.');
         }
     }
 
-        /**
-         * Given a row of data from the import file, this function checks if the project exists,
-         * and if it does, checks if the start and end dates have changed. It then creates or
-         * updates the project in the database.
-         *
-         * @param array $rowData the row of data from the import file
-         *
-         * @return int the id of the project in the database
-         */
+    /**
+     * Given a row of data from the import file, this function checks if the project exists,
+     * and if it does, checks if the start and end dates have changed. It then creates or
+     * updates the project in the database.
+     *
+     * @param  array  $rowData  the row of data from the import file
+     * @return int the id of the project in the database
+     */
     private function checkProject($rowData)
     {
         $empowerID = $rowData[$this->columnEmpowerID];
@@ -221,34 +227,33 @@ class ImportController extends Controller
         $projectID = $project->id ?? null;
         $projectStatus = $rowData[$this->columnProjectStatus];
         $projectOwner = $rowData[$this->columnProjectOwner];
-        //clean up projectOwner - truncate any org suffix that may be in there
+        // clean up projectOwner - truncate any org suffix that may be in there
         $projectOwner = preg_replace('/\s*\([^)]*\)\s*$/', '', $projectOwner);
         $projectOwner = trim($projectOwner);
-        //data is in excel like 15/05/24 needs to be in 2024-05-15
+        // data is in excel like 15/05/24 needs to be in 2024-05-15
         $projectStart = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectStart])->format('Y-m-d');
         $projectEnd = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectEnd])->format('Y-m-d');
-        //check if project exists and check start and end for changes
-        if (!is_null($projectID)) {
+        // check if project exists and check start and end for changes
+        if (! is_null($projectID)) {
             $projectInDB = Project::find($projectID);
             if ($projectInDB->start_date != $projectStart || $projectInDB->end_date != $projectEnd) {
                 // do stuff later if we need to
             }
         }
-        //for the moment we won't handle changes
+        // for the moment we won't handle changes
         $project = Project::updateOrCreate(
             ['empowerID' => $empowerID],
             [
                 'name' => $projectName,
                 'start_date' => $projectStart,
                 'end_date' => $projectEnd,
-                'projectManager' => $projectOwner
+                'projectManager' => $projectOwner,
             ]
         );
         $projectID = $project->id;
 
         return $projectID;
     }
-
 
     public function reviewDemands()
     {
@@ -266,7 +271,7 @@ class ImportController extends Controller
                 $demand = $demand->where('demand_date', $stagedDemand->demand_date)->first();
             }
 
-            //If we have an existing demand then process as a change
+            // If we have an existing demand then process as a change
             if ($demand) {
                 if ($stagedDemand->fte != $demand->fte) {
                     $lastChange = end($changes);
@@ -293,7 +298,7 @@ class ImportController extends Controller
                     }
                 }
             } else {
-                //Check if this demand has already been allocated
+                // Check if this demand has already been allocated
                 $allocation = Allocation::where('projects_id', $stagedDemand->projects_id)
                     ->where('allocation_date', $stagedDemand->demand_date)
                     ->first();
@@ -301,7 +306,7 @@ class ImportController extends Controller
                 if ($allocation) {
                     continue;
                 }
-                //otherise compact if there are sequential identical FTE allocations
+                // otherise compact if there are sequential identical FTE allocations
                 $lastChange = end($changes);
 
                 if (
@@ -329,7 +334,6 @@ class ImportController extends Controller
 
         return view('import.reviewDemands', compact('changes'));
     }
-
 
     public function reviewAllocations()
     {
@@ -396,6 +400,7 @@ class ImportController extends Controller
 
         return view('import.reviewAllocations', compact('changes'));
     }
+
     public function handleReviewAction(Request $request)
     {
         $referringURL = $request->headers->get('referer');
@@ -413,7 +418,7 @@ class ImportController extends Controller
             if ($action === 'Accept') {
                 // Handle acceptance logic for Demand
                 // Example: Update Demand model with new data
-                Log::info("accepted demand: " . print_r($change, true));
+                Log::info('accepted demand: '.print_r($change, true));
                 if ($change['end'] = $change['start']) {
                     $project = Project::where('name', $change['project'])->first();
                     $change['project_id'] = $project->id;
@@ -455,7 +460,7 @@ class ImportController extends Controller
             } elseif ($action === 'Reject') {
                 // Handle rejection logic for Demand
                 // Example: Remove or ignore changes
-                Log::info("rejected demand: " . print_r($change, true));
+                Log::info('rejected demand: '.print_r($change, true));
                 StagingDemand::where('id', $change['id'])->update(['status' => 'Rejected']);
             }
         } elseif ($type === 'Allocation') {
@@ -471,7 +476,7 @@ class ImportController extends Controller
                 StagingAllocation::where('id', $change['id'])->delete();
                 Artisan::call('app:refresh-cache');
             } elseif ($action === 'Reject') {
-                Log::info("rejected allocation: " . print_r($change, true));
+                Log::info('rejected allocation: '.print_r($change, true));
                 StagingAllocation::where('id', $change['id'])->update(['status' => 'Rejected']);
                 Artisan::call('app:refresh-cache');
             }
@@ -481,11 +486,10 @@ class ImportController extends Controller
         return redirect($referringURL)->with('success', 'Action processed successfully.');
     }
 
-
     public function importHolidays()
     {
         $url = 'https://data.gov.au/data/dataset/b1bc6077-dadd-4f61-9f8c-002ab2cdff10/resource/33673aca-0857-42e5-b8f0-9981b4755686/download/australian-public-holidays-combined-2021-2025.csv';
-        $client = new \GuzzleHttp\Client();
+        $client = new \GuzzleHttp\Client;
         $response = $client->get($url);
         $stream = $response->getBody();
         $rows = array_map('str_getcsv', explode("\n", $stream));
@@ -504,11 +508,11 @@ class ImportController extends Controller
                 ];
                 PublicHoliday::updateOrCreate([
                     'region_id' => $region->id,
-                    'date' => $holiday['Date']
+                    'date' => $holiday['Date'],
                 ], $holidayData);
             }
         }
+
         return redirect()->back()->with('success', 'Public Holidays imported successfully.');
     }
-
 }

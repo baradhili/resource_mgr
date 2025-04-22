@@ -2,12 +2,12 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use App\Models\Plugin;
+use Illuminate\Support\ServiceProvider;
 
 class ModuleServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         $this->registerModules();
     }
@@ -27,7 +27,7 @@ class ModuleServiceProvider extends ServiceProvider
         $moduleType = $module->get('type'); // Assuming each module has a type in its module.json
         $moduleDescription = $module->get('description'); // Assuming each module has a description in its module.json
 
-        if (!\Schema::hasTable('plugins')) {
+        if (! \Schema::hasTable('plugins')) {
             return;
         }
 

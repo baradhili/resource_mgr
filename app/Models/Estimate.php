@@ -1,13 +1,11 @@
 <?php
 
 namespace App\Models;
-use App\Models\User;
-use App\Models\Assumption;
-use App\Models\Item;
-use App\Models\Risk;
-use App\Models\Scope;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Class Estimate
@@ -22,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property $allows_to_select_items
  * @property $tags
  * @property $total_cost
- *
  * @property-read User $created_by
  * @property-read User $estimator
  * @property-read User $partner
@@ -31,12 +28,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read Item[] $items
  * @property-read Risk[] $risks
  * @property-read Scope $scope
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Estimate extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -46,69 +42,43 @@ class Estimate extends Model
      */
     protected $fillable = ['name', 'use_name_as_title', 'expiration_date', 'currency_symbol', 'currency_decimal_separator', 'currency_thousands_separator', 'allows_to_select_items', 'tags', 'estimate_owner', 'partner', 'total_cost', 'created_by', 'updated_by'];
 
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function creator()
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function estimator()
+
+    public function estimator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'estimate_owner', 'id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function seller()
+
+    public function seller(): BelongsTo
     {
         return $this->belongsTo(User::class, 'partner', 'id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function last_updated_by()
+
+    public function last_updated_by(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function assumptions()
+
+    public function assumptions(): HasMany
     {
         return $this->hasMany(Assumption::class, 'id', 'estimate_id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function items()
+
+    public function items(): HasMany
     {
         return $this->hasMany(Item::class, 'id', 'estimate_id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function risks()
+
+    public function risks(): HasMany
     {
         return $this->hasMany(Risk::class, 'id', 'estimate_id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function scope()
+
+    public function scope(): HasOne
     {
         return $this->hasOne(Scope::class, 'id', 'estimate_id');
     }
-    
 }

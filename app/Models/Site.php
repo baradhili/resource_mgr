@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Site
@@ -12,14 +13,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $description
  * @property $created_at
  * @property $updated_at
- *
  * @property Request[] $requests
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Site extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -29,13 +28,8 @@ class Site extends Model
      */
     protected $fillable = ['name', 'description'];
 
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function requests()
+    public function requests(): HasMany
     {
         return $this->hasMany(\App\Models\Request::class, 'id', 'site_id');
     }
-    
 }

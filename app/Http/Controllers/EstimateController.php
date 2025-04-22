@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EstimateRequest;
 use App\Models\Estimate;
 use App\Models\Service;
 use App\Models\TermsAndCondition;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\EstimateRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -30,17 +29,17 @@ class EstimateController extends Controller
      */
     public function create(): View
     {
-        $estimate = new Estimate();
+        $estimate = new Estimate;
         $services = Service::all();
         $termsAndConditions = TermsAndCondition::all();
 
-        return view('estimate.create', compact('estimate','services', 'termsAndConditions'));
+        return view('estimate.create', compact('estimate', 'services', 'termsAndConditions'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse //EstimateRequest
+    public function store(Request $request): RedirectResponse // EstimateRequest
     {
         Estimate::create($request->validated());
 
@@ -54,7 +53,6 @@ class EstimateController extends Controller
     public function show($id): View
     {
         $estimate = Estimate::find($id);
-        
 
         return view('estimate.show', compact('estimate'));
     }
@@ -68,7 +66,7 @@ class EstimateController extends Controller
         $services = Service::all();
         $termsAndConditions = TermAsndCondition::all();
 
-        return view('estimate.edit', compact('estimate','services', 'termsAndConditions'));
+        return view('estimate.edit', compact('estimate', 'services', 'termsAndConditions'));
     }
 
     /**

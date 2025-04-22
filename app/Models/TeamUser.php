@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class TeamUser
@@ -11,18 +12,19 @@ use Illuminate\Database\Eloquent\Model;
  * @property $team_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class TeamUser extends Model
 {
     protected $fillable = ['user_id', 'team_id'];
+
     protected $table = 'team_user';
 
     /**
      * Get the user associated with the team user.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
     }
@@ -30,7 +32,7 @@ class TeamUser extends Model
     /**
      * Get the team associated with the team user.
      */
-    public function team()
+    public function team(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Team::class, 'team_id', 'id');
     }

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DomainRequest;
 use App\Models\Domain;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\DomainRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -27,7 +27,7 @@ class DomainController extends Controller
      */
     public function create(): View
     {
-        $domain = new Domain();
+        $domain = new Domain;
 
         return view('domain.create', compact('domain'));
     }

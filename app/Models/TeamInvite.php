@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class TeamInvite
@@ -16,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $deny_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class TeamInvite extends Model
@@ -33,7 +34,7 @@ class TeamInvite extends Model
     /**
      * Get the user associated with the team invite.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class);
     }
@@ -41,7 +42,7 @@ class TeamInvite extends Model
     /**
      * Get the team associated with the team invite.
      */
-    public function team()
+    public function team(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Team::class);
     }

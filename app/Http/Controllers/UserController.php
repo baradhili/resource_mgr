@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Models\Team;
-use App\Models\Resource;
+use App\Http\Requests\UserRequest;
 use App\Models\Location;
 use App\Models\Region;
+use App\Models\Resource;
 use App\Models\Role;
+use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\UserRequest;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserController extends Controller
 {
@@ -50,7 +50,7 @@ class UserController extends Controller
      */
     public function create(): View
     {
-        $user = new User();
+        $user = new User;
         $users = User::all();
         $teams = Team::all();
         $roles = Role::all();
@@ -82,6 +82,7 @@ class UserController extends Controller
     {
         $user = User::with('roles')->find($id);
         $reportees = $user->reportees; // Get the people who report to this user
+
         return view('user.show', compact('user', 'reportees'));
     }
 
@@ -95,6 +96,7 @@ class UserController extends Controller
         $teams = Team::all();
         $resources = Resource::all();
         $roles = Role::all();
+
         return view('user.edit', compact('user', 'roles', 'users', 'teams', 'resources'));
     }
 
@@ -135,7 +137,7 @@ class UserController extends Controller
             } 
         }
 
-        //sync using spatie/permissions calls
+        // sync using spatie/permissions calls
         $user->syncRoles($roles);
 
         return Redirect::route('users.index')
@@ -160,7 +162,7 @@ class UserController extends Controller
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($reportees as $reportee) {
-            if ($reportee->resource && isset($reportee->resource->contracts[0]) && !$reportee->resource->contracts[0]->permanent) {
+            if ($reportee->resource && isset($reportee->resource->contracts[0]) && ! $reportee->resource->contracts[0]->permanent) {
                 $reportee->name .= ' [c]';
             }
         }
@@ -174,7 +176,6 @@ class UserController extends Controller
         $skills = $resource ? $resource->skills : [(object) ['skill_name' => 'Unknown Skills']];
         // Log::info("roles available: " . json_encode($roles));
         // Log::info("current roles" . json_encode($userRoles));
-
 
         return view('user.profile', compact('user', 'userRoles', 'reportees', 'region', 'location', 'reports', 'resource', 'skills'));
     }

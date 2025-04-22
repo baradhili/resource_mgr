@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Role
@@ -12,15 +13,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property $guard_name
  * @property $created_at
  * @property $updated_at
- *
  * @property ModelHasRole[] $modelHasRoles
  * @property RoleHasPermission[] $roleHasPermissions
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Role extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -30,21 +29,13 @@ class Role extends Model
      */
     protected $fillable = ['name', 'guard_name'];
 
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function modelHasRoles()
+    public function modelHasRoles(): HasMany
     {
         return $this->hasMany(\App\Models\ModelHasRole::class, 'id', 'role_id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function roleHasPermissions()
+
+    public function roleHasPermissions(): HasMany
     {
         return $this->hasMany(\App\Models\RoleHasPermission::class, 'id', 'role_id');
     }
-    
 }

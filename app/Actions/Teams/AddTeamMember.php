@@ -18,9 +18,8 @@ class AddTeamMember implements AddsTeamMembers
      *
      * @param  mixed  $user  The user initiating the action
      * @param  mixed  $team  The team to which the member is being added
-     * @param  string $email  Email of the member to be added
-     * @param  string|null $role  Role of the member within the team
-     * @return void
+     * @param  string  $email  Email of the member to be added
+     * @param  string|null  $role  Role of the member within the team
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      * @throws ValidationException
@@ -40,13 +39,12 @@ class AddTeamMember implements AddsTeamMembers
         TeamMemberAdded::dispatch($team, $member);
     }
 
-
     /**
      * Validate the add member operation.
      *
      * @param  mixed  $team  The team to which the member is being added
-     * @param  string $email  Email of the member to be added
-     * @param  string|null $role  Role of the member within the team
+     * @param  string  $email  Email of the member to be added
+     * @param  string|null  $role  Role of the member within the team
      * @return void
      *
      * @throws ValidationException
@@ -66,9 +64,6 @@ class AddTeamMember implements AddsTeamMembers
 
     /**
      * Get the validation rules for adding a team member.
-     *
-     * @param  mixed  $team
-     * @return array
      */
     protected function rules(mixed $team): array
     {
@@ -80,10 +75,6 @@ class AddTeamMember implements AddsTeamMembers
 
     /**
      * Ensure the user is not already a member of the team.
-     *
-     * @param  mixed  $team
-     * @param  string $email
-     * @return Closure
      */
     protected function ensureUserIsNotAlreadyOnTeam(mixed $team, string $email): Closure
     {

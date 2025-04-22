@@ -2,10 +2,9 @@
 
 namespace App\Widgets;
 
+use App\Models\Resource;
 use Arrilot\Widgets\AbstractWidget;
 use Carbon\Carbon;
-use App\Models\Resource;
-use Illuminate\Support\Facades\Log;
 
 class ResourceAvailability extends AbstractWidget
 {
@@ -76,12 +75,12 @@ class ResourceAvailability extends AbstractWidget
                             $baseAvailability = $currentContract->availability;
                         }
                         // Use year-month as the key
-                        $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                        $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                         // Add the calculated base availability to the resource availability array
                         $resourceAvailability[$resource->id]['availability'][$key] = $baseAvailability;
                     }
-                    //now check for leave
+                    // now check for leave
                     foreach ($resource->leaves as $leave) {
                         $leaveStartDate = Carbon::parse($leave->start_date);
                         $leaveEndDate = Carbon::parse($leave->end_date);
@@ -105,7 +104,7 @@ class ResourceAvailability extends AbstractWidget
                                 $leaveAvailability = 1.00;
                             }
                             // Use year-month as the key
-                            $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                            $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                             // Add the calculated base availability to the resource availability array
                             $resourceAvailability[$resource->id]['availability'][$key] = $resourceAvailability[$resource->id]['availability'][$key] - $leaveAvailability;
@@ -125,13 +124,12 @@ class ResourceAvailability extends AbstractWidget
                 $date = Carbon::createFromFormat('Y-m', $yearMonth);
                 $yearMonthShortName = $date->format('M');
 
-                if (!isset($yearMonthSums[$yearMonthShortName])) {
+                if (! isset($yearMonthSums[$yearMonthShortName])) {
                     $yearMonthSums[$yearMonthShortName] = 0;
                 }
                 $yearMonthSums[$yearMonthShortName] += $availability;
             }
         }
-
 
         return view('widgets.resource_availability', [
             'config' => $this->config,

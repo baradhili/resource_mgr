@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class PublicHoliday
@@ -13,14 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $region_id
  * @property $created_at
  * @property $updated_at
- *
  * @property Region $region
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class PublicHoliday extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -30,13 +29,8 @@ class PublicHoliday extends Model
      */
     protected $fillable = ['date', 'name', 'region_id'];
 
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function region()
+    public function region(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id');
     }
-    
 }

@@ -22,9 +22,9 @@ class ProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'empowerID' => 'string',
-			'name' => 'string',
-			'projectManager' => 'string',
+            'empowerID' => 'string',
+            'name' => 'string',
+            'projectManager' => 'string',
         ];
     }
 }

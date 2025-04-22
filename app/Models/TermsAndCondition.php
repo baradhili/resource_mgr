@@ -15,12 +15,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property $created_at
  * @property $updated_at
  *
- * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class TermsAndCondition extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -29,6 +27,4 @@ class TermsAndCondition extends Model
      * @var array<int, string>
      */
     protected $fillable = ['payment_terms', 'validity', 'assumptions', 'change_management'];
-
-
 }

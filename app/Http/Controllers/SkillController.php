@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SkillRequest;
 use App\Models\Skill;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\SkillRequest;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-
+use Illuminate\View\View;
 
 class SkillController extends Controller
 {
@@ -31,7 +30,7 @@ class SkillController extends Controller
      */
     public function create(): View
     {
-        $skill = new Skill();
+        $skill = new Skill;
 
         return view('skill.create', compact('skill'));
     }
@@ -141,4 +140,3 @@ class SkillController extends Controller
             ->with('success', "{$count} Skills imported successfully");
     }
 }
-

@@ -22,9 +22,9 @@ class AssumptionRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'description' => 'required|string',
-			'impact' => 'required|string',
-			'estimate_id' => 'required',
+            'description' => 'required|string',
+            'impact' => 'required|string',
+            'estimate_id' => 'required',
         ];
     }
 }

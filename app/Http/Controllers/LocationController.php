@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LocationRequest;
 use App\Models\Location;
 use App\Models\Region;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\LocationRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
-
 
 class LocationController extends Controller
 {
@@ -30,7 +28,7 @@ class LocationController extends Controller
      */
     public function create(): View
     {
-        $location = new Location();
+        $location = new Location;
         $regions = Region::all();
 
         return view('location.create', compact('location', 'regions'));

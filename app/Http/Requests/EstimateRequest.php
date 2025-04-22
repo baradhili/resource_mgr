@@ -22,17 +22,17 @@ class EstimateRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'name' => 'required|string',
-			'use_name_as_title' => 'required',
-			'expiration_date' => 'required',
-			'currency_symbol' => 'required|string',
-			'currency_decimal_separator' => 'required|string',
-			'currency_thousands_separator' => 'required|string',
-			'allows_to_select_items' => 'required',
-			'tags' => 'required|string',
-			'estimate_owner' => 'required',
-			'partner' => 'required',
-			'total_cost' => 'required',
+            'name' => 'required|string',
+            'use_name_as_title' => 'required',
+            'expiration_date' => 'required',
+            'currency_symbol' => 'required|string',
+            'currency_decimal_separator' => 'required|string',
+            'currency_thousands_separator' => 'required|string',
+            'allows_to_select_items' => 'required',
+            'tags' => 'required|string',
+            'estimate_owner' => 'required',
+            'partner' => 'required',
+            'total_cost' => 'required',
         ];
     }
 }

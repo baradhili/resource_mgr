@@ -22,9 +22,9 @@ class RiskRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'potential_risks' => 'required|string',
-			'mitigation_steps' => 'required|string',
-			'estimate_id' => 'required',
+            'potential_risks' => 'required|string',
+            'mitigation_steps' => 'required|string',
+            'estimate_id' => 'required',
         ];
     }
 }

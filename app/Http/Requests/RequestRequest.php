@@ -22,17 +22,17 @@ class RequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'business_partner' => 'string',
-			'request_title' => 'string',
-			'background' => 'string',
-			'business_need' => 'string',
-			'problem_statement' => 'string',
-			'specific_requirements' => 'string',
-			'wbs_number' => 'string',
-			'business_value' => 'string',
-			'business_unit' => 'string',
-			'additional_expert_contact' => 'string',
-			'resource_type' => 'string',
+            'business_partner' => 'string',
+            'request_title' => 'string',
+            'background' => 'string',
+            'business_need' => 'string',
+            'problem_statement' => 'string',
+            'specific_requirements' => 'string',
+            'wbs_number' => 'string',
+            'business_value' => 'string',
+            'business_unit' => 'string',
+            'additional_expert_contact' => 'string',
+            'resource_type' => 'string',
         ];
     }
 }
