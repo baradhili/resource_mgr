@@ -110,7 +110,7 @@ Route::middleware('auth')->group(function () {
 /**
  * Teamwork routes
  */
-Route::prefix('teams')->namespace('Teamwork')->group(function () {
+Route::prefix('teams')->group(function () {
     Route::get('/', [App\Http\Controllers\Teamwork\TeamController::class, 'index'])->name('teams.index');
     Route::get('create', [App\Http\Controllers\Teamwork\TeamController::class, 'create'])->name('teams.create');
     Route::post('teams', [App\Http\Controllers\Teamwork\TeamController::class, 'store'])->name('teams.store');
