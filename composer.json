@@ -16,7 +16,7 @@
     "require": {
         "php": "^8.1",
         "arrilot/laravel-widgets": "^3.14",
-        "avadim/fast-excel-laravel": "^2.7",
+        "avadim/fast-excel-laravel": "^2.8",
         "brunocfalcao/blade-feather-icons": "^4.0",
         "deployer/deployer": "^7.5",
         "filament/filament": "*",
@@ -24,7 +24,6 @@
         "graham-campbell/markdown": "^15.2",
         "guzzlehttp/guzzle": "^7.9",
         "laravel/framework": "^10.10",
-        "laravel/sanctum": "^3.3",
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.5",
@@ -34,8 +33,7 @@
         "phpoffice/phpspreadsheet": "^3.4",
         "spatie/laravel-menu": "^4.2",
         "spatie/laravel-permission": "^6.10",
-        "symfony/dom-crawler": "^7.2",
-        "yajra/laravel-datatables": "^10.0"
+        "symfony/dom-crawler": "^7.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.14",
