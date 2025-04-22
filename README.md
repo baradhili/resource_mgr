@@ -1,6 +1,8 @@
 ## Resource Manager
 
-!\[coderabbit\](https://img.shields.io/coderabbit/prs/github/baradhili/resource_mgr)
+!\[ coderabbit \](https://img.shields.io/coderabbit/prs/github/baradhili/resource_mgr)
+
+!\[my badge\](https://badgen.net/badge/hello/world/red?icon=twitter)
 
 This tool is initially to help manage demand and resource levelling across many projects in an enterprise. 
 At this stage it expects input from a powerBi report out of Microsoft Project Server and thus works on allocations per month rather than project tasks.
