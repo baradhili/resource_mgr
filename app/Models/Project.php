@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -36,7 +37,7 @@ class Project extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function allocations()
+    public function allocations(): HasMany
     {
         return $this->hasMany(\App\Models\Allocation::class, 'projects_id', 'id');
     }
@@ -44,7 +45,7 @@ class Project extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function demands()
+    public function demands(): HasMany
     {
         return $this->hasMany(\App\Models\Demand::class, 'projects_id', 'id');
     }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -23,7 +24,7 @@ class TeamUser extends Model
     /**
      * Get the user associated with the team user.
      */
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id', 'id');
     }
@@ -31,7 +32,7 @@ class TeamUser extends Model
     /**
      * Get the team associated with the team user.
      */
-    public function team()
+    public function team(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Team::class, 'team_id', 'id');
     }

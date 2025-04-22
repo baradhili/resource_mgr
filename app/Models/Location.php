@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -31,7 +33,7 @@ class Location extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function region()
+    public function region(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id');
     }
@@ -39,7 +41,7 @@ class Location extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function resources()
+    public function resources(): HasMany
     {
         return $this->hasMany(\App\Models\Resource::class, 'id', 'location_id');
     }

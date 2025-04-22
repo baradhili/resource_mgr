@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('scopes', function (Blueprint $table) {
             // Add the foreign key column
@@ -20,7 +20,7 @@ return new class extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::table('scopes', function (Blueprint $table) {
             $table->dropForeign(['estimate_id']);

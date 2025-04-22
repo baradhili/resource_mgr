@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -42,7 +45,7 @@ class Estimate extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function creator()
+    public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
@@ -50,7 +53,7 @@ class Estimate extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function estimator()
+    public function estimator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'estimate_owner', 'id');
     }
@@ -58,7 +61,7 @@ class Estimate extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function seller()
+    public function seller(): BelongsTo
     {
         return $this->belongsTo(User::class, 'partner', 'id');
     }
@@ -66,7 +69,7 @@ class Estimate extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function last_updated_by()
+    public function last_updated_by(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
@@ -74,7 +77,7 @@ class Estimate extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function assumptions()
+    public function assumptions(): HasMany
     {
         return $this->hasMany(Assumption::class, 'id', 'estimate_id');
     }
@@ -82,7 +85,7 @@ class Estimate extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function items()
+    public function items(): HasMany
     {
         return $this->hasMany(Item::class, 'id', 'estimate_id');
     }
@@ -90,7 +93,7 @@ class Estimate extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function risks()
+    public function risks(): HasMany
     {
         return $this->hasMany(Risk::class, 'id', 'estimate_id');
     }
@@ -98,7 +101,7 @@ class Estimate extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function scope()
+    public function scope(): HasOne
     {
         return $this->hasOne(Scope::class, 'id', 'estimate_id');
     }

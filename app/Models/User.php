@@ -3,6 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Glorand\Model\Settings\Traits\HasSettingsField;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -57,7 +60,7 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function teamUsers()
+    public function teamUsers(): HasMany
     {
         return $this->hasMany(TeamUser::class, 'user_id');
     }
@@ -67,7 +70,7 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function reportingLine()
+    public function reportingLine(): HasOne
     {
         return $this->hasOne(User::class, 'id', 'reports');
     }
@@ -77,7 +80,7 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function reportees()
+    public function reportees(): HasMany
     {
         return $this->hasMany(User::class, 'reports', 'id');
     }
@@ -87,7 +90,7 @@ class User extends Authenticatable
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function resource()
+    public function resource(): BelongsTo
     {
         return $this->belongsTo(Resource::class, 'resource_id');
     }

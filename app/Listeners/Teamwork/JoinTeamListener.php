@@ -11,7 +11,7 @@ class JoinTeamListener
      *
      * @param  mixed  $event
      */
-    public function handle($event)
+    public function handle($event): void
     {
         if (session('invite_token')) {
             if ($invite = Teamwork::getInviteFromAcceptToken(session('invite_token'))) {

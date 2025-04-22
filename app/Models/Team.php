@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mpociot\Teamwork\TeamworkTeam;
 
 /**
@@ -30,12 +32,12 @@ class Team extends TeamworkTeam
      */
     protected $fillable = ['owner_id', 'name', 'resource_type'];
 
-    public function parentTeam()
+    public function parentTeam(): BelongsTo
     {
         return $this->belongsTo(Team::class, 'parent_team_id');
     }
 
-    public function subTeams()
+    public function subTeams(): HasMany
     {
         return $this->hasMany(Team::class, 'parent_team_id');
     }

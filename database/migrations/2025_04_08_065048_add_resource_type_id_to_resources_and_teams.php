@@ -10,7 +10,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('resources', function (Blueprint $table) {
             $table->renameColumn('resource_type', 'resource_type_temp');
@@ -70,7 +70,7 @@ return new class extends Migration
     /**
      * Reverse the migrations.
      */
-    public function down()
+    public function down(): void
     {
         // Add the temporary resource_type_temp columns back
         Schema::table('resources', function (Blueprint $table) {

@@ -44,7 +44,7 @@ class refreshCache extends Command
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->cacheService->cacheResourceAvailability();
         $this->cacheService->cacheResourceAllocation();

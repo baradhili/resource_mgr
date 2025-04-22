@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -32,7 +33,7 @@ class Scope extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function estimate()
+    public function estimate(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Estimate::class, 'estimate_id', 'id');
     }

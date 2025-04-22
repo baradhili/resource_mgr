@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -41,7 +42,7 @@ class Skill extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function resourceSkills()
+    public function resourceSkills(): HasMany
     {
         return $this->hasMany(\App\Models\ResourceSkill::class, 'id', 'skills_id');
     }

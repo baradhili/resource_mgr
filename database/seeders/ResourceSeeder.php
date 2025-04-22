@@ -20,7 +20,7 @@ class ResourceSeeder extends CsvSeeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         // Recommended when importing larger CSVs
         DB::disableQueryLog();

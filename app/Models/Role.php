@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -31,7 +32,7 @@ class Role extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function modelHasRoles()
+    public function modelHasRoles(): HasMany
     {
         return $this->hasMany(\App\Models\ModelHasRole::class, 'id', 'role_id');
     }
@@ -39,7 +40,7 @@ class Role extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function roleHasPermissions()
+    public function roleHasPermissions(): HasMany
     {
         return $this->hasMany(\App\Models\RoleHasPermission::class, 'id', 'role_id');
     }

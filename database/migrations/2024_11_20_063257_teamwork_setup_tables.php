@@ -10,7 +10,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table(\Config::get('teamwork.users_table'), function (Blueprint $table) {
             $table->integer('current_team_id')->unsigned()->nullable();
@@ -46,7 +46,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table(\Config::get('teamwork.users_table'), function (Blueprint $table) {
             $table->dropColumn('current_team_id');
