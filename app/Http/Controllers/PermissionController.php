@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Spatie\Permission\Models\Permission;
+use App\Http\Requests\PermissionRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\PermissionRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
-    public function __construct() //TODO change once perms seeded
+    public function __construct() // TODO change once perms seeded
     {
         // $this->middleware('permission:view', ['only' => ['index']]);
         // $this->middleware('permission:create', ['only' => ['create','store']]);
@@ -35,7 +35,7 @@ class PermissionController extends Controller
      */
     public function create(): View
     {
-        $permission = new Permission();
+        $permission = new Permission;
 
         return view('permission.create', compact('permission'));
     }
@@ -49,16 +49,16 @@ class PermissionController extends Controller
             'name' => [
                 'required',
                 'string',
-                'unique:permissions,name'
-            ]
+                'unique:permissions,name',
+            ],
         ]);
 
         Permission::create([
-            'name' => $request->name
+            'name' => $request->name,
         ]);
-    // public function store(PermissionRequest $request): RedirectResponse
-    // {
-    //     Permission::create($request->validated());
+        // public function store(PermissionRequest $request): RedirectResponse
+        // {
+        //     Permission::create($request->validated());
 
         return Redirect::route('permissions.index')
             ->with('success', 'Permission created successfully.');
@@ -93,16 +93,16 @@ class PermissionController extends Controller
             'name' => [
                 'required',
                 'string',
-                'unique:permissions,name,'.$permission->id
-            ]
+                'unique:permissions,name,'.$permission->id,
+            ],
         ]);
 
         $permission->update([
-            'name' => $request->name
+            'name' => $request->name,
         ]);
-    // public function update(PermissionRequest $request, Permission $permission): RedirectResponse
-    // {
-    //     $permission->update($request->validated());
+        // public function update(PermissionRequest $request, Permission $permission): RedirectResponse
+        // {
+        //     $permission->update($request->validated());
 
         return Redirect::route('permissions.index')
             ->with('success', 'Permission updated successfully');
@@ -112,9 +112,9 @@ class PermissionController extends Controller
     {
         $permission = Permission::find($permissionId);
         $permission->delete();
-    // public function destroy($id): RedirectResponse
-    // {
-    //     Permission::find($id)->delete();
+        // public function destroy($id): RedirectResponse
+        // {
+        //     Permission::find($id)->delete();
 
         return Redirect::route('permissions.index')
             ->with('success', 'Permission deleted successfully');

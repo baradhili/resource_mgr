@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Services\CacheService;
+use Illuminate\Console\Command;
 
 class refreshCache extends Command
 {
@@ -31,7 +31,6 @@ class refreshCache extends Command
     /**
      * Create a new command instance.
      *
-     * @param CacheService $cacheService
      * @return void
      */
     public function __construct(CacheService $cacheService)

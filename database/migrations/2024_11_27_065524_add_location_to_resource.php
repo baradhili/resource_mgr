@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
         });
 
-        
     }
 
     /**
@@ -30,6 +29,5 @@ return new class extends Migration
             $table->dropColumn(['region_id', 'location_id']);
         });
 
-        
     }
 };

@@ -12,15 +12,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property $created_at
  * @property $updated_at
  * @property $region_id
- *
  * @property Region $region
- * @property Resource[] $resources
- * @package App
+ * @property resource[] $resources
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Location extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -30,7 +28,6 @@ class Location extends Model
      */
     protected $fillable = ['name', 'region_id'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -38,7 +35,7 @@ class Location extends Model
     {
         return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -46,5 +43,4 @@ class Location extends Model
     {
         return $this->hasMany(\App\Models\Resource::class, 'id', 'location_id');
     }
-    
 }

@@ -22,14 +22,14 @@ class SkillRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'skill_name' => 'required|string',
-			'skill_description' => 'string',
-			'context' => 'string',
-			'category' => 'string',
-			'license' => 'string',
-			'source_id' => 'string',
-			'type' => 'string',
-			'authors' => 'string',
+            'skill_name' => 'required|string',
+            'skill_description' => 'string',
+            'context' => 'string',
+            'category' => 'string',
+            'license' => 'string',
+            'source_id' => 'string',
+            'type' => 'string',
+            'authors' => 'string',
         ];
     }
 }

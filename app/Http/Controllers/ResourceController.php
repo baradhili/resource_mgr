@@ -3,31 +3,31 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ResourceRequest;
-use App\Models\Contract;
-use App\Models\Demand;
 use App\Models\Allocation;
-use App\Models\Project;
+use App\Models\Contract;
 use App\Models\Leave;
+use App\Models\Location;
+use App\Models\Project;
 use App\Models\Resource;
 use App\Models\ResourceSkill;
-use App\Models\Skill;
-use App\Models\Location;
-use App\Models\User;
 use App\Models\ResourceType;
+use App\Models\Skill;
+use App\Models\User;
+use App\Services\CacheService;
+use App\Services\ResourceService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use App\Services\CacheService;
-use App\Services\ResourceService;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class ResourceController extends Controller
 {
     protected $cacheService;
+
     protected $resourceService;
 
     public function __construct(CacheService $cacheService, ResourceService $resourceService)
@@ -35,6 +35,7 @@ class ResourceController extends Controller
         $this->cacheService = $cacheService;
         $this->resourceService = $resourceService;
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -52,7 +53,7 @@ class ResourceController extends Controller
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
-                'monthFullName' => $date->format('F')
+                'monthFullName' => $date->format('F'),
             ];
         }
 
@@ -61,12 +62,12 @@ class ResourceController extends Controller
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+            if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
                 $resource->full_name .= ' [c]';
             }
         }
 
-        if (!Cache::has('resourceAvailability')) {
+        if (! Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
@@ -95,7 +96,7 @@ class ResourceController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        //return to the view
+        // return to the view
         return view('resource.index', compact('resources', 'paginatedResourceAvailability', 'nextTwelveMonths'))
             ->with('i', ($request->input('page', 1) - 1) * $paginatedResourceAvailability->perPage());
     }
@@ -105,7 +106,7 @@ class ResourceController extends Controller
      */
     public function create(): View
     {
-        $resource = new Resource();
+        $resource = new Resource;
         $locations = Location::all();
         $skills = Skill::all()->map(function ($skill) {
             return [
@@ -121,7 +122,6 @@ class ResourceController extends Controller
 
         return view('resource.create', compact('resource', 'locations', 'skills', 'resourceSkills', 'users', 'resourceTypes'));
     }
-
 
     /**
      * Show the form for editing the specified resource.
@@ -165,7 +165,7 @@ class ResourceController extends Controller
         $resource = Resource::with(['location', 'skills', 'contracts', 'allocations', 'leaves', 'user', 'resourceType'])->find($id);
 
         // Modify resource names to add [c] if the resource is not permanent
-        if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+        if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
             $resource->full_name .= ' [c]';
         }
 
@@ -184,8 +184,7 @@ class ResourceController extends Controller
         }
         $skills = $resourceSkills;
 
-
-        $projects = Project::whereIn('id', function($query) use ($resource) {
+        $projects = Project::whereIn('id', function ($query) use ($resource) {
             $query->select('projects_id')
                 ->from('allocations')
                 ->where('resources_id', $resource->id)
@@ -193,7 +192,7 @@ class ResourceController extends Controller
         })->get();
 
         // Log::info("resource: ".json_encode($resource));
-        return view('resource.show', compact('resource', 'skills','projects'));
+        return view('resource.show', compact('resource', 'skills', 'projects'));
     }
 
     /**
@@ -209,20 +208,20 @@ class ResourceController extends Controller
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
-                'monthFullName' => $date->format('F')
+                'monthFullName' => $date->format('F'),
             ];
         }
 
-        if (!Cache::has('resourceAvailability')) {
+        if (! Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
             $resourceAvailability = Cache::get('resourceAvailability');
         }
-        //hope that they have viewed the resources in the last day
+        // hope that they have viewed the resources in the last day
         // $resourceAvailability = Cache::get('resourceAvailability');
-        //pick our resource out
-        $resourceAvailability = $resourceAvailability[$id]["availability"];
+        // pick our resource out
+        $resourceAvailability = $resourceAvailability[$id]['availability'];
 
         $resource = Resource::find($id);
 
@@ -246,11 +245,10 @@ class ResourceController extends Controller
                     ->pluck('fte')
                     ->first();
                 // if ($totalAllocation !== null) Log::info(print_r($totalAllocation,true) . "Resource: {$resource->id} Date: {$monthStartDate} Project: {$project->id}");
-                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Get the availability for the current month
                 $availability = isset($resourceAvailability[$key]) ? (float) $resourceAvailability[$key] : 0.0;
-
 
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
@@ -263,13 +261,13 @@ class ResourceController extends Controller
                         // Add the calculated percentage allocation to the resource availability array
                         $allocationArray[$project->id]['allocation'][$key] = [
                             'fte' => $totalAllocation,
-                            'percentage' => $percentageAllocation
+                            'percentage' => $percentageAllocation,
                         ];
                     } else {
                         // If no allocation or availability is zero, store the allocation as is
                         $allocationArray[$project->id]['allocation'][$key] = [
                             'fte' => -1 * $totalAllocation,
-                            'percentage' => 0.0
+                            'percentage' => 0.0,
                         ];
                     }
                 }
@@ -284,8 +282,6 @@ class ResourceController extends Controller
 
         return view('resource.allocations', compact('resource', 'allocationArray', 'projects', 'nextTwelveMonths'));
     }
-
-
 
     /**
      * Update the specified resource in storage.
@@ -339,7 +335,6 @@ class ResourceController extends Controller
             ->with('success', 'Resource deleted successfully');
     }
 
-
     private function leaveToMonthlyPercentage(Leave $leave)
     {
         $result = [];
@@ -353,7 +348,7 @@ class ResourceController extends Controller
             $result[] = [
                 'year' => $date->format('Y'),
                 'month' => $date->format('n'),
-                'percentage' => 100 / $period->count()
+                'percentage' => 100 / $period->count(),
             ];
         }
 

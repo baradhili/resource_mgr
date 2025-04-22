@@ -12,15 +12,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property $created_at
  * @property $updated_at
  * @property $region_id
- *
  * @property Project $project
  * @property Region $region
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class ProjectRegion extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -30,7 +28,6 @@ class ProjectRegion extends Model
      */
     protected $fillable = ['project_id', 'region_id'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -38,7 +35,7 @@ class ProjectRegion extends Model
     {
         return $this->belongsTo(\App\Models\Project::class, 'project_id', 'id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -46,5 +43,4 @@ class ProjectRegion extends Model
     {
         return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id');
     }
-    
 }

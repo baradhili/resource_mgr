@@ -8,7 +8,8 @@ class JoinTeamListener
 {
     /**
      * See if the session contains an invite token on login and try to accept it.
-     * @param mixed $event
+     *
+     * @param  mixed  $event
      */
     public function handle($event)
     {

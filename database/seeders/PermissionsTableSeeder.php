@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 
 class PermissionsTableSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -42,15 +41,15 @@ class PermissionsTableSeeder extends Seeder
                 }
             }
 
-            if (!$shouldExclude) {
+            if (! $shouldExclude) {
                 $permissions[] = [
                     'name' => $name,
                     'guard_name' => 'web',
                 ];
             }
         }
-        
+
         \Spatie\Permission\Models\Permission::insertOrIgnore($permissions);
-        
+
     }
 }

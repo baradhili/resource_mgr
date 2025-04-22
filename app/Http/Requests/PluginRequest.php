@@ -22,9 +22,9 @@ class PluginRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'name' => 'required|string',
-			'type' => 'required|string',
-			'description' => 'string',
+            'name' => 'required|string',
+            'type' => 'required|string',
+            'description' => 'string',
         ];
     }
 }

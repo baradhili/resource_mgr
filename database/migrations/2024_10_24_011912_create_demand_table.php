@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('month')->nullable();
             $table->string('resource_type')->nullable();
             $table->decimal('fte', 3, 2)->nullable();
-            $table->enum('status', ['Proposed','Committed','Manual'])->nullable();
+            $table->enum('status', ['Proposed', 'Committed', 'Manual'])->nullable();
             $table->integer('projects_id')->index('fk_demand_projects1_idx');
             $table->timestamps();
         });

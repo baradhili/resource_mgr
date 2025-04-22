@@ -13,14 +13,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $created_at
  * @property $updated_at
  * @property $estimate_id
- *
  * @property Estimate $estimate
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Assumption extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -30,7 +28,6 @@ class Assumption extends Model
      */
     protected $fillable = ['description', 'impact', 'estimate_id'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -38,5 +35,4 @@ class Assumption extends Model
     {
         return $this->belongsTo(\App\Models\Estimate::class, 'estimate_id', 'id');
     }
-    
 }

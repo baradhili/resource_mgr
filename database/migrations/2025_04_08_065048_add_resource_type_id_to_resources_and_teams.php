@@ -5,7 +5,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -42,7 +43,7 @@ return new class extends Migration {
 
         // Update resources table
         foreach ($resourceTypes as $resourceTypeName) {
-            $resourceTypeId = (int)$resourceTypeName;
+            $resourceTypeId = (int) $resourceTypeName;
             DB::table('resources')
                 ->where('resource_type_temp', $resourceTypeName)
                 ->update(['resource_type' => $resourceTypeId]);

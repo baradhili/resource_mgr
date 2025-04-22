@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use JeroenZwart\CsvSeeder\CsvSeeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use JeroenZwart\CsvSeeder\CsvSeeder;
 
 class ProjectSeeder extends CsvSeeder
 {

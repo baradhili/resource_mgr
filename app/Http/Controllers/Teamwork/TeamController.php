@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers\Teamwork;
 
+use App\Models\ResourceType;
 use App\Models\Team;
 use App\Models\User;
-use App\Models\ResourceType;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\TeamRequest;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Routing\Controller;
-use Mpociot\Teamwork\Exceptions\UserNotInTeamException;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
+use Mpociot\Teamwork\Exceptions\UserNotInTeamException;
 
 class TeamController extends Controller
 {
@@ -29,7 +26,7 @@ class TeamController extends Controller
      */
     public function index(Request $request)
     {
-        //TODO based on privs either show teams wher ethe user is a member, or show all teams
+        // TODO based on privs either show teams wher ethe user is a member, or show all teams
 
         /**
          * old */
@@ -50,21 +47,21 @@ class TeamController extends Controller
     public function create()
     {
         // old
-        $team = new Team();
+        $team = new Team;
         $users = User::all()->map(function ($user) {
             return ['value' => $user->id, 'name' => $user->name];
         })->sortBy('name')->values()->toArray();
         $resource_types = ResourceType::all()->map(function ($resource_type) {
             return ['name' => $resource_type->name];
         })->toArray();
+
         return view('teamwork.create', compact('team', 'resource_types', 'users'));
-        //return view('teamwork.create');
+        // return view('teamwork.create');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -87,7 +84,7 @@ class TeamController extends Controller
 
     /**
      * Display the specified resource.
-     * 
+     *
      * @return \Illuminate\Http\Response
      */
     public function show($id): View
@@ -105,7 +102,7 @@ class TeamController extends Controller
     /**
      * Switch to the given team.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function switchTeam($id)
@@ -124,14 +121,14 @@ class TeamController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
         $teamModel = config('teamwork.team_model');
         $team = $teamModel::findOrFail($id);
-        if (!auth()->user()->isOwnerOfTeam($team)) {
+        if (! auth()->user()->isOwnerOfTeam($team)) {
             return redirect(route('teams.index'))->with('error', 'You do not have permission to edit this team');
         }
 
@@ -147,15 +144,14 @@ class TeamController extends Controller
             return ['name' => $resource_type->name];
         })->toArray();
 
-        //return view('teamwork.edit')->withTeam($team);
+        // return view('teamwork.edit')->withTeam($team);
         return view('teamwork.edit', compact('team', 'users', 'resource_types'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $id)
@@ -178,12 +174,12 @@ class TeamController extends Controller
 
         foreach ($members_data as $member) {
             $user = User::find($member['value']);
-            if (!in_array($user->id, $existing_members)) {
+            if (! in_array($user->id, $existing_members)) {
                 $user->attachTeam($team);
             }
         }
         foreach ($existing_members as $existing_member_id) {
-            if (!in_array($existing_member_id, array_column($members_data, 'value'))) {
+            if (! in_array($existing_member_id, array_column($members_data, 'value'))) {
                 $user = User::find($existing_member_id);
                 $user->detachTeam($team);
             }
@@ -196,7 +192,7 @@ class TeamController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -204,7 +200,7 @@ class TeamController extends Controller
         $teamModel = config('teamwork.team_model');
 
         $team = $teamModel::findOrFail($id);
-        if (!auth()->user()->isOwnerOfTeam($team)) {
+        if (! auth()->user()->isOwnerOfTeam($team)) {
             abort(403);
         }
 
@@ -217,11 +213,10 @@ class TeamController extends Controller
         return redirect(route('teams.index'));
     }
 
-
     /**
      * Make the given user the leader of the current team.
      *
-     * @param  int $id
+     * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
     public function makeLeader($teamId, $userId)
@@ -243,5 +238,4 @@ class TeamController extends Controller
 
         return redirect(route('teams.show', $teamId))->with('success', 'Team leader updated successfully');
     }
-
 }

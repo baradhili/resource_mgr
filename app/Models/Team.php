@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Mpociot\Teamwork\TeamworkTeam;
-use Mpociot\Teamwork\Traits\TeamTrait;
 
 /**
  * Class Team
@@ -15,10 +14,9 @@ use Mpociot\Teamwork\Traits\TeamTrait;
  * @property $created_at
  * @property $updated_at
  * @property $parent_team_id
- *
  * @property TeamInvite[] $teamInvites
  * @property TeamUser[] $teamUsers
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Team extends TeamworkTeam
@@ -42,7 +40,6 @@ class Team extends TeamworkTeam
         return $this->hasMany(Team::class, 'parent_team_id');
     }
 
-    
     public static function allSubTeamResourceTypes(Team $parentTeam): array
     {
         $subTeams = $parentTeam->subTeams;
@@ -50,11 +47,11 @@ class Team extends TeamworkTeam
         if ($parentTeam->resource_type !== null) {
             $subTeamResourceTypes->push($parentTeam->resource_type);
         }
-        
+
         foreach ($subTeams as $subTeam) {
             $subTeamResourceTypes = $subTeamResourceTypes->merge(self::allSubTeamResourceTypes($subTeam));
         }
-        
+
         return $subTeamResourceTypes->unique()->toArray();
     }
 }

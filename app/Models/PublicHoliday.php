@@ -13,14 +13,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $region_id
  * @property $created_at
  * @property $updated_at
- *
  * @property Region $region
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class PublicHoliday extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -30,7 +28,6 @@ class PublicHoliday extends Model
      */
     protected $fillable = ['date', 'name', 'region_id'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -38,5 +35,4 @@ class PublicHoliday extends Model
     {
         return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id');
     }
-    
 }

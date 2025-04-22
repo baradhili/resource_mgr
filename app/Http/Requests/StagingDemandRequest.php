@@ -22,11 +22,11 @@ class StagingDemandRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'demand_date' => 'required',
-			'fte' => 'required',
-			'status' => 'string',
-			'resource_type' => 'string',
-			'source' => 'string',
+            'demand_date' => 'required',
+            'fte' => 'required',
+            'status' => 'string',
+            'resource_type' => 'string',
+            'source' => 'string',
         ];
     }
 }

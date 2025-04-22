@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Resource;
@@ -10,7 +11,7 @@ class ResourceService
 {
     public function getResourceList($regionID = null, $all = false)
     {
-        //get user 
+        // get user
         $user = Auth::user();
         // Check if the user is an owner of a team
         if ($user->ownedTeams()->count() > 0) {
@@ -35,7 +36,7 @@ class ResourceService
                         $query->where('start_date', '<=', now())
                             ->where('end_date', '>=', now());
                     },
-                    'region'
+                    'region',
                 ])->get();
             // Log::info("resources: " . json_encode($resources));
         } elseif ($user->reportees->count() > 0) {
@@ -50,7 +51,7 @@ class ResourceService
             }
 
             // Log::info("resourceids: " . json_encode($resourceIDs));
-            //for each linked resource contract, check if the start date is before now and the end date is after now
+            // for each linked resource contract, check if the start date is before now and the end date is after now
 
             $resources = Resource::whereIn('id', $resourceIDs)
                 ->whereHas('contracts', function ($query) use ($regionID) {
@@ -77,6 +78,7 @@ class ResourceService
             }
             // Log::info("resources: " . json_encode($resources));
         }
+
         return $resources;
     }
 }

@@ -19,7 +19,7 @@ class ChangeRequest extends Model
         'notes',
         'requested_by',
         'approved_by',
-        'approval_date'
+        'approval_date',
     ];
 
     public function record()

@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProjectRegionRequest;
+use App\Http\Resources\ProjectRegionResource;
 use App\Models\ProjectRegion;
 use Illuminate\Http\Request;
-use App\Http\Requests\ProjectRegionRequest;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\ProjectRegionResource;
 
 class ProjectRegionController extends Controller
 {

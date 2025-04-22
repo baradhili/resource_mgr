@@ -18,8 +18,8 @@ return new class extends Migration
         Schema::table(\Config::get('teamwork.teams_table'), function (Blueprint $table) {
             $table->unsignedInteger('parent_team_id')->nullable();
         });
-        
-        //and key
+
+        // and key
         Schema::table(\Config::get('teamwork.teams_table'), function (Blueprint $table) {
             $table->index('parent_team_id');
         });
@@ -42,7 +42,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        //drop recursive
+        // drop recursive
         Schema::table(\Config::get('teamwork.teams_table'), function (Blueprint $table) {
             $table->dropIndex(['parent_team_id']);
             $table->dropColumn('parent_team_id');

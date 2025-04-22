@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FundingApprovalStageRequest;
 use App\Models\FundingApprovalStage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\FundingApprovalStageRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -27,7 +27,7 @@ class FundingApprovalStageController extends Controller
      */
     public function create(): View
     {
-        $fundingApprovalStage = new FundingApprovalStage();
+        $fundingApprovalStage = new FundingApprovalStage;
 
         return view('funding-approval-stage.create', compact('fundingApprovalStage'));
     }

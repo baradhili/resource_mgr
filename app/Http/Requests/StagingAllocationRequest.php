@@ -22,10 +22,10 @@ class StagingAllocationRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'allocation_date' => 'required',
-			'fte' => 'required',
-			'status' => 'string',
-			'source' => 'string',
+            'allocation_date' => 'required',
+            'fte' => 'required',
+            'status' => 'string',
+            'source' => 'string',
         ];
     }
 }

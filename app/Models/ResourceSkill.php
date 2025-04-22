@@ -12,16 +12,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property $proficiency_levels
  * @property $created_at
  * @property $updated_at
- *
- * @property Resource $resource
+ * @property resource $resource
  * @property Skill $skill
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class ResourceSkill extends Model
 {
-    
     protected $perPage = 20;
+
     protected $table = 'resource_skill';
 
     /**
@@ -31,7 +30,6 @@ class ResourceSkill extends Model
      */
     protected $fillable = ['resources_id', 'skills_id', 'proficiency_levels'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -39,7 +37,7 @@ class ResourceSkill extends Model
     {
         return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -47,5 +45,4 @@ class ResourceSkill extends Model
     {
         return $this->belongsTo(\App\Models\Skill::class, 'skills_id', 'id');
     }
-    
 }

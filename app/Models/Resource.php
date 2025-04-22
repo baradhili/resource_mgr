@@ -15,7 +15,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property float $baseAvailability
  * @property int $region_id
  * @property int $location_id
- *
  * @property Allocation[] $allocations
  * @property Contract[] $contracts
  * @property Leave[] $leaves
@@ -24,12 +23,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property Location $location
  * @property User $user
  * @property ResourceType $resourceType
- * @package App\Models
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Resource extends Model
 {
-
     protected $perPage = 20;
 
     /**
@@ -114,7 +112,6 @@ class Resource extends Model
     /**
      * Get all resources that match a list of resource_type.
      *
-     * @param array $resourceTypes
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getResourcesByTypes(array $resourceTypes)
@@ -131,7 +128,4 @@ class Resource extends Model
     {
         return $this->contracts()->value('permanent');
     }
-
-
 }
-

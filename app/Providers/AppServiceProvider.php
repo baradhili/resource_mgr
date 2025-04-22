@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Spatie\Menu\Laravel\Menu;
 use Spatie\Menu\Laravel\Link;
+use Spatie\Menu\Laravel\Menu;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -39,11 +39,11 @@ class AppServiceProvider extends ServiceProvider
         // });
     }
 
-    
     private function wrapInSpan(string $string): string
     {
-        $wrapper = '<span class="align-middle">' . $string . '</span>';
-        //TODO look up an icon
+        $wrapper = '<span class="align-middle">'.$string.'</span>';
+
+        // TODO look up an icon
         return $wrapper;
     }
 }

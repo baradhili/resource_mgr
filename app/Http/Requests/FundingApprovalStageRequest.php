@@ -22,8 +22,8 @@ class FundingApprovalStageRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'stage_name' => 'required|string',
-			'description' => 'required|string',
+            'stage_name' => 'required|string',
+            'description' => 'required|string',
         ];
     }
 }

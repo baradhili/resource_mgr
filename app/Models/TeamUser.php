@@ -11,12 +11,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property $team_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class TeamUser extends Model
 {
     protected $fillable = ['user_id', 'team_id'];
+
     protected $table = 'team_user';
 
     /**

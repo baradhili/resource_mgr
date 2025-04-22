@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TermsAndConditionRequest;
 use App\Models\TermsAndCondition;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\TermsAndConditionRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -27,7 +27,7 @@ class TermsAndConditionController extends Controller
      */
     public function create(): View
     {
-        $termsAndCondition = new TermsAndCondition();
+        $termsAndCondition = new TermsAndCondition;
 
         return view('terms-and-condition.create', compact('termsAndCondition'));
     }

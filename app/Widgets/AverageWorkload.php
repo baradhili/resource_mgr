@@ -2,11 +2,10 @@
 
 namespace App\Widgets;
 
-use Arrilot\Widgets\AbstractWidget;
 use App\Services\CacheService;
-use Illuminate\Support\Facades\Cache;
+use Arrilot\Widgets\AbstractWidget;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class AverageWorkload extends AbstractWidget
 {
@@ -16,6 +15,7 @@ class AverageWorkload extends AbstractWidget
      * @var array
      */
     protected $config = [];
+
     protected $cacheService;
 
     public function __construct(CacheService $cacheService)
@@ -30,13 +30,13 @@ class AverageWorkload extends AbstractWidget
     public function run()
     {
         // grab or update allocations
-        if (!Cache::has('resourceAllocation')) {
+        if (! Cache::has('resourceAllocation')) {
             $this->cacheService->cacheResourceAllocation();
             $resourceAllocation = Cache::get('resourceAllocation');
         } else {
             $resourceAllocation = Cache::get('resourceAllocation');
         }
-       // Get the current month and the previous month in 'Y-m' format
+        // Get the current month and the previous month in 'Y-m' format
         $currentMonth = Carbon::now()->format('Y-m');
         $previousMonth = Carbon::now()->subMonth()->format('Y-m');
 
@@ -69,16 +69,15 @@ class AverageWorkload extends AbstractWidget
 
         // Calculate the average availability for the current month
         $currentMonthAverage = $currentMonthCount > 0 ? $currentMonthSum / $currentMonthCount : 0;
-        $currentMonthAverage = (int)$currentMonthAverage;
+        $currentMonthAverage = (int) $currentMonthAverage;
 
         // Calculate the average availability for the previous month
-        $delta = $currentMonthAverage - ( $previousMonthCount > 0 ? $previousMonthSum / $previousMonthCount : 0);
-
+        $delta = $currentMonthAverage - ($previousMonthCount > 0 ? $previousMonthSum / $previousMonthCount : 0);
 
         return view('widgets.average_workload', [
             'config' => $this->config,
             'currentMonthAverage' => $currentMonthAverage,
-            'delta' => $delta
+            'delta' => $delta,
         ]);
     }
 }

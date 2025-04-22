@@ -13,10 +13,9 @@ class RemoveTeamMember implements RemovesTeamMembers
     /**
      * Remove a member from the specified team.
      *
-     * @param  mixed  $user       User initiating the removal
-     * @param  mixed  $team       The team to remove the member from
-     * @param  mixed  $teamMember The member to be removed
-     * @return void
+     * @param  mixed  $user  User initiating the removal
+     * @param  mixed  $team  The team to remove the member from
+     * @param  mixed  $teamMember  The member to be removed
      *
      * @throws AuthorizationException
      * @throws ValidationException
@@ -34,16 +33,15 @@ class RemoveTeamMember implements RemovesTeamMembers
     /**
      * Authorize that the user can remove the specified team member.
      *
-     * @param  mixed  $user       User initiating the removal
-     * @param  mixed  $team       The team from which the member is being removed
-     * @param  mixed  $teamMember The member being removed
-     * @return void
+     * @param  mixed  $user  User initiating the removal
+     * @param  mixed  $team  The team from which the member is being removed
+     * @param  mixed  $teamMember  The member being removed
      *
      * @throws AuthorizationException
      */
     protected function authorize(mixed $user, mixed $team, mixed $teamMember): void
     {
-        if ($user->id !== $teamMember->id && !Gate::forUser($user)->check('removeTeamMember', $team)) {
+        if ($user->id !== $teamMember->id && ! Gate::forUser($user)->check('removeTeamMember', $team)) {
             throw new AuthorizationException;
         }
     }
@@ -51,9 +49,8 @@ class RemoveTeamMember implements RemovesTeamMembers
     /**
      * Ensure that the team member is not the owner of the team.
      *
-     * @param  mixed  $teamMember The member being removed
-     * @param  mixed  $team       The team to check ownership against
-     * @return void
+     * @param  mixed  $teamMember  The member being removed
+     * @param  mixed  $team  The team to check ownership against
      *
      * @throws ValidationException
      */

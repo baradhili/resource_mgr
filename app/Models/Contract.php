@@ -14,14 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $resources_id
  * @property $created_at
  * @property $updated_at
+ * @property resource $resource
  *
- * @property Resource $resource
- * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Contract extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -31,7 +29,6 @@ class Contract extends Model
      */
     protected $fillable = ['start_date', 'end_date', 'availability', 'resources_id', 'permanent'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -39,5 +36,4 @@ class Contract extends Model
     {
         return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
     }
-    
 }

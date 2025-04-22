@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contract;
-use App\Models\Resource;
-use App\Models\Allocation;
-use App\Models\Demand;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use App\Http\Requests\ContractRequest;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
+use App\Models\Allocation;
+use App\Models\Contract;
+use App\Models\Demand;
+use App\Models\Resource;
 use App\Services\CacheService;
 use App\Services\ResourceService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
 
 class ContractController extends Controller
 {
@@ -25,15 +24,15 @@ class ContractController extends Controller
      * The middleware configured here will be assigned to this controller's
      * routes.
      */
-
     protected $cacheService;
+
     protected $resourceService;
 
     public function __construct(CacheService $cacheService, ResourceService $resourceService)
     {
         $this->cacheService = $cacheService;
         $this->resourceService = $resourceService;
-        // $this->middleware('teamowner', ['only' => ['create','store','update','edit','destroy']]);  
+        // $this->middleware('teamowner', ['only' => ['create','store','update','edit','destroy']]);
         // $this->middleware('contract:view', ['only' => ['index']]);
         // $this->middleware('contract:create', ['only' => ['create','store']]);
         // $this->middleware('contract:update', ['only' => ['update','edit']]);
@@ -55,14 +54,14 @@ class ContractController extends Controller
 
         $old = $request->query('old');
         $search = $request->query('search');
-        
+
         // assemble the query based on old and search values
 
         $query = Contract::query()
             ->whereIn('resources_id', $resources->pluck('id'))
             ->orderBy('end_date', 'asc');
 
-        if (!$old) {
+        if (! $old) {
             $query->where('end_date', '>=', now());
         }
 
@@ -101,7 +100,7 @@ class ContractController extends Controller
      */
     public function create(): View
     {
-        $contract = new Contract();
+        $contract = new Contract;
 
         $resources = Resource::all(); // Retrieve all resources
 
@@ -164,6 +163,7 @@ class ContractController extends Controller
 
         $contract->update($validatedData);
         $this->cacheService->cacheResourceAvailability();
+
         return Redirect::route('contracts.index')
             ->with('success', 'Contract updated successfully');
     }
@@ -186,11 +186,11 @@ class ContractController extends Controller
             ->get();
 
         foreach ($allocations as $allocation) {
-            $demand = new Demand();
+            $demand = new Demand;
             $demand->demand_date = $allocation->allocation_date;
             $demand->fte = $allocation->fte;
             $demand->projects_id = $allocation->projects_id;
-            $demand->resource_type = "Solution Architect";
+            $demand->resource_type = 'Solution Architect';
             $demand->save();
 
             $allocation->delete();

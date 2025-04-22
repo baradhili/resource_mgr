@@ -22,10 +22,10 @@ class TermsAndConditionRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'payment_terms' => 'required|string',
-			'validity' => 'required|string',
-			'assumptions' => 'required|string',
-			'change_management' => 'required|string',
+            'payment_terms' => 'required|string',
+            'validity' => 'required|string',
+            'assumptions' => 'required|string',
+            'change_management' => 'required|string',
         ];
     }
 }

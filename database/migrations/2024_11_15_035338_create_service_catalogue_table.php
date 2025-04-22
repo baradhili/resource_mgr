@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->string('service_name'); //Not sure if we want a level, but for now we'll have it in teh name
+            $table->string('service_name'); // Not sure if we want a level, but for now we'll have it in teh name
             $table->text('description')->nullable();
             $table->json('required_skills')->nullable(); // json for now, but maybe we want a relationship?
-            $table->decimal('hours_cost', 8, 2)->nullable(); 
+            $table->decimal('hours_cost', 8, 2)->nullable();
             $table->timestamps();
         });
     }

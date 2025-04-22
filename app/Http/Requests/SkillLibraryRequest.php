@@ -22,8 +22,8 @@ class SkillLibraryRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'skill_name' => 'required|string',
-			'skill_description' => 'string',
+            'skill_name' => 'required|string',
+            'skill_description' => 'string',
         ];
     }
 }

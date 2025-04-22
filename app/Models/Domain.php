@@ -13,14 +13,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $description
  * @property $created_at
  * @property $updated_at
- *
  * @property Request[] $requests
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Domain extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -30,7 +28,6 @@ class Domain extends Model
      */
     protected $fillable = ['name', 'business_partner_name', 'description'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -38,5 +35,4 @@ class Domain extends Model
     {
         return $this->hasMany(\App\Models\Request::class, 'id', 'product_group_function_domain_id');
     }
-    
 }

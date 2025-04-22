@@ -55,13 +55,14 @@ class AuthController extends Controller
     public function logout()
     {
         Auth::logout();
+
         return redirect('/');
     }
-
 
     public function showChangePasswordForm(Request $request)
     {
         $id = $request->query('id');
+
         // Log::info("received password change for id = " . $id);
         return view('auth.change-password', ['user' => $id]);
     }
@@ -80,7 +81,7 @@ class AuthController extends Controller
             $user = Auth::user();
         }
 
-        if (!$user) {
+        if (! $user) {
             return redirect('/login')->withErrors([
                 'auth' => 'You must be logged in to change your password.',
             ]);
@@ -91,6 +92,4 @@ class AuthController extends Controller
 
         return redirect('/home')->with('success', 'Password changed successfully');
     }
-
 }
-

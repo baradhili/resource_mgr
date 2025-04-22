@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ServiceRequest;
 use App\Models\Service;
 use App\Models\Skill;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\ServiceRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
 
 class ServiceController extends Controller
 {
@@ -35,7 +35,7 @@ class ServiceController extends Controller
      */
     public function create(): View
     {
-        $service = new Service();
+        $service = new Service;
 
         return view('service.create', compact('service'));
     }
@@ -93,7 +93,7 @@ class ServiceController extends Controller
         $service = Service::find($id);
         // Decode the JSON data for required_skills
         $service->required_skills = json_decode($service->required_skills, true) ?? [];
-        Log::info("skills: " . json_encode($service->required_skills));
+        Log::info('skills: '.json_encode($service->required_skills));
         // Fetch all skill names for the whitelist
         $skills = Skill::pluck('skill_name')->toArray();
 

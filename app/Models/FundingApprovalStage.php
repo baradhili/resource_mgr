@@ -12,14 +12,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $description
  * @property $created_at
  * @property $updated_at
- *
  * @property Request[] $requests
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class FundingApprovalStage extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -29,7 +27,6 @@ class FundingApprovalStage extends Model
      */
     protected $fillable = ['stage_name', 'description'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -37,5 +34,4 @@ class FundingApprovalStage extends Model
     {
         return $this->hasMany(\App\Models\Request::class, 'id', 'funding_approval_stage_id');
     }
-    
 }

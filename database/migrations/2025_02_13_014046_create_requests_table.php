@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -31,7 +32,7 @@ return new class extends Migration {
             $table->longText('attachments')->nullable();
             $table->string('resource_type')->nullable();
             $table->decimal('fte', 3, 2)->nullable();
-            $table->enum('status', ['Proposed','Committed','Manual','Closed'])->nullable();
+            $table->enum('status', ['Proposed', 'Committed', 'Manual', 'Closed'])->nullable();
             $table->timestamps();
         });
 

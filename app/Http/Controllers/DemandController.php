@@ -2,28 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DemandRequest;
 use App\Models\Allocation;
-use App\Models\Contract;
 use App\Models\Demand;
 use App\Models\Project;
 use App\Models\Resource;
+use App\Models\ResourceType;
+use App\Services\CacheService;
+use App\Services\ResourceService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use App\Services\CacheService;
-use App\Services\ResourceService;
-use App\Models\ResourceType;
-use Illuminate\Support\Facades\Auth;
 
 class DemandController extends Controller
 {
     protected $cacheService;
+
     protected $resourceService;
 
     public function __construct(CacheService $cacheService, ResourceService $resourceService)
@@ -46,14 +45,14 @@ class DemandController extends Controller
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
-                'monthFullName' => $date->format('F')
+                'monthFullName' => $date->format('F'),
             ];
         }
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
-        //get user 
+        // get user
         $user = Auth::user();
         $resource_types = $user->ownedTeams->pluck('resource_type')->toArray();
         if (empty($resource_types)) {
@@ -85,7 +84,7 @@ class DemandController extends Controller
         foreach ($projects as $project) {
 
             $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
-            //TODO - once we migrate to a numeric value for resource type, remove this
+            // TODO - once we migrate to a numeric value for resource type, remove this
             if (is_numeric($resource_type)) {
                 $resource_type = ResourceType::findOrFail($resource_type)->name;
             }
@@ -110,7 +109,7 @@ class DemandController extends Controller
                     ->where('projects_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
-                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
@@ -118,6 +117,7 @@ class DemandController extends Controller
                 }
             }
         }
+
         //  Log::info("return: " . print_r($projects, true));
         return view('demand.index', compact('projects', 'demandArray', 'nextTwelveMonths', 'resources'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
@@ -128,8 +128,8 @@ class DemandController extends Controller
      */
     public function create(): View
     {
-        $demand = new \stdClass();
-        $demand->name = "";
+        $demand = new \stdClass;
+        $demand->name = '';
         $demand->start_date = '';
         $demand->end_date = '';
         $demand->status = '';
@@ -140,6 +140,7 @@ class DemandController extends Controller
 
         $projects = Project::all();
         $resourceTypes = ResourceType::all();
+
         return view('demand.create', compact('demand', 'projects', 'resourceTypes'));
     }
 
@@ -180,7 +181,7 @@ class DemandController extends Controller
 
         $demand_raw = Demand::where('projects_id', $id)->get();
         $project = Project::findOrFail($id);
-        $demand = new \stdClass();
+        $demand = new \stdClass;
         $demand->name = $project->name;
         $demand->start_date = $demand_raw->min('demand_date');
         $demand->end_date = $demand_raw->max('demand_date');
@@ -189,12 +190,11 @@ class DemandController extends Controller
         $demand->total_fte = $demand_raw->sum('fte');
         $demand->fte = $demand_raw->first()->fte;
 
-
         return view('demand.show', compact('demand'));
     }
 
     /**
-     * Show the form for editing the specified resource. 
+     * Show the form for editing the specified resource.
      * - TODO we need to make sure we don't wipe out other demands
      * - TODO we should run to the end of the demand, or deal with each month by itself
      */
@@ -205,7 +205,7 @@ class DemandController extends Controller
             ->get();
 
         foreach ($demandArray as $demand) {
-            $allocation = new Allocation();
+            $allocation = new Allocation;
             $allocation->allocation_date = $demand->demand_date;
             $allocation->resources_id = $request->resource_id;
             $allocation->fte = $demand->fte;
@@ -217,18 +217,17 @@ class DemandController extends Controller
             $demand->delete();
         }
 
-        //Update the cache
+        // Update the cache
         $this->cacheService->cacheResourceAllocation();
+
         return Redirect::route('demands.index')
             ->with('success', 'Resource assigned to project successfully.');
     }
 
-
     /**
      * Edit the overall demand of a project
      *
-     * @param int $project_id The id of the project
-     * @return \Illuminate\View\View
+     * @param  int  $project_id  The id of the project
      */
     public function editFullDemand($project_id): View
     {
@@ -236,7 +235,7 @@ class DemandController extends Controller
             ->whereBetween('demand_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
             ->get();
 
-        $demand = new \stdClass();
+        $demand = new \stdClass;
         $demand->name = $demandArray->first()->project->name;
         $demand->start_date = Carbon::parse($demandArray->min('demand_date'))->format('Y-m-d');
         $demand->end_date = Carbon::parse($demandArray->max('demand_date'))->format('Y-m-d');
@@ -246,9 +245,9 @@ class DemandController extends Controller
         $demand->projects_id = $project_id;
         $demand->demand_id = $demandArray->first()->id;
 
-
         $projects = Project::all();
         $resourceTypes = ResourceType::all();
+
         return view('demand.edit', compact('demand', 'projects', 'resourceTypes'));
     }
 
@@ -328,7 +327,7 @@ class DemandController extends Controller
     /**
      * Destroy all demands for a given project that are in the next year
      *
-     * @param int $id The ID of the project
+     * @param  int  $id  The ID of the project
      * @return RedirectResponse To the demands index page
      */
     public function destroy($id): RedirectResponse
@@ -340,13 +339,14 @@ class DemandController extends Controller
         return Redirect::route('demands.index')
             ->with('success', 'Demands deleted successfully');
     }
+
     public function exportDemands()
     {
         // Build our next twelve month array
         $nextTwelveMonths = [];
 
         // start labelling
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->setCellValue('A1', 'Project Name');
@@ -360,9 +360,9 @@ class DemandController extends Controller
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
-                'monthFullName' => $date->format('F')
+                'monthFullName' => $date->format('F'),
             ];
-            $sheet->setCellValue([$i + 4, 1], $date->format('M') . ' ' . $date->year);
+            $sheet->setCellValue([$i + 4, 1], $date->format('M').' '.$date->year);
         }
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
@@ -380,7 +380,7 @@ class DemandController extends Controller
                 'status' => Demand::select('status')
                     ->whereColumn('projects_id', 'projects.id')
                     ->orderBy('demand_date')
-                    ->limit(1)
+                    ->limit(1),
             ])
             ->get();
         $i = 2;
@@ -408,7 +408,7 @@ class DemandController extends Controller
                     ->where('projects_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
-                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($demand > 0) {
@@ -430,6 +430,4 @@ class DemandController extends Controller
         return Redirect::route('demands.index')
             ->with('success', 'Demand exported successfully');
     }
-
-
 }

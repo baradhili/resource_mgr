@@ -22,11 +22,11 @@ class ItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'description' => 'required|string',
-			'duration' => 'required',
-			'price' => 'required',
-			'obligatory' => 'required',
-			'position' => 'required',
+            'description' => 'required|string',
+            'duration' => 'required',
+            'price' => 'required',
+            'obligatory' => 'required',
+            'position' => 'required',
         ];
     }
 }

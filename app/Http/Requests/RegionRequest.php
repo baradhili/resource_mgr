@@ -22,8 +22,8 @@ class RegionRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'name' => 'required|string',
-			'jurisdiction' => 'string',
+            'name' => 'required|string',
+            'jurisdiction' => 'string',
         ];
     }
 }

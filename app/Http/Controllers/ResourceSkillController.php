@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ResourceSkillRequest;
+use App\Models\Contract;
+use App\Models\Resource;
 use App\Models\ResourceSkill;
 use App\Models\Skill;
-use App\Models\Resource;
-use App\Models\Contract;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\ResourceSkillRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class ResourceSkillController extends Controller
 {
@@ -46,7 +46,7 @@ class ResourceSkillController extends Controller
             $resources = null;
 
         } else {
-            $resource = new Resource();
+            $resource = new Resource;
             $resource->id = 0;
 
             $currentContracts = Contract::where('end_date', '>=', Carbon::today())->pluck('resources_id');
@@ -56,11 +56,9 @@ class ResourceSkillController extends Controller
             $unassignedSkills = $allSkills;
         }
 
+        $resourceSkill = new ResourceSkill;
 
-
-        $resourceSkill = new ResourceSkill();
-
-        return view('resource-skill.create', compact('resourceSkill', 'resource', 'unassignedSkills','resources'));
+        return view('resource-skill.create', compact('resourceSkill', 'resource', 'unassignedSkills', 'resources'));
     }
 
     /**

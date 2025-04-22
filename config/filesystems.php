@@ -58,8 +58,8 @@ return [
 
         'samlidp' => [
             'driver' => 'local',
-            'root' => storage_path() . '/samlidp',
-        ]
+            'root' => storage_path().'/samlidp',
+        ],
 
     ],
 

@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 
 class TeamworkSetupTables extends Migration
 {
-     /**
+    /**
      * Run the migrations.
      *
      * @return void

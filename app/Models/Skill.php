@@ -23,14 +23,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $source_id
  * @property $type
  * @property $authors
- *
  * @property ResourceSkill[] $resourceSkills
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Skill extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -40,7 +38,6 @@ class Skill extends Model
      */
     protected $fillable = ['skill_name', 'skill_description', 'context', 'employers', 'keywords', 'category', 'certifications', 'occupations', 'license', 'derived_from', 'source_id', 'type', 'authors'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -48,5 +45,4 @@ class Skill extends Model
     {
         return $this->hasMany(\App\Models\ResourceSkill::class, 'id', 'skills_id');
     }
-    
 }

@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //add new date col
+        // add new date col
         Schema::table('allocations', function (Blueprint $table) {
             $table->date('allocation_date')->nullable()->after('id');
         });
 
-        //drop old cols
+        // drop old cols
         Schema::table('allocations', function (Blueprint $table) {
             $table->dropColumn('year');
             $table->dropColumn('month');
@@ -28,7 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //revert changes
+        // revert changes
         Schema::table('allocations', function (Blueprint $table) {
             $table->string('year', 4)->nullable()->after('id');
             $table->integer('month')->nullable()->after('year');

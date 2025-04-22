@@ -14,14 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $created_at
  * @property $updated_at
  * @property $estimate_id
- *
  * @property Estimate $estimate
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Scope extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -31,7 +29,6 @@ class Scope extends Model
      */
     protected $fillable = ['tasks_deliverables', 'timeline', 'exclusions', 'estimate_id'];
 
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
@@ -39,5 +36,4 @@ class Scope extends Model
     {
         return $this->belongsTo(\App\Models\Estimate::class, 'estimate_id', 'id');
     }
-    
 }

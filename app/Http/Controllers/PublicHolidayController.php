@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PublicHolidayRequest;
 use App\Models\PublicHoliday;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\PublicHolidayRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -27,7 +27,7 @@ class PublicHolidayController extends Controller
      */
     public function create(): View
     {
-        $publicHoliday = new PublicHoliday();
+        $publicHoliday = new PublicHoliday;
 
         return view('public-holiday.create', compact('publicHoliday'));
     }
