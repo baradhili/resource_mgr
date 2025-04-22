@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Project
@@ -34,17 +34,11 @@ class Project extends Model
      */
     protected $fillable = ['start_date', 'end_date', 'empowerID', 'name', 'projectManager', 'status'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function allocations(): HasMany
     {
         return $this->hasMany(\App\Models\Allocation::class, 'projects_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function demands(): HasMany
     {
         return $this->hasMany(\App\Models\Demand::class, 'projects_id', 'id');

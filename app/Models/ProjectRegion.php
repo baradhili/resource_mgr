@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class ProjectRegion
@@ -29,17 +29,11 @@ class ProjectRegion extends Model
      */
     protected $fillable = ['project_id', 'region_id'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function project(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Project::class, 'project_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function region(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id');

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Item
@@ -32,9 +32,6 @@ class Item extends Model
      */
     protected $fillable = ['description', 'duration', 'price', 'obligatory', 'position', 'estimate_id'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function estimate(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Estimate::class, 'estimate_id', 'id');

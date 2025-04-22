@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Allocation
@@ -33,17 +33,11 @@ class Allocation extends Model
      */
     protected $fillable = ['allocation_date', 'fte', 'resources_id', 'projects_id', 'status', 'source'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function project(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Project::class, 'projects_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function resource(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');

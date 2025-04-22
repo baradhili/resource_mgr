@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Location
@@ -30,17 +30,11 @@ class Location extends Model
      */
     protected $fillable = ['name', 'region_id'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function region(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function resources(): HasMany
     {
         return $this->hasMany(\App\Models\Resource::class, 'id', 'location_id');

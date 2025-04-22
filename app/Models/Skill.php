@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Skill
@@ -39,9 +39,6 @@ class Skill extends Model
      */
     protected $fillable = ['skill_name', 'skill_description', 'context', 'employers', 'keywords', 'category', 'certifications', 'occupations', 'license', 'derived_from', 'source_id', 'type', 'authors'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function resourceSkills(): HasMany
     {
         return $this->hasMany(\App\Models\ResourceSkill::class, 'id', 'skills_id');

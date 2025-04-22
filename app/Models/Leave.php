@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Leave
@@ -29,9 +29,6 @@ class Leave extends Model
      */
     protected $fillable = ['start_date', 'end_date', 'resources_id'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function resource(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');

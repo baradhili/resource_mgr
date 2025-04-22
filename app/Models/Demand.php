@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Demand
@@ -32,9 +32,6 @@ class Demand extends Model
      */
     protected $fillable = ['demand_date', 'fte', 'status', 'resource_type', 'projects_id', 'source'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function project(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Project::class, 'projects_id', 'id');

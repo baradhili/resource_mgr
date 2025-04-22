@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Domain
@@ -29,9 +29,6 @@ class Domain extends Model
      */
     protected $fillable = ['name', 'business_partner_name', 'description'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function requests(): HasMany
     {
         return $this->hasMany(\App\Models\Request::class, 'id', 'product_group_function_domain_id');

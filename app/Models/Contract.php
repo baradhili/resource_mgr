@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Contract
@@ -30,9 +30,6 @@ class Contract extends Model
      */
     protected $fillable = ['start_date', 'end_date', 'availability', 'resources_id', 'permanent'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function resource(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Region
@@ -31,33 +31,21 @@ class Region extends Model
      */
     protected $fillable = ['name', 'jurisdiction'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function locations(): HasMany
     {
         return $this->hasMany(\App\Models\Location::class, 'id', 'region_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function projectRegions(): HasMany
     {
         return $this->hasMany(\App\Models\ProjectRegion::class, 'id', 'region_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function publicHolidays(): HasMany
     {
         return $this->hasMany(\App\Models\PublicHoliday::class, 'id', 'region_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function resources(): HasMany
     {
         return $this->hasMany(\App\Models\Resource::class, 'id', 'region_id');

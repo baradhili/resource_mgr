@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Site
@@ -28,9 +28,6 @@ class Site extends Model
      */
     protected $fillable = ['name', 'description'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function requests(): HasMany
     {
         return $this->hasMany(\App\Models\Request::class, 'id', 'site_id');

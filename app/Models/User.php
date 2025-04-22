@@ -3,11 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Glorand\Model\Settings\Traits\HasSettingsField;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -57,8 +57,6 @@ class User extends Authenticatable
 
     /**
      * Get the team users associated with the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function teamUsers(): HasMany
     {
@@ -67,8 +65,6 @@ class User extends Authenticatable
 
     /**
      * Get the reporting line of the user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function reportingLine(): HasOne
     {
@@ -77,8 +73,6 @@ class User extends Authenticatable
 
     /**
      * Get the people who report to this manager.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function reportees(): HasMany
     {
@@ -87,8 +81,6 @@ class User extends Authenticatable
 
     /**
      * Get the resource linked to this user.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function resource(): BelongsTo
     {

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class ResourceSkill
@@ -31,17 +31,11 @@ class ResourceSkill extends Model
      */
     protected $fillable = ['resources_id', 'skills_id', 'proficiency_levels'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function resource(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function skill(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Skill::class, 'skills_id', 'id');

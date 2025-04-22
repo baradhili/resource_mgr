@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Scope
@@ -30,9 +30,6 @@ class Scope extends Model
      */
     protected $fillable = ['tasks_deliverables', 'timeline', 'exclusions', 'estimate_id'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function estimate(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Estimate::class, 'estimate_id', 'id');

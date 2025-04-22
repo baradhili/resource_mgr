@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Permission
@@ -29,17 +29,11 @@ class Permission extends Model
      */
     protected $fillable = ['name', 'guard_name'];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function modelHasPermissions(): HasMany
     {
         return $this->hasMany(\App\Models\ModelHasPermission::class, 'id', 'permission_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function roleHasPermissions(): HasMany
     {
         return $this->hasMany(\App\Models\RoleHasPermission::class, 'id', 'permission_id');
