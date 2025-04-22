@@ -1,8 +1,7 @@
 ## Resource Manager
 
-!\[ coderabbit \](https://img.shields.io/coderabbit/prs/github/baradhili/resource_mgr)
+![Code Rabbit Pull Reviews](https://img.shields.io/github/issues-pr/baradhili/resource_mgr.svg)
 
-!\[my badge\](https://badgen.net/badge/hello/world/red?icon=twitter)
 
 This tool is initially to help manage demand and resource levelling across many projects in an enterprise. 
 At this stage it expects input from a powerBi report out of Microsoft Project Server and thus works on allocations per month rather than project tasks.
@@ -32,11 +31,11 @@ Its early stages right now, we are looking for help in:
 - [X] Make calendar controls consistent
 - [X] Set up teams 
 - [X] Create Resource Type crud and link with teams
-- [ ] Filter multiple views/permissions by Team
+- [X] Filter multiple views/permissions by Team
 - [X] Create a "Senior Manager" role that might oversee one or more Teams
-- [ ] Update User admin to assign the user into various function roles such as "Resource", "Team Owner", etc
+- [X] Update User admin to assign the user into various function roles such as "Resource", "Team Owner", etc
 - [X] Add ability to release demand from a resource from a date (to handle exits)
-- [ ] Detect changes in imported data
+- [X] Detect changes in imported data
 
 
-Yes it is currently Laravel 10 based, not 11. Bleading edge, especially for major changes is not my thing.
+Yes it is currently Laravel 11 based, not 12. BSeveral of teh packages don't yet support 12.
