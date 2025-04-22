@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Cache;
-use Carbon\Carbon;
-use App\Models\Resource;
 use App\Models\Allocation;
+use App\Models\Resource;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class CacheService
@@ -20,15 +20,15 @@ class CacheService
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
-                'monthFullName' => $date->format('F')
+                'monthFullName' => $date->format('F'),
             ];
         }
 
         $resources = Resource::whereHas('contracts', function ($query) {
-            $query->where(function($query) {
+            $query->where(function ($query) {
                 $query->where('start_date', '<=', now())
                     ->where('end_date', '>=', now());
-            })->orWhere(function($query) {
+            })->orWhere(function ($query) {
                 $query->where('start_date', '>', now())
                     ->where('start_date', '<=', Carbon::now()->addMonth());
             });
@@ -71,12 +71,12 @@ class CacheService
                             $baseAvailability = $currentContract->availability;
                         }
                         // Use year-month as the key
-                        $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                        $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                         // Add the calculated base availability to the resource availability array
                         $resourceAvailability[$resource->id]['availability'][$key] = $baseAvailability;
                     }
-                    //now check for leave
+                    // now check for leave
                     foreach ($resource->leaves as $leave) {
                         $leaveStartDate = Carbon::parse($leave->start_date);
                         $leaveEndDate = Carbon::parse($leave->end_date);
@@ -100,7 +100,7 @@ class CacheService
                                 $leaveAvailability = 1.00;
                             }
                             // Use year-month as the key
-                            $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                            $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                             // Add the calculated base availability to the resource availability array
                             $resourceAvailability[$resource->id]['availability'][$key] = $resourceAvailability[$resource->id]['availability'][$key] - $leaveAvailability;
@@ -127,7 +127,7 @@ class CacheService
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
-                'monthFullName' => $date->format('F')
+                'monthFullName' => $date->format('F'),
             ];
         }
         //  Start and end dates for the period
@@ -136,18 +136,18 @@ class CacheService
 
         // Collect our resources who have a current contract
         $resources = Resource::whereHas('contracts', function ($query) {
-            $query->where(function($query) {
+            $query->where(function ($query) {
                 $query->where('start_date', '<=', now())
                     ->where('end_date', '>=', now());
-            })->orWhere(function($query) {
+            })->orWhere(function ($query) {
                 $query->where('start_date', '>', now())
                     ->where('start_date', '<=', Carbon::now()->addMonth());
             });
         })->get();
 
-        //Collect the availability
+        // Collect the availability
         $resourceAvailability = Cache::get('resourceAvailability');
-        if (!Cache::has('resourceAvailability')) {
+        if (! Cache::has('resourceAvailability')) {
             $this->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
@@ -167,10 +167,10 @@ class CacheService
                     ->where('resources_id', '=', $resource->id)
                     ->sum('fte');
                 // Use year-month as the key
-                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                 // Get the availability for the month
                 // Get the availability for the current month
-                $availability = isset($resourceAvailability[$resource->id]['availability'][$key]) ? (float)$resourceAvailability[$resource->id]['availability'][$key] : 0.0;
+                $availability = isset($resourceAvailability[$resource->id]['availability'][$key]) ? (float) $resourceAvailability[$resource->id]['availability'][$key] : 0.0;
                 // Calculate the percentage of total allocation divided by availability
                 $percentage = $availability > 0 ? ($totalAllocation / $availability) * 100 : 0;
 

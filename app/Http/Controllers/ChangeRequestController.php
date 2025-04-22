@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ChangeRequest;
 use App\Models\Allocation;
+use App\Models\ChangeRequest;
 use App\Models\Demand;
 use App\Models\ResourceType;
+use App\Services\CacheService;
+use App\Services\ResourceService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\ChangeRequestRequest;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Log;
-use Illuminate\View\View;
-use App\Services\CacheService;
-use App\Services\ResourceService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
 
 class ChangeRequestController extends Controller
 {
@@ -29,17 +28,18 @@ class ChangeRequestController extends Controller
         $this->cacheService = $cacheService;
         $this->resourceService = $resourceService;
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
-        //get user 
+        // get user
         $user = Auth::user();
         $resourceTypes = $user->ownedTeams->pluck('resource_type')->toArray();
         $resourceTypes = ResourceType::whereIn('name', $resourceTypes)->pluck('id')->toArray();
 
-        //get the resources we manage
+        // get the resources we manage
         $resources = $this->resourceService->getResourceList()->pluck('id')->toArray();
         // Log::info("resources: " . json_encode($resources));
 
@@ -51,11 +51,11 @@ class ChangeRequestController extends Controller
                 [Allocation::class, Demand::class],
                 function ($query, $type) use ($resources, $resourceTypes) {
                     if ($type === Allocation::class) {
-                        $query->when(!empty($resources), function ($query) use ($resources) {
+                        $query->when(! empty($resources), function ($query) use ($resources) {
                             $query->whereIn('resources_id', $resources);
                         });
                     } elseif ($type === Demand::class) {
-                        $query->when(!empty($resourceTypes), function ($query) use ($resourceTypes) {
+                        $query->when(! empty($resourceTypes), function ($query) use ($resourceTypes) {
                             $query->whereIn('resource_type', $resourceTypes);
                         });
                     }
@@ -68,7 +68,7 @@ class ChangeRequestController extends Controller
             })
             ->paginate();
 
-        //if the record type is allocation, get the allocation resource->full_name and insert into a new parameter "subject"
+        // if the record type is allocation, get the allocation resource->full_name and insert into a new parameter "subject"
         $changeRequestsToRemove = [];
         foreach ($changeRequests as $changeRequest) {
             if ($changeRequest->record_type === Allocation::class) {
@@ -79,9 +79,9 @@ class ChangeRequestController extends Controller
             } elseif ($changeRequest->record_type === Demand::class) {
                 $demand = $changeRequest->record;
                 // Log::info("checking if its one of our resource types - {$demand->resource_type}");
-                //if this isn't one of our $resource_types then remove from $changeRequests
+                // if this isn't one of our $resource_types then remove from $changeRequests
 
-                //if $demand->resource_type is a number then find ResourceType->name
+                // if $demand->resource_type is a number then find ResourceType->name
                 if (is_numeric($demand->resource_type)) {
                     $demand->resource_type = ResourceType::find($demand->resource_type)->name;
                 }
@@ -118,8 +118,9 @@ class ChangeRequestController extends Controller
             'approved_by' => auth()->id(),
             'approval_date' => Carbon::now(),
         ]);
-        //refresh cache for allocation
+        // refresh cache for allocation
         $this->cacheService->cacheResourceAllocation();
+
         return redirect()->route('change-requests.index')->with('success', 'Change request approved');
 
     }

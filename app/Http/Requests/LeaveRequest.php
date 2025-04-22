@@ -22,9 +22,9 @@ class LeaveRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'start_date' => 'required',
-			'end_date' => 'required',
-			'resources_id' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'resources_id' => 'required',
         ];
     }
 }

@@ -2,10 +2,9 @@
 
 namespace App\Widgets;
 
-use Arrilot\Widgets\AbstractWidget;
 use App\Models\Resource;
+use Arrilot\Widgets\AbstractWidget;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class ContractTenure extends AbstractWidget
 {
@@ -30,7 +29,7 @@ class ContractTenure extends AbstractWidget
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
-                'monthFullName' => $date->format('F')
+                'monthFullName' => $date->format('F'),
             ];
         }
 
@@ -47,7 +46,7 @@ class ContractTenure extends AbstractWidget
                         ->where('end_date', '>=', now())
                         ->where('end_date', '<=', $oneYearFromNow)
                         ->orderBy('end_date', 'asc');
-                }
+                },
             ])
             ->get()
             ->sortBy(function ($resource) {
@@ -59,14 +58,14 @@ class ContractTenure extends AbstractWidget
             return $resource->contracts->last()->end_date <= $threeMonthsFromNow;
         })->count();
 
-    $firstResource = $resources->first();  
-        $nextPersonOutDate = Carbon::parse($firstResource->contracts->last()->end_date)->format('Y-m-d');  
-    $nextPersonOut = "{$firstResource->full_name} on {$nextPersonOutDate}";  
+        $firstResource = $resources->first();
+        $nextPersonOutDate = Carbon::parse($firstResource->contracts->last()->end_date)->format('Y-m-d');
+        $nextPersonOut = "{$firstResource->full_name} on {$nextPersonOutDate}";
 
         return view('widgets.contract_tenure', [
             'config' => $this->config,
             'resourcesEndingSoonCount' => $resourcesEndingSoonCount,
-            'nextPersonOut' => $nextPersonOut
+            'nextPersonOut' => $nextPersonOut,
         ]);
     }
 }

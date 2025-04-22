@@ -22,9 +22,9 @@ class DomainRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'name' => 'required|string',
-			'business_partner_name' => 'required|string',
-			'description' => 'string',
+            'name' => 'required|string',
+            'business_partner_name' => 'required|string',
+            'description' => 'string',
         ];
     }
 }

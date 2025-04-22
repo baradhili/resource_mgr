@@ -2,14 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use App\Http\Requests\RoleRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\RoleRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -18,8 +17,7 @@ class RoleController extends Controller
      *
      * @return void
      */
-
-    public function __construct() //change this later once perms seeded
+    public function __construct() // change this later once perms seeded
     {
         //     $this->middleware('role:view', ['only' => ['index']]);
         //     $this->middleware('role:create', ['only' => ['create', 'store', 'addPermissionToRole', 'givePermissionToRole']]);
@@ -43,9 +41,9 @@ class RoleController extends Controller
      */
     public function create(): View
     {
-        $role = new Role();
+        $role = new Role;
         $permissions = Permission::all();
-        $role_permissions = collect(); 
+        $role_permissions = collect();
 
         return view('role.create', compact('role', 'role_permissions', 'permissions'));
     }
@@ -53,16 +51,16 @@ class RoleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse //RoleRequest
+    public function store(Request $request): RedirectResponse // RoleRequest
     {
         // Role::create($request->validated());
         $request->validate([
             'name' => [
                 'required',
                 'string',
-                'unique:roles,name'
+                'unique:roles,name',
             ],
-            'role_permissions' => 'nullable|string'
+            'role_permissions' => 'nullable|string',
         ]);
 
         // Retrieve the permission objects based on the names
@@ -70,7 +68,7 @@ class RoleController extends Controller
         $permissions = Permission::whereIn('name', $permissions_names)->get();
 
         $role = Role::create([
-            'name' => $request->name
+            'name' => $request->name,
         ]);
 
         // Synchronize the permissions with the role
@@ -87,14 +85,13 @@ class RoleController extends Controller
     {
         $role = Role::findById($id);
         $role_permissions = $role->permissions;
-        return view('role.show', compact('role','role_permissions'));
+
+        return view('role.show', compact('role', 'role_permissions'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-
-
     public function edit($id): View
     {
         $role = Role::findById($id);
@@ -103,6 +100,7 @@ class RoleController extends Controller
 
         return view('role.edit', compact('role', 'role_permissions', 'permissions'));
     }
+
     /**
      * Update the specified resource in storage.
      */
@@ -113,9 +111,9 @@ class RoleController extends Controller
             'name' => [
                 'required',
                 'string',
-                'unique:roles,name,' . $role->id
+                'unique:roles,name,'.$role->id,
             ],
-            'role_permissions' => 'nullable|string'
+            'role_permissions' => 'nullable|string',
         ]);
 
         $role = Role::findById($role->id);
@@ -124,7 +122,7 @@ class RoleController extends Controller
         $permissions = Permission::whereIn('name', $permissions_names)->get();
 
         $role->update([
-            'name' => $request->name
+            'name' => $request->name,
         ]);
 
         // Synchronize the permissions with the role
@@ -145,6 +143,7 @@ class RoleController extends Controller
     {
         $role = Role::find($roleId);
         $role->delete();
+
         return redirect('roles')->with('status', 'Role Deleted Successfully');
     }
 
@@ -160,14 +159,14 @@ class RoleController extends Controller
         return view('role-permission.role.add-permissions', [
             'role' => $role,
             'permissions' => $permissions,
-            'rolePermissions' => $rolePermissions
+            'rolePermissions' => $rolePermissions,
         ]);
     }
 
     public function givePermissionToRole(Request $request, $roleId)
     {
         $request->validate([
-            'permission' => 'required'
+            'permission' => 'required',
         ]);
 
         $role = Role::findOrFail($roleId);

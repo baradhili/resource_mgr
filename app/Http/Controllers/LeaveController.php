@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LeaveRequest;
 use App\Models\Leave;
 use App\Models\Resource;
+use App\Services\ResourceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\LeaveRequest;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use App\Services\ResourceService;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Log;
 
 class LeaveController extends Controller
 {
@@ -21,7 +20,7 @@ class LeaveController extends Controller
     {
         $this->resourceService = $resourceService;
     }
-    
+
     /**
      * Display a listing of the resource.
      */
@@ -32,7 +31,7 @@ class LeaveController extends Controller
         $regionID = $request->input('region_id');
         // Collect our resources who have a current contract
         $resources = $this->resourceService->getResourceList($regionID);
-    
+
         // collect teh regions from teh resources->region
         $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
@@ -44,7 +43,7 @@ class LeaveController extends Controller
         $query = Leave::query()
             ->whereIn('resources_id', $resources->pluck('id'));
 
-        if (!$old) {
+        if (! $old) {
             $query->where('end_date', '>=', now());
         }
 
@@ -69,7 +68,7 @@ class LeaveController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('leave.index', compact('leaves','regions'))
+        return view('leave.index', compact('leaves', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $leaves->perPage());
 
     }
@@ -79,11 +78,11 @@ class LeaveController extends Controller
      */
     public function create(): View
     {
-        $leave = new Leave();
+        $leave = new Leave;
 
         $resources = Resource::all(); // Retrieve all resources
 
-        return view('leave.create', compact('leave','resources'));
+        return view('leave.create', compact('leave', 'resources'));
     }
 
     /**
@@ -116,7 +115,7 @@ class LeaveController extends Controller
 
         $resources = Resource::all(); // Retrieve all resources
 
-        return view('leave.edit', compact('leave','resources'));
+        return view('leave.edit', compact('leave', 'resources'));
     }
 
     /**

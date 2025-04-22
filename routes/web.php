@@ -6,32 +6,28 @@ use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
+use App\Http\Controllers\DemandRequestController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\FundingApprovalStageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\LeaveController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\DemandRequestController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\PluginController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\PublicHolidayController;
+use App\Http\Controllers\RegionController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\ResourceSkillController;
-use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ResourceTypeController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SiteController;
 use App\Http\Controllers\SkillController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TermsAndConditionController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\RegionController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\ResourceTypeController;
-use App\Http\Controllers\PublicHolidayController;
-
 use Illuminate\Support\Facades\Route;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -52,12 +48,11 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
 Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('allocations/editOne', [AllocationController::class, 'editOne'])->name('allocations.editOne');
     Route::resource('allocations', AllocationController::class);
-    //additional functions
+    // additional functions
     Route::get('/contracts/clean', [ContractController::class, 'cleanProjects'])->name('contracts.clean');
     Route::resource('contracts', ContractController::class);
     Route::get('/demands/export', [DemandController::class, 'exportDemands'])->name('demands.export');
@@ -81,7 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('terms-and-conditions', TermsAndConditionController::class);
     Route::get('change-password', [AuthController::class, 'showChangePasswordForm'])->name('auth.change-password');
     Route::post('change-password', [AuthController::class, 'changePassword'])->name('auth.change-password.update');
-    Route::group(['middleware' => ['role:super-admin|admin']], function () {
+    Route::middleware('role:super-admin|admin')->group(function () {
 
         Route::resource('permissions', App\Http\Controllers\PermissionController::class);
         Route::get('permissions/{permissionId}/delete', [App\Http\Controllers\PermissionController::class, 'destroy']);
@@ -112,12 +107,10 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-
-
 /**
  * Teamwork routes
  */
-Route::group(['prefix' => 'teams', 'namespace' => 'Teamwork'], function () {
+Route::prefix('teams')->group(function () {
     Route::get('/', [App\Http\Controllers\Teamwork\TeamController::class, 'index'])->name('teams.index');
     Route::get('create', [App\Http\Controllers\Teamwork\TeamController::class, 'create'])->name('teams.create');
     Route::post('teams', [App\Http\Controllers\Teamwork\TeamController::class, 'store'])->name('teams.store');

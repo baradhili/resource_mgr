@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ResourceTypeRequest;
 use App\Models\ResourceType;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\ResourceTypeRequest;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
@@ -27,7 +27,7 @@ class ResourceTypeController extends Controller
      */
     public function create(): View
     {
-        $resourceType = new ResourceType();
+        $resourceType = new ResourceType;
 
         return view('resource-type.create', compact('resourceType'));
     }

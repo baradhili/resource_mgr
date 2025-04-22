@@ -15,17 +15,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property $created_at
  * @property $updated_at
  *
- * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class ServiceCatalogue extends Model
 {
-    
     protected $perPage = 20;
-
-    protected $casts = [
-        'required_skills' => 'json', // Casts the required_skills column to JSON
-    ];
 
     /**
      * The attributes that are mass assignable.
@@ -34,5 +28,10 @@ class ServiceCatalogue extends Model
      */
     protected $fillable = ['service_name', 'description', 'required_skills', 'hours_cost'];
 
-
+    protected function casts(): array
+    {
+        return [
+            'required_skills' => 'json', // Casts the required_skills column to JSON
+        ];
+    }
 }

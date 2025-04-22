@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Allocation
@@ -16,15 +17,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property $source
  * @property $created_at
  * @property $updated_at
- *
  * @property Project $project
- * @property Resource $resource
- * @package App
+ * @property resource $resource
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Allocation extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -34,21 +33,13 @@ class Allocation extends Model
      */
     protected $fillable = ['allocation_date', 'fte', 'resources_id', 'projects_id', 'status', 'source'];
 
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function project()
+    public function project(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Project::class, 'projects_id', 'id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function resource()
+
+    public function resource(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
     }
-    
 }

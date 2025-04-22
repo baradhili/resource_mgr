@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Class Resource
@@ -15,7 +19,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property float $baseAvailability
  * @property int $region_id
  * @property int $location_id
- *
  * @property Allocation[] $allocations
  * @property Contract[] $contracts
  * @property Leave[] $leaves
@@ -24,12 +27,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property Location $location
  * @property User $user
  * @property ResourceType $resourceType
- * @package App\Models
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Resource extends Model
 {
-
     protected $perPage = 20;
 
     /**
@@ -47,66 +49,42 @@ class Resource extends Model
         'location_id',
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function allocations()
+    public function allocations(): HasMany
     {
         return $this->hasMany(\App\Models\Allocation::class, 'resources_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function contracts()
+    public function contracts(): HasMany
     {
         return $this->hasMany(\App\Models\Contract::class, 'resources_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function leaves()
+    public function leaves(): HasMany
     {
         return $this->hasMany(\App\Models\Leave::class, 'resources_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function skills()
+    public function skills(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Skill::class, 'resource_skill', 'resources_id', 'skills_id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function region()
+    public function region(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id')->withDefault();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function location()
+    public function location(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id')->withDefault();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function user()
+    public function user(): HasOne
     {
         return $this->hasOne(\App\Models\User::class, 'resource_id', 'id')->withDefault();
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function resourceType()
+    public function resourceType(): BelongsTo
     {
         return $this->belongsTo(ResourceType::class, 'resource_type', 'id')->withDefault();
     }
@@ -114,7 +92,6 @@ class Resource extends Model
     /**
      * Get all resources that match a list of resource_type.
      *
-     * @param array $resourceTypes
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public static function getResourcesByTypes(array $resourceTypes)
@@ -131,7 +108,4 @@ class Resource extends Model
     {
         return $this->contracts()->value('permanent');
     }
-
-
 }
-

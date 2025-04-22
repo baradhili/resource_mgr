@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Demand
@@ -16,14 +17,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property $source
  * @property $created_at
  * @property $updated_at
- *
  * @property Project $project
- * @package App
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Demand extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -31,15 +30,10 @@ class Demand extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['demand_date', 'fte', 'status', 'resource_type','projects_id', 'source'];
+    protected $fillable = ['demand_date', 'fte', 'status', 'resource_type', 'projects_id', 'source'];
 
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function project()
+    public function project(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Project::class, 'projects_id', 'id');
     }
-    
 }

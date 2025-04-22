@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Region
@@ -12,17 +13,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property $created_at
  * @property $updated_at
  * @property $jurisdiction
- *
  * @property Location[] $locations
  * @property ProjectRegion[] $projectRegions
  * @property PublicHoliday[] $publicHolidays
- * @property Resource[] $resources
- * @package App
+ * @property resource[] $resources
+ *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Region extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -32,37 +31,23 @@ class Region extends Model
      */
     protected $fillable = ['name', 'jurisdiction'];
 
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function locations()
+    public function locations(): HasMany
     {
         return $this->hasMany(\App\Models\Location::class, 'id', 'region_id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function projectRegions()
+
+    public function projectRegions(): HasMany
     {
         return $this->hasMany(\App\Models\ProjectRegion::class, 'id', 'region_id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function publicHolidays()
+
+    public function publicHolidays(): HasMany
     {
         return $this->hasMany(\App\Models\PublicHoliday::class, 'id', 'region_id');
     }
-    
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function resources()
+
+    public function resources(): HasMany
     {
         return $this->hasMany(\App\Models\Resource::class, 'id', 'region_id');
     }
-    
 }

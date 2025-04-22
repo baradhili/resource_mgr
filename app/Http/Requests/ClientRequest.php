@@ -22,8 +22,8 @@ class ClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'name' => 'required|string',
-			'contact_details' => 'required|string',
+            'name' => 'required|string',
+            'contact_details' => 'required|string',
         ];
     }
 }

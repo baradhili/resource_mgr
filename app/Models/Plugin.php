@@ -14,12 +14,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property $created_at
  * @property $updated_at
  *
- * @package App
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class Plugin extends Model
 {
-    
     protected $perPage = 20;
 
     /**
@@ -28,6 +26,4 @@ class Plugin extends Model
      * @var array<int, string>
      */
     protected $fillable = ['name', 'type', 'description'];
-
-
 }

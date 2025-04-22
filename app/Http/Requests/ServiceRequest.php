@@ -22,9 +22,9 @@ class ServiceRequest extends FormRequest
     public function rules(): array
     {
         return [
-			'service_name' => 'required|string',
-			'description' => 'string',
-			'required_skills' => 'nullable|json',
+            'service_name' => 'required|string',
+            'description' => 'string',
+            'required_skills' => 'nullable|json',
             'hours_cost' => 'nullable|numeric|regex:/^\d+(\.\d{1,2})?$/',
         ];
     }
