@@ -2,12 +2,24 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Menu\Laravel\Link;
 use Spatie\Menu\Laravel\Menu;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * The path to your application's "home" route.
+     *
+     * Typically, users are redirected here after authentication.
+     *
+     * @var string
+     */
+    public const HOME = '/home';
+
     /**
      * Register any application services.
      */
@@ -37,6 +49,8 @@ class AppServiceProvider extends ServiceProvider
 
         //     $view->with('sidebarMenu', $menu);
         // });
+
+        $this->bootRoute();
     }
 
     private function wrapInSpan(string $string): string
@@ -45,5 +59,12 @@ class AppServiceProvider extends ServiceProvider
 
         // TODO look up an icon
         return $wrapper;
+    }
+
+    public function bootRoute(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
     }
 }
