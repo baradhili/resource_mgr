@@ -116,7 +116,7 @@ class ImportController extends Controller
                             //check the month allocations
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(ord($this->columnDataStart) + $i);
-                                $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
+                                $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
                                 $existingAllocation = Allocation::where('resources_id', $resourceID)
                                     ->where('projects_id', $projectID)
                                     ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
@@ -156,7 +156,7 @@ class ImportController extends Controller
                         // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
-                            $fte = (double) number_format((float) $rowData[$columnLetter], 2, '.', '');
+                            $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
                             $existingDemand = Demand::where('projects_id', $projectID)
                                 ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
                                 ->first();
