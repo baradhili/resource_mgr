@@ -76,7 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('terms-and-conditions', TermsAndConditionController::class);
     Route::get('change-password', [AuthController::class, 'showChangePasswordForm'])->name('auth.change-password');
     Route::post('change-password', [AuthController::class, 'changePassword'])->name('auth.change-password.update');
-    Route::group(['middleware' => ['role:super-admin|admin']], function () {
+    Route::middleware('role:super-admin|admin')->group(function () {
 
         Route::resource('permissions', App\Http\Controllers\PermissionController::class);
         Route::get('permissions/{permissionId}/delete', [App\Http\Controllers\PermissionController::class, 'destroy']);
@@ -110,7 +110,7 @@ Route::middleware('auth')->group(function () {
 /**
  * Teamwork routes
  */
-Route::group(['prefix' => 'teams', 'namespace' => 'Teamwork'], function () {
+Route::prefix('teams')->namespace('Teamwork')->group(function () {
     Route::get('/', [App\Http\Controllers\Teamwork\TeamController::class, 'index'])->name('teams.index');
     Route::get('create', [App\Http\Controllers\Teamwork\TeamController::class, 'create'])->name('teams.create');
     Route::post('teams', [App\Http\Controllers\Teamwork\TeamController::class, 'store'])->name('teams.store');
