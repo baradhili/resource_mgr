@@ -46,6 +46,15 @@
                         <div class="form-group mb-2 mb20">
                             <strong>Projects overlapping contract end:</strong>
                             {{ $resource->currentProjects ? collect($resource->currentProjects)->map(fn($p) => $p->empowerID . ' - ' . $p->name . ' (' . $p->projectManager . ')')->implode(', ') : '' }}
+                            /************* ✨ Windsurf Command 🌟 *************/
+                            @if ($resource->currentProjects->count() > 0)
+                                @can('contracts.clean')
+                                    <a class="btn btn-sm btn-success"
+                                        href="{{ route('contracts.clean', ['end_date' => $contract->end_date, 'resource_id' => $contract->resource->id]) }}"><i
+                                            class="fa fa-fw fa-edit"></i> {{ __('Return Projects') }}</a>
+                                @endcan
+                            @endif
+                            /******* d4b29796-c4b5-4753-8225-7bf1967b71ba *******/
                         </div>
                     </div>
                 </div>

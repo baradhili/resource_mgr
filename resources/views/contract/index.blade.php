@@ -107,11 +107,6 @@
                                                             onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
                                                                 class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
                                                     @endcan
-                                                    @can('contracts.clean')
-                                                        <a class="btn btn-sm btn-success"
-                                                            href="{{ route('contracts.clean', ['end_date' => $contract->end_date, 'resource_id' => $contract->resource->id]) }}"><i
-                                                                class="fa fa-fw fa-edit"></i> {{ __('Return Projects') }}</a>
-                                                    @endcan
                                                 </form>
                                             </td>
                                         </tr>
