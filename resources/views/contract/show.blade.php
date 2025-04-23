@@ -19,28 +19,34 @@
                     </div>
 
                     <div class="card-body bg-white">
-
+                        <div class="form-group mb-2 mb20">
+                            <strong>Resource name:</strong>
+                            {{ $resource->full_name }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong> Perm/Contract </strong>
+                            {{ $contract->permanent ? 'Permanent' : 'Contract' }}
+                        </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Start Date:</strong>
-                            {{ $contract->start_date }}
+                            {{ \Carbon\Carbon::parse($contract->start_date)->format('d/m/Y') }}
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>End Date:</strong>
-                            {{ $contract->end_date }}
+                            {{ \Carbon\Carbon::parse($contract->end_date)->format('d/m/Y') }}
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Availability:</strong>
                             {{ $contract->availability }}
                         </div>
                         <div class="form-group mb-2 mb20">
-                            <strong>Resources Id:</strong>
-                            {{ $contract->resources_id }}
+                            <strong>Tenure at end of contract:</strong>
+                            {{ $resource->tenure }}
                         </div>
                         <div class="form-group mb-2 mb20">
-                            <strong> Perm/Contract </strong>
-                            {{ $contract->permanent ? 'Permanent' : 'Contract' }}
+                            <strong>Projects overlapping contract end:</strong>
+                            {{ $resource->currentProjects ? collect($resource->currentProjects)->map(fn($p) => $p->empowerID . ' - ' . $p->name . ' (' . $p->projectManager . ')')->implode(', ') : '' }}
                         </div>
-
                     </div>
                 </div>
             </div>

@@ -48,11 +48,10 @@
 
                     <div class="card-body bg-white">
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover">
+                            <table class="table table-hover table-striped">
                                 <thead class="thead">
                                     <tr>
                                         <th>Resource</th>
-
                                         <th>Start Date</th>
                                         <th>End Date</th>
                                         <th>Availability</th>
@@ -63,8 +62,25 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($contracts as $contract)
+                                        @php
+                                            // Calculate the difference in months between the end_date and today
+                                            $endDate = \Carbon\Carbon::parse($contract->end_date);
+                                            $today = \Carbon\Carbon::today();
+                                            $monthsDifference = $endDate->diffInMonths($today);
+                                        @endphp
                                         <tr>
-                                            <td>{{ $contract->resource->full_name }}</td>
+                                            <td>
+                                                {{ $contract->resource->full_name }}
+                                                @if ($monthsDifference <= 3)
+                                                    @if ($monthsDifference >= 2)
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                    @elseif ($monthsDifference >= 1)
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                    @else
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                    @endif
+                                                @endif
+                                            </td>
                                             <td>{{ $contract->permanent ? 'N/A' : \Carbon\Carbon::parse($contract->start_date)->format('Y-m-d') }}
                                             </td>
                                             <td>{{ $contract->permanent ? 'N/A' : \Carbon\Carbon::parse($contract->end_date)->format('Y-m-d') }}
@@ -76,9 +92,9 @@
                                             <td>
                                                 <form action="{{ route('contracts.destroy', $contract->id) }}"
                                                     method="POST">
-                                                    <!-- <a class="btn btn-sm btn-primary "
-                                                            href="{{ route('contracts.show', $contract->id) }}"><i
-                                                                class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a> -->
+                                                    <a class="btn btn-sm btn-primary "
+                                                                            href="{{ route('contracts.show', $contract->id) }}"><i
+                                                                                class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
                                                     @can('contracts.edit')
                                                         <a class="btn btn-sm btn-success"
                                                             href="{{ route('contracts.edit', $contract->id) }}"><i
