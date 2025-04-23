@@ -62,7 +62,7 @@ class ContractController extends Controller
             ->whereIn('resources_id', $resources->pluck('id'))
             ->orderBy('end_date', 'asc');
 
-        if (! $old) {
+        if (!$old) {
             $query->where('end_date', '>=', now());
         }
 
@@ -136,37 +136,37 @@ class ContractController extends Controller
         //get teh resource for this contract
         $resource = $contract->resource;
         // calculate tenure in years between contract start and end date, round to 1 decimal place
-            if ($resource->contracts && count($resource->contracts) > 0) {
-                $firstContract = $resource->contracts[0];
-                if ($firstContract->start_date && $firstContract->end_date) {
-                    $startDate = \Carbon\Carbon::parse($firstContract->start_date);
-                    $endDate = \Carbon\Carbon::parse($firstContract->end_date);
-                    $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
-                }
+        if ($resource->contracts && $resource->contracts->isNotEmpty()) {
+            $firstContract = $resource->contracts->first();
+            if ($firstContract->start_date && $firstContract->end_date) {
+                $startDate = \Carbon\Carbon::parse($firstContract->start_date);
+                $endDate = \Carbon\Carbon::parse($firstContract->end_date);
+                $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
             }
-            // find the project ids from teh resource's current allocations
-            $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $resource->contracts->first()->end_date])->get();
-            $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
-            $projects = Project::whereIn('id', $uniqueProjectIds)->get();
-            $currentProjects = $projects;
-            //filter all projects where the project end date is after or within one month of the resource's contract end date
-            $currentProjects = $currentProjects->filter(function ($project) use ($resource) {
-                $contractEndDate = \Carbon\Carbon::parse($resource->contracts->first()->end_date);
-                $projectEndDate = \Carbon\Carbon::parse($project->end_date);
-                // first is project end date after contract end date?
-                $overlap = $contractEndDate->lt($projectEndDate);
-                //if true return
-                if ($overlap) {
-                    return $overlap;
-                } else {
-                    // second is project end date inside one month less of contract end date? 
-                    $overlap = $contractEndDate->copy()->subMonth()->lt($projectEndDate);
-                    return $overlap;
-                }
-            });
-            $resource->currentProjects = $currentProjects;
+        }
+        // find the project ids from teh resource's current allocations
+        $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $resource->contracts->first()->end_date])->get();
+        $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
+        $projects = Project::whereIn('id', $uniqueProjectIds)->get();
+        $currentProjects = $projects;
+        //filter all projects where the project end date is after or within one month of the resource's contract end date
+        $currentProjects = $currentProjects->filter(function ($project) use ($resource) {
+            $contractEndDate = \Carbon\Carbon::parse($resource->contracts->first()->end_date);
+            $projectEndDate = \Carbon\Carbon::parse($project->end_date);
+            // first is project end date after contract end date?
+            $overlap = $contractEndDate->lt($projectEndDate);
+            //if true return
+            if ($overlap) {
+                return $overlap;
+            } else {
+                // second is project end date inside one month less of contract end date? 
+                $overlap = $contractEndDate->copy()->subMonth()->lt($projectEndDate);
+                return $overlap;
+            }
+        });
+        $resource->currentProjects = $currentProjects;
 
-        return view('contract.show', compact('contract','resource'));
+        return view('contract.show', compact('contract', 'resource'));
     }
 
     /**

@@ -23,19 +23,13 @@ Its early stages right now, we are looking for help in:
 
 ## Next steps
 
-- [X] Split out some hard coded things into env or a settings table
-- [X] Update Allocations view to show percent of availablity
-- [X] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
-- [X] Differentiate manual demand from uploads so we don't delete the wrong stuff
-- [X] Bulk add public holidays - to people in a region
-- [X] Make calendar controls consistent
-- [X] Set up teams 
-- [X] Create Resource Type crud and link with teams
-- [X] Filter multiple views/permissions by Team
-- [X] Create a "Senior Manager" role that might oversee one or more Teams
-- [X] Update User admin to assign the user into various function roles such as "Resource", "Team Owner", etc
-- [X] Add ability to release demand from a resource from a date (to handle exits)
-- [X] Detect changes in imported data
+- [ ] Make a non-API/JS export method?
+- [ ] New change Requests should supercede old ones
+- [ ] Import project allocations should supercede existing for change requests - thus if the project moves it should delete existing as well as modify
+- [ ] Show only change requests that apply to the viewer (ie don't show BAs to someone managing SAs)
+- [ ] Ignore roles where we don't have a resource manager (ie. if no one on the system handles PMs - don't import at all)
+- [ ] Sort out importing of resource types and make sure demands view shows the names
+- [ ] Make CRUDs consistent (search, backs on show, etc)
 
 
-Yes it is currently Laravel 11 based, not 12. BSeveral of teh packages don't yet support 12.
+Yes it is currently Laravel 11 based, not 12. But several of the packages don't yet support 12.
