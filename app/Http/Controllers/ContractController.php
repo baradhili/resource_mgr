@@ -7,6 +7,7 @@ use App\Models\Allocation;
 use App\Models\Contract;
 use App\Models\Demand;
 use App\Models\Resource;
+use App\Models\Project;
 use App\Services\CacheService;
 use App\Services\ResourceService;
 use Illuminate\Http\RedirectResponse;
@@ -61,7 +62,7 @@ class ContractController extends Controller
             ->whereIn('resources_id', $resources->pluck('id'))
             ->orderBy('end_date', 'asc');
 
-        if (! $old) {
+        if (!$old) {
             $query->where('end_date', '>=', now());
         }
 
@@ -132,8 +133,43 @@ class ContractController extends Controller
     public function show($id): View
     {
         $contract = Contract::find($id);
+        //get teh resource for this contract
+        $resource = $contract->resource;
+        // calculate tenure in years between contract start and end date, round to 1 decimal place
+        if ($resource->contracts && $resource->contracts->isNotEmpty()) {
+            $firstContract = $resource->contracts->first();
+            if ($firstContract->start_date && $firstContract->end_date) {
+                $startDate = \Carbon\Carbon::parse($firstContract->start_date);
+                $endDate = \Carbon\Carbon::parse($firstContract->end_date);
+                $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
+            }
+        }
+        // find the project ids from teh resource's current allocations
+        $endDate = $resource->contracts && $resource->contracts->isNotEmpty()
+            ? $resource->contracts->first()->end_date
+            : \Carbon\Carbon::now()->addMonths(3);
+        $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $endDate])->get();
+        $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
+        $projects = Project::whereIn('id', $uniqueProjectIds)->get();
+        $currentProjects = $projects;
+        //filter all projects where the project end date is after or within one month of the resource's contract end date
+        $currentProjects = $currentProjects->filter(function ($project) use ($resource) {
 
-        return view('contract.show', compact('contract'));
+            if (!$resource->contracts || $resource->contracts->isEmpty() || !$project->end_date) {
+                return false;
+            }
+
+            $contractEndDate = \Carbon\Carbon::parse($resource->contracts->first()->end_date);
+            $projectEndDate = \Carbon\Carbon::parse($project->end_date);
+
+            // Return true if project ends after contract OR within one month of contract end
+            return $contractEndDate->lt($projectEndDate) ||
+                $contractEndDate->copy()->subMonth()->lt($projectEndDate);
+        });
+
+        $resource->currentProjects = $currentProjects;
+
+        return view('contract.show', compact('contract', 'resource'));
     }
 
     /**

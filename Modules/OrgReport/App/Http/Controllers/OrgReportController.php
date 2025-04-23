@@ -50,7 +50,7 @@ class OrgReportController extends Controller
                 if ($firstContract->start_date && $firstContract->end_date) {
                     $startDate = \Carbon\Carbon::parse($firstContract->start_date);
                     $endDate = \Carbon\Carbon::parse($firstContract->end_date);
-                    $resource->tenure = round($endDate->diffInDays($startDate) / 365, 1);
+                    $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
                 }
             }
             // find the project ids from teh resource's current allocations
@@ -80,9 +80,9 @@ class OrgReportController extends Controller
         $resources = $resources->sortByDesc('tenure');
         // remove any resources where tenure is < 1.5 years or their top contract in contracts has permanent = 1
         $resources = $resources->filter(function ($resource) {
-            return $resource->tenure >= 1.5 && ! $resource->contracts->first()->permanent;
+            return $resource->tenure >= 1.5 && !$resource->contracts->first()->permanent;
         });
-Log::info("resource: ".json_encode($resources));
+        Log::info("resource: " . json_encode($resources));
         return view('orgreport::index', compact('resources', 'regions'));
     }
 }

@@ -1,5 +1,8 @@
 ## Resource Manager
 
+![Code Rabbit Pull Reviews](https://img.shields.io/github/issues-pr/baradhili/resource_mgr.svg)
+
+
 This tool is initially to help manage demand and resource levelling across many projects in an enterprise. 
 At this stage it expects input from a powerBi report out of Microsoft Project Server and thus works on allocations per month rather than project tasks.
 
@@ -20,19 +23,13 @@ Its early stages right now, we are looking for help in:
 
 ## Next steps
 
-- [X] Split out some hard coded things into env or a settings table
-- [X] Update Allocations view to show percent of availablity
-- [X] Delete/edit Demands - this probably needs to be more usable than a month by month allocation, but still allow that
-- [X] Differentiate manual demand from uploads so we don't delete the wrong stuff
-- [X] Bulk add public holidays - to people in a region
-- [X] Make calendar controls consistent
-- [X] Set up teams 
-- [X] Create Resource Type crud and link with teams
-- [ ] Filter multiple views/permissions by Team
-- [X] Create a "Senior Manager" role that might oversee one or more Teams
-- [ ] Update User admin to assign the user into various function roles such as "Resource", "Team Owner", etc
-- [X] Add ability to release demand from a resource from a date (to handle exits)
-- [ ] Detect changes in imported data
+- [ ] Make a non-API/JS export method?
+- [ ] New change Requests should supercede old ones
+- [ ] Import project allocations should supercede existing for change requests - thus if the project moves it should delete existing as well as modify
+- [ ] Show only change requests that apply to the viewer (ie don't show BAs to someone managing SAs)
+- [ ] Ignore roles where we don't have a resource manager (ie. if no one on the system handles PMs - don't import at all)
+- [ ] Sort out importing of resource types and make sure demands view shows the names
+- [ ] Make CRUDs consistent (search, backs on show, etc)
 
 
-Yes it is currently Laravel 10 based, not 11. Bleading edge, especially for major changes is not my thing.
+Yes it is currently Laravel 11 based, not 12. But several of the packages don't yet support 12.
