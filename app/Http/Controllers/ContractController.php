@@ -145,8 +145,8 @@ class ContractController extends Controller
             }
         }
         // find the project ids from teh resource's current allocations
-        $endDate = $resource->contracts && $resource->contracts->isNotEmpty() 
-            ? $resource->contracts->first()->end_date 
+        $endDate = $resource->contracts && $resource->contracts->isNotEmpty()
+            ? $resource->contracts->first()->end_date
             : \Carbon\Carbon::now()->addMonths(3);
         $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $endDate])->get();
         $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
@@ -154,19 +154,19 @@ class ContractController extends Controller
         $currentProjects = $projects;
         //filter all projects where the project end date is after or within one month of the resource's contract end date
         $currentProjects = $currentProjects->filter(function ($project) use ($resource) {
+
+            if (!$resource->contracts || $resource->contracts->isEmpty() || !$project->end_date) {
+                return false;
+            }
+
             $contractEndDate = \Carbon\Carbon::parse($resource->contracts->first()->end_date);
             $projectEndDate = \Carbon\Carbon::parse($project->end_date);
-            // first is project end date after contract end date?
-            $overlap = $contractEndDate->lt($projectEndDate);
-            //if true return
-            if ($overlap) {
-                return $overlap;
-            } else {
-                // second is project end date inside one month less of contract end date? 
-                $overlap = $contractEndDate->copy()->subMonth()->lt($projectEndDate);
-                return $overlap;
-            }
+
+            // Return true if project ends after contract OR within one month of contract end
+            return $contractEndDate->lt($projectEndDate) ||
+                $contractEndDate->copy()->subMonth()->lt($projectEndDate);
         });
+
         $resource->currentProjects = $currentProjects;
 
         return view('contract.show', compact('contract', 'resource'));
