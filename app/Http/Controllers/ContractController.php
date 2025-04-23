@@ -145,7 +145,10 @@ class ContractController extends Controller
             }
         }
         // find the project ids from teh resource's current allocations
-        $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $resource->contracts->first()->end_date])->get();
+        $endDate = $resource->contracts && $resource->contracts->isNotEmpty() 
+            ? $resource->contracts->first()->end_date 
+            : \Carbon\Carbon::now()->addMonths(3);
+        $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $endDate])->get();
         $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
         $projects = Project::whereIn('id', $uniqueProjectIds)->get();
         $currentProjects = $projects;
