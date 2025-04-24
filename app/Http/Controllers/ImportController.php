@@ -171,7 +171,7 @@ class ImportController extends Controller
                         });
                         if ($belongsToTeam) {
 
-                            $rowData[$this->columnResourceName] = $resourceType->id;
+                            $rowData[$this->columnResourceName] = $resourceType ? $resourceType->id : null;
                             // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
