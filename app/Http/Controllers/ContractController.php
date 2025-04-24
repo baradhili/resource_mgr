@@ -226,24 +226,37 @@ class ContractController extends Controller
 
     public function cleanProjects(Request $request): RedirectResponse
     {
+        $validated = $request->validate([
+            'resource_id' => 'required|exists:resources,id',
+            'end_date' => 'required|date',
+        ]);
         $resourceID = $request->resource_id;
         $end_date = $request->end_date;
 
         $allocations = Allocation::where('resources_id', $resourceID)
             ->whereDate('allocation_date', '>=', $end_date)
             ->get();
-// TODO Need to look up the resource's current resource type and make teh demand as that resource type
-        foreach ($allocations as $allocation) {
-            $demand = new Demand;
-            $demand->demand_date = $allocation->allocation_date;
-            $demand->fte = $allocation->fte;
-            $demand->projects_id = $allocation->projects_id;
-            $demand->resource_type = 'Solution Architect';
-            $demand->save();
 
-            $allocation->delete();
+        $resource_type = Resource::find($resourceID)->resourceType->id;
+
+        \DB::beginTransaction();
+        try {
+            foreach ($allocations as $allocation) {
+                $demand = new Demand;
+                $demand->demand_date = $allocation->allocation_date;
+                $demand->fte = $allocation->fte;
+                $demand->projects_id = $allocation->projects_id;
+                $demand->resource_type = $resource_type;
+                $demand->save();
+
+                $allocation->delete();
+            }
+            \DB::commit();
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return Redirect::route('contracts.index')
+                ->with('error', 'Failed to process allocations: ' . $e->getMessage());
         }
-
         return Redirect::route('contracts.index')
             ->with('success', 'Allocations returned successfully');
     }
