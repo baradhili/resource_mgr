@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Facade;
 
 return [
-    'APP_TENURE' => env('APP_TENURE'),
+    'tenure' => env('APP_TENURE'),
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
         'Menu' => Spatie\Menu\Laravel\Facades\Menu::class,
