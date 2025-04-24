@@ -73,16 +73,37 @@
                                                 {{ $contract->resource->full_name }}
                                                 @if ($monthsDifference <= 3)
                                                     @if ($monthsDifference >= 2)
-                                                        <span data-toggle="tooltip" data-placement="top" title="{{ __('Contract ends in next 3 months') }}">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                        <span data-toggle="tooltip" data-placement="top"
+                                                            title="{{ __('Contract ends in next 3 months') }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="black" stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round" class="feather feather-clock">
+                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                                            </svg>
                                                         </span>
                                                     @elseif ($monthsDifference >= 1)
-                                                        <span data-toggle="tooltip" data-placement="top" title="{{ __('Contract ends in next 2 months') }}">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="orange" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                        <span data-toggle="tooltip" data-placement="top"
+                                                            title="{{ __('Contract ends in next 2 months') }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="orange" stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round" class="feather feather-clock">
+                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                                            </svg>
                                                         </span>
                                                     @else
-                                                        <span data-toggle="tooltip" data-placement="top" title="{{ __('Contract ends this month') }}">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                                        <span data-toggle="tooltip" data-placement="top"
+                                                            title="{{ __('Contract ends this month') }}">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="24"
+                                                                height="24" viewBox="0 0 24 24" fill="none"
+                                                                stroke="red" stroke-width="2" stroke-linecap="round"
+                                                                stroke-linejoin="round" class="feather feather-clock">
+                                                                <circle cx="12" cy="12" r="10"></circle>
+                                                                <polyline points="12 6 12 12 16 14"></polyline>
+                                                            </svg>
                                                         </span>
                                                     @endif
                                                 @endif
@@ -93,29 +114,17 @@
                                             </td>
                                             <td>{{ $contract->availability }}</td>
                                             <td>
-                                                @php
-                                                    $tenure = env('APP_TENURE', null);
-                                                    $calc = $contract->permanent ? 0 : number_format(\Carbon\Carbon::parse($contract->end_date)->floatDiffInYears(\Carbon\Carbon::parse($contract->start_date)), 1);
-                                                @endphp
-                                                @if ($tenure)
-                                                    @if ($calc >= $tenure - 0.5 && $calc < $tenure)
-                                                        <span style="color: orange;">{{ $calc }}</span>
-                                                    @elseif ($calc >= $tenure)
-                                                        <span style="color: red;">{{ $calc }}</span>
-                                                    @else
-                                                        {{ $calc }}
-                                                    @endif
-                                                @else
-                                                    {{ $calc }}
-                                                @endif
+                                                <span class="text-{{ $contract->tenure_status }}">
+                                                    {{ $contract->tenure }}
+                                                </span>
                                             </td>
                                             <td>{{ $contract->permanent ? 'P' : 'C' }}</td>
                                             <td>
                                                 <form action="{{ route('contracts.destroy', $contract->id) }}"
                                                     method="POST">
                                                     <a class="btn btn-sm btn-primary "
-                                                                            href="{{ route('contracts.show', $contract->id) }}"><i
-                                                                                class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                        href="{{ route('contracts.show', $contract->id) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
                                                     @can('contracts.edit')
                                                         <a class="btn btn-sm btn-success"
                                                             href="{{ route('contracts.edit', $contract->id) }}"><i
@@ -137,7 +146,20 @@
                         </div>
                     </div>
                 </div>
-                {!! $contracts->withQueryString()->links() !!}
+                <form action="{{ route('contracts.index') }}" method="get">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <label for="perPage" class="form-label">{{ __('Items per page') }}</label>
+                            <select name="perPage" id="perPage" class="form-control" onchange="this.form.submit()">
+                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
+                            </select>
+                        </div>
+                        {!! $contracts->withQueryString()->links() !!}
+                    </div>
+                </form>
             </div>
         </div>
     </div>

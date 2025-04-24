@@ -80,7 +80,7 @@ class ContractController extends Controller
 
         // Get the current page from the request
         $page = $request->input('page', 1);
-        $perPage = 10; // Define the number of items per page
+        $perPage = $request->input('perPage', 10); // Use request perPage if defined, otherwise default to 10
 
         // Paginate the collection
         $contracts = new LengthAwarePaginator(
@@ -212,6 +212,18 @@ class ContractController extends Controller
             ->with('success', 'Contract deleted successfully');
     }
 
+    /**
+     * Move future allocations of a resource to demands and delete them.
+     *
+     * This function retrieves all allocations for a specified resource that
+     * occur after a given end date. For each allocation, it creates a new
+     * demand entry and then deletes the original allocation. The demand is
+     * created with a fixed resource type of 'Solution Architect'.
+     *
+     * @param Request $request The HTTP request containing 'resource_id' and 'end_date'.
+     * @return RedirectResponse Redirect to the contracts index page with a success message.
+     */
+
     public function cleanProjects(Request $request): RedirectResponse
     {
         $resourceID = $request->resource_id;
@@ -220,7 +232,7 @@ class ContractController extends Controller
         $allocations = Allocation::where('resources_id', $resourceID)
             ->whereDate('allocation_date', '>=', $end_date)
             ->get();
-
+// TODO Need to look up the resource's current resource type and make teh demand as that resource type
         foreach ($allocations as $allocation) {
             $demand = new Demand;
             $demand->demand_date = $allocation->allocation_date;
@@ -235,4 +247,5 @@ class ContractController extends Controller
         return Redirect::route('contracts.index')
             ->with('success', 'Allocations returned successfully');
     }
+
 }
