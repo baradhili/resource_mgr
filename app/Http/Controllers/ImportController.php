@@ -10,6 +10,7 @@ use App\Models\PublicHoliday;
 use App\Models\Region;
 use App\Models\Resource;
 use App\Models\ResourceType;
+use App\Models\Team;
 use App\Services\CacheService;
 use avadim\FastExcelReader\Excel;
 use Carbon\Carbon;
@@ -79,6 +80,9 @@ class ImportController extends Controller
                 return strtolower($name);
             })->toArray();
 
+            // collect resource types that have an associated team/resource manager
+            $ownedResourceTypes = Team::select('resource_type')->distinct()->get()->pluck('resourceType')->unique();
+
             // Initialize missingResources array
             $missingResources = [];
             // Generate the desired file name
@@ -99,7 +103,7 @@ class ImportController extends Controller
                     // Step through columns 'G' on until blank, capture each filled column into array as monthYear
                     $monthYear = [];
                     foreach ($rowData as $columnLetter => $columnValue) {
-                        if ($columnLetter >= $this->columnDataStart && ! is_null($columnValue)) {
+                        if ($columnLetter >= $this->columnDataStart && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
                         }
@@ -113,7 +117,8 @@ class ImportController extends Controller
                     $resourceNameLower = strtolower($resourceName);
                     $contains = in_array($resourceNameLower, $resourceTypes);
 
-                    if (! $contains) {
+                    if (!$contains) {
+
                         $resource = Resource::where('empowerID', $resourceName)->first();
                         $resourceID = $resource->id ?? null;
                         if (is_null($resourceID)) {
@@ -141,7 +146,7 @@ class ImportController extends Controller
                                         'status' => 'pending',
                                         // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                     ]);
-                                } elseif (! $existingAllocation) {
+                                } elseif (!$existingAllocation) {
                                     Allocation::create([
                                         'resources_id' => $resourceID,
                                         'projects_id' => $projectID,
@@ -155,44 +160,53 @@ class ImportController extends Controller
                             }
                         }
                     } else { // Insert these into demand
+
                         $projectID = $this->checkProject($rowData);
                         // first replace the "resource name" with a resource_type id
-                        $resourceType = ResourceType::where('name', 'LIKE', $resourceName.'%')->first();
-                        $rowData[$this->columnResourceName] = $resourceType->id;
-                        // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
-                        for ($i = 0; $i < count($monthYear); $i++) {
-                            $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
-                            $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
-                            $existingDemand = Demand::where('projects_id', $projectID)
-                                ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
-                                ->first();
-                            // if its a change
-                            if ($existingDemand && $existingDemand->fte != $fte) {
-                                // Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
-                                ChangeRequest::create([
-                                    'record_type' => Demand::class,
-                                    'record_id' => $existingDemand->id,
-                                    'field' => 'fte',
-                                    'old_value' => $existingDemand->fte,
-                                    'new_value' => $fte,
-                                    'status' => 'pending',
-                                    // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
-                                ]);
-                            } elseif (! $existingDemand) {
+                        $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
+                        
+                        // Check if the resource type belongs to a team aka someone is going to manage this demand - otherwise skip
+                        $belongsToTeam = $ownedResourceTypes->contains(function ($resourceType) use ($resourceName) {
+                            return strtolower($resourceType->name) === strtolower($resourceName);
+                        });
+                        if ($belongsToTeam) {
 
-                                $resourceType = ResourceType::where('name', 'like', "$resourceName%")->first();
-                                $resourceTypeId = $resourceType ? $resourceType->id : $resourceName;
+                            $rowData[$this->columnResourceName] = $resourceType->id;
+                            // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
+                            for ($i = 0; $i < count($monthYear); $i++) {
+                                $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
+                                $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
+                                $existingDemand = Demand::where('projects_id', $projectID)
+                                    ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
+                                    ->where('resource_type', $resourceType->id)
+                                    ->first();
+                                // if its a change
+                                if ($existingDemand && $existingDemand->fte != $fte) {
+                                    // Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
+                                    ChangeRequest::create([
+                                        'record_type' => Demand::class,
+                                        'record_id' => $existingDemand->id,
+                                        'field' => 'fte',
+                                        'old_value' => $existingDemand->fte,
+                                        'new_value' => $fte,
+                                        'status' => 'pending',
+                                        // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
+                                    ]);
+                                } elseif (!$existingDemand) {
 
-                                Demand::create([
-                                    'projects_id' => $projectID,
-                                    'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'),
-                                    'fte' => $fte,
-                                    'resource_type' => $resourceTypeId,
-                                    'status' => 'Proposed',
-                                    'source' => 'Imported',
-                                ]);
+                                    $resourceType = ResourceType::where('name', 'like', "$resourceName%")->first();
+                                    $resourceTypeId = $resourceType ? $resourceType->id : $resourceName;
+
+                                    Demand::create([
+                                        'projects_id' => $projectID,
+                                        'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'),
+                                        'fte' => $fte,
+                                        'resource_type' => $resourceTypeId,
+                                        'status' => 'Proposed',
+                                        'source' => 'Imported',
+                                    ]);
+                                }
                             }
-
                         }
                     }
                 }
@@ -202,7 +216,7 @@ class ImportController extends Controller
         // update the cache
         $this->cacheService->cacheResourceAllocation();
 
-        if (! empty($missingResources)) {
+        if (!empty($missingResources)) {
             $missingResourceList = implode(', ', $missingResources);
 
             return redirect()->back()->with('error', "The following resources were not found: $missingResourceList");
@@ -234,7 +248,7 @@ class ImportController extends Controller
         $projectStart = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectStart])->format('Y-m-d');
         $projectEnd = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectEnd])->format('Y-m-d');
         // check if project exists and check start and end for changes
-        if (! is_null($projectID)) {
+        if (!is_null($projectID)) {
             $projectInDB = Project::find($projectID);
             if ($projectInDB->start_date != $projectStart || $projectInDB->end_date != $projectEnd) {
                 // do stuff later if we need to
@@ -418,7 +432,7 @@ class ImportController extends Controller
             if ($action === 'Accept') {
                 // Handle acceptance logic for Demand
                 // Example: Update Demand model with new data
-                Log::info('accepted demand: '.print_r($change, true));
+                Log::info('accepted demand: ' . print_r($change, true));
                 if ($change['end'] = $change['start']) {
                     $project = Project::where('name', $change['project'])->first();
                     $change['project_id'] = $project->id;
@@ -460,7 +474,7 @@ class ImportController extends Controller
             } elseif ($action === 'Reject') {
                 // Handle rejection logic for Demand
                 // Example: Remove or ignore changes
-                Log::info('rejected demand: '.print_r($change, true));
+                Log::info('rejected demand: ' . print_r($change, true));
                 StagingDemand::where('id', $change['id'])->update(['status' => 'Rejected']);
             }
         } elseif ($type === 'Allocation') {
@@ -476,7 +490,7 @@ class ImportController extends Controller
                 StagingAllocation::where('id', $change['id'])->delete();
                 Artisan::call('app:refresh-cache');
             } elseif ($action === 'Reject') {
-                Log::info('rejected allocation: '.print_r($change, true));
+                Log::info('rejected allocation: ' . print_r($change, true));
                 StagingAllocation::where('id', $change['id'])->update(['status' => 'Rejected']);
                 Artisan::call('app:refresh-cache');
             }

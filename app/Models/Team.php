@@ -42,6 +42,12 @@ class Team extends TeamworkTeam
         return $this->hasMany(Team::class, 'parent_team_id');
     }
 
+    
+    public function resourceType(): BelongsTo
+    {
+        return $this->belongsTo(ResourceType::class, 'resource_type');
+    }
+
     public static function allSubTeamResourceTypes(Team $parentTeam): array
     {
         $subTeams = $parentTeam->subTeams;
