@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class ContractController extends Controller
 {
@@ -80,7 +81,7 @@ class ContractController extends Controller
 
         // Get the current page from the request
         $page = $request->input('page', 1);
-        $perPage = 10; // Define the number of items per page
+        $perPage = $request->input('perPage', 10); // Use request perPage if defined, otherwise default to 10
 
         // Paginate the collection
         $contracts = new LengthAwarePaginator(
@@ -212,8 +213,24 @@ class ContractController extends Controller
             ->with('success', 'Contract deleted successfully');
     }
 
+    /**
+     * Move future allocations of a resource to demands and delete them.
+     *
+     * This function retrieves all allocations for a specified resource that
+     * occur after a given end date. For each allocation, it creates a new
+     * demand entry and then deletes the original allocation. The demand is
+     * created with a fixed resource type of 'Solution Architect'.
+     *
+     * @param Request $request The HTTP request containing 'resource_id' and 'end_date'.
+     * @return RedirectResponse Redirect to the contracts index page with a success message.
+     */
+
     public function cleanProjects(Request $request): RedirectResponse
     {
+        $validated = $request->validate([
+            'resource_id' => 'required|exists:resources,id',
+            'end_date' => 'required|date',
+        ]);
         $resourceID = $request->resource_id;
         $end_date = $request->end_date;
 
@@ -221,18 +238,28 @@ class ContractController extends Controller
             ->whereDate('allocation_date', '>=', $end_date)
             ->get();
 
-        foreach ($allocations as $allocation) {
-            $demand = new Demand;
-            $demand->demand_date = $allocation->allocation_date;
-            $demand->fte = $allocation->fte;
-            $demand->projects_id = $allocation->projects_id;
-            $demand->resource_type = 'Solution Architect';
-            $demand->save();
+        $resource_type = Resource::find($resourceID)->resourceType->id;
 
-            $allocation->delete();
+        \DB::beginTransaction();
+        try {
+            foreach ($allocations as $allocation) {
+                $demand = new Demand;
+                $demand->demand_date = $allocation->allocation_date;
+                $demand->fte = $allocation->fte;
+                $demand->projects_id = $allocation->projects_id;
+                $demand->resource_type = $resource_type;
+                $demand->save();
+
+                $allocation->delete();
+            }
+            \DB::commit();
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            return Redirect::route('contracts.index')
+                ->with('error', 'Failed to process allocations: ' . $e->getMessage());
         }
-
         return Redirect::route('contracts.index')
             ->with('success', 'Allocations returned successfully');
     }
+
 }
