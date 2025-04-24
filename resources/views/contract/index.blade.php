@@ -92,7 +92,22 @@
                                             <td>{{ $contract->permanent ? 'N/A' : \Carbon\Carbon::parse($contract->end_date)->format('Y-m-d') }}
                                             </td>
                                             <td>{{ $contract->availability }}</td>
-                                            <td>{{ $contract->permanent ? 'N/A' : number_format(\Carbon\Carbon::parse($contract->end_date)->floatDiffInYears(\Carbon\Carbon::parse($contract->start_date)), 1) }}
+                                            <td>
+                                                @php
+                                                    $tenure = env('APP_TENURE', null);
+                                                    $calc = $contract->permanent ? 0 : number_format(\Carbon\Carbon::parse($contract->end_date)->floatDiffInYears(\Carbon\Carbon::parse($contract->start_date)), 1);
+                                                @endphp
+                                                @if ($tenure)
+                                                    @if ($calc >= $tenure - 0.5 && $calc < $tenure)
+                                                        <span style="color: orange;">{{ $calc }}</span>
+                                                    @elseif ($calc >= $tenure)
+                                                        <span style="color: red;">{{ $calc }}</span>
+                                                    @else
+                                                        {{ $calc }}
+                                                    @endif
+                                                @else
+                                                    {{ $calc }}
+                                                @endif
                                             </td>
                                             <td>{{ $contract->permanent ? 'P' : 'C' }}</td>
                                             <td>
