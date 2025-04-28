@@ -116,6 +116,10 @@ class DemandController extends Controller
 
             $data[] = $demandData;
         }
+        // Filter out entries with an empty demands array
+        $data = array_filter($data, function ($item) {
+            return !empty($item['demands']);
+        });
 
         // Pagination
         $page = $request->input('page', 1);
