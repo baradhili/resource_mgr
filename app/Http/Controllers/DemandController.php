@@ -94,7 +94,9 @@ class DemandController extends Controller
             }
 
             $demandData = [
+                'id' => $project->id,
                 'name' => $project->name,
+                'empowerID' => $project->empowerID, // Collect empowerID
                 'type' => $acronym,
                 'demands' => [],
             ];

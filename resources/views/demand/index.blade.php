@@ -56,7 +56,7 @@
                                     @foreach ($paginator as $item)
                                         <tr>
                                             <td><a
-                                                    href="{{ route('projects.show', $item['id'] ?? '') }}">{{ $item['name'] ?? '' }}</a>
+                                                    href="{{ route('projects.show', $item['id'] ?? '') }}">{{ $item['empowerID'] ?? '' }} - {{ $item['name'] ?? '' }}</a>
                                             </td>
                                             <td>{{ $item['type'] ?? '-' }} </td>
                                             <!-- Populate availability for each month -->
