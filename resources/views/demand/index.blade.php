@@ -53,11 +53,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($projects as $project)
+                                    @foreach ($paginator as $item)
                                         <tr>
-                                            <td><a href="{{ route('projects.show', $project->id) }}">{{ $project->empowerID ?? '' }}
-                                                    - {{ $project->name ?? '' }}</a></td>
-                                            <td>{{ $demandArray[$project['id']]['type'] ?? '-' }} </td>
+                                            <td><a
+                                                    href="{{ route('projects.show', $item['id'] ?? '') }}">{{ $item['empowerID'] ?? '' }} - {{ $item['name'] ?? '' }}</a>
+                                            </td>
+                                            <td>{{ $item['type'] ?? '-' }} </td>
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php
@@ -65,18 +66,17 @@
                                                         $month['year'] .
                                                         '-' .
                                                         str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                                                    $demandFTE =
-                                                        $demandArray[$project['id']]['demand'][$monthKey] ?? '-';
+                                                    $demandFTE = $item['demands'][$monthKey] ?? '-';
                                                 @endphp
                                                 <td>{{ $demandFTE }}</td>
                                             @endforeach
                                             <td>
                                                 @can('demands.edit')
-                                                    <form action="{{ route('demands.edit', $project->id) }}" method="GET"
-                                                        style="display: flex;">
+                                                    <form action="{{ route('demands.edit', $item['id'] ?? '') }}"
+                                                        method="GET" style="display: flex;">
                                                         <select name="resource_id"
                                                             class="form-control @error('resource_id') is-invalid @enderror"
-                                                            id="resource_id_{{ $project->id }}"
+                                                            id="resource_id_{{ $item['id'] ?? '' }}"
                                                             onchange="toggleSubmitButton(this)">
                                                             <option value="">Select Resource</option>
                                                             @foreach ($resources as $resource)
@@ -85,17 +85,15 @@
                                                             @endforeach
                                                         </select>
                                                         <button type="submit" class="btn btn-sm btn-success"
-                                                            id="assign_button_{{ $project->id }}" disabled><i
+                                                            id="assign_button_{{ $item['id'] ?? '' }}" disabled><i
                                                                 class="fa fa-fw fa-edit"></i> {{ __('Assign') }}</button>
                                                     </form>
                                                 @endcan
-                                                <form action="{{ route('demands.destroy', $project->id) }}" method="POST">
-                                                    <!-- <a class="btn btn-sm btn-primary "
-                                                            href="{{ route('demands.show', $project->id) }}"><i
-                                                                class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a> -->
+                                                <form action="{{ route('demands.destroy', $item['id'] ?? '') }}"
+                                                    method="POST">
                                                     @can('demands.editFullDemand')
                                                         <a class="btn btn-sm btn-success"
-                                                            href="{{ route('demands.editFullDemand', $project->id) }}"><i
+                                                            href="{{ route('demands.editFullDemand', $item['id'] ?? '') }}"><i
                                                                 class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @endcan
                                                     @csrf
@@ -114,7 +112,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $projects->withQueryString()->links() !!}
+                {!! $paginator->withQueryString()->links() !!}
             </div>
         </div>
         <script>
@@ -123,7 +121,6 @@
                 var buttonId = selectElement.id.replace('resource_id', 'assign_button');
                 var submitButton = document.getElementById(buttonId);
 
-                // Check if a valid resource is selected
                 if (selectedValue !== "") {
                     submitButton.disabled = false;
                 } else {
@@ -131,7 +128,6 @@
                 }
             }
 
-            // Optionally, call the function on page load to ensure the button is initially disabled
             window.onload = function() {
                 var selectElements = document.querySelectorAll('select[name="resource_id"]');
                 selectElements.forEach(function(selectElement) {

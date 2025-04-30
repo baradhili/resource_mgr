@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class DemandController extends Controller
 {
@@ -48,22 +49,20 @@ class DemandController extends Controller
                 'monthFullName' => $date->format('F'),
             ];
         }
-        //  Start and end dates for the period
+
+        // Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
-        // get user
+        // Get user
         $user = Auth::user();
         $resource_types = $user->ownedTeams->pluck('resource_type')->toArray();
         if (empty($resource_types)) {
             return view('home');
         }
-        // Log::info("User is an owner of a team with resource types: " . json_encode($resource_types));
-        //$resource_types = ResourceType::whereIn('name', $resource_types)->pluck('id')->toArray();
-        // Log::info("resourcestypes: ".json_encode($resource_types));
+
         // Collect resources with contracts in the next 12 months
         $resources = $this->resourceService->getResourceList();
-        // Log::info("resources: ".json_encode($resources));
 
         // Collect the projects_id from demands in our window
         $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
@@ -73,18 +72,14 @@ class DemandController extends Controller
             ->values()
             ->all();
 
-        // Eager load the projects with their names
+        // Eager load the projects with their names and demands
         $projects = Project::whereIn('id', $demandIDs)
-            ->with('demands') // Eager load the demands relationship
-            ->paginate();
+            ->with('demands')
+            ->get();
 
-        $demandArray = [];
-        // For each project - find the allocations for the period
-
+        $data = [];
         foreach ($projects as $project) {
-
             $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
-            // TODO - once we migrate to a numeric value for resource type, remove this
             if (is_numeric($resource_type)) {
                 $resource_type = ResourceType::findOrFail($resource_type)->name;
             }
@@ -98,9 +93,12 @@ class DemandController extends Controller
                 $acronym = '';
             }
 
-            $demandArray[$project->id] = [
+            $demandData = [
+                'id' => $project->id,
                 'name' => $project->name,
+                'empowerID' => $project->empowerID, // Collect empowerID
                 'type' => $acronym,
+                'demands' => [],
             ];
 
             foreach ($nextTwelveMonths as $month) {
@@ -109,18 +107,33 @@ class DemandController extends Controller
                     ->where('projects_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
-                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
-                // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
-                    $demandArray[$project->id]['demand'][$key] = $totalAllocation;
+                    $demandData['demands'][$key] = $totalAllocation;
                 }
             }
-        }
 
-        //  Log::info("return: " . print_r($projects, true));
-        return view('demand.index', compact('projects', 'demandArray', 'nextTwelveMonths', 'resources'))
-            ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
+            $data[] = $demandData;
+        }
+        // Filter out entries with an empty demands array
+        $data = array_filter($data, function ($item) {
+            return !empty($item['demands']);
+        });
+
+        // Pagination
+        $page = $request->input('page', 1);
+        $perPage = 10; // Set the number of items per page
+        $offset = ($page * $perPage) - $perPage;
+
+        $result = array_slice($data, $offset, $perPage, true);
+        $paginator = new LengthAwarePaginator($result, count($data), $perPage, $page, [
+            'path' => $request->url(),
+            'query' => $request->query(),
+        ]);
+
+        return view('demand.index', compact('paginator', 'nextTwelveMonths', 'resources'))
+            ->with('i', ($request->input('page', 1) - 1) * $perPage);
     }
 
     /**
@@ -362,7 +375,7 @@ class DemandController extends Controller
                 'monthName' => $date->format('M'),
                 'monthFullName' => $date->format('F'),
             ];
-            $sheet->setCellValue([$i + 4, 1], $date->format('M').' '.$date->year);
+            $sheet->setCellValue([$i + 4, 1], $date->format('M') . ' ' . $date->year);
         }
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
@@ -408,7 +421,7 @@ class DemandController extends Controller
                     ->where('projects_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
-                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($demand > 0) {
