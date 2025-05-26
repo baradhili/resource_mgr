@@ -47,6 +47,8 @@
                                             <li class="sidebar-item"><a class="sidebar-link"
                                                     href="{{ route('leaves.index') }}">Leave </a></li>
                                         @endcan
+                                        <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('capacity.index') }}">Capacity </a></li>
                                     </ul>
                                 </li>
 
