@@ -4,6 +4,7 @@ use App\Http\Controllers\AllocationController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\CapacityController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\DemandRequestController;
@@ -73,6 +74,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('services', ServiceController::class);
     Route::resource('estimates', EstimateController::class);
     Route::resource('clients', ClientController::class);
+    Route::get('/capacity/export', [CapacityController::class, 'exportCapacity'])->name('capacity.export');
+    Route::resource('capacity', CapacityController::class);
     Route::resource('terms-and-conditions', TermsAndConditionController::class);
     Route::get('change-password', [AuthController::class, 'showChangePasswordForm'])->name('auth.change-password');
     Route::post('change-password', [AuthController::class, 'changePassword'])->name('auth.change-password.update');
