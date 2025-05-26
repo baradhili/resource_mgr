@@ -401,17 +401,16 @@ class DemandController extends Controller
 
             $sheet->setCellValue([1, $i], $project->name);
 
-            $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
-            if ($resource_type) {
-                $words = explode(' ', trim($resource_type));
-                $acronym = '';
-                for ($k = 0; $k < min(2, count($words)); $k++) {
-                    $acronym .= strtoupper(substr($words[$k], 0, 1));
-                }
+            $resource_type_code = Demand::where('projects_id', '=', $project->id)->value('resource_type');
+            //look up ResourceType object
+            $resource_type = ResourceType::find($resource_type_code);
+
+            if ($resource_type && $resource_type->name) {
+                $resource_type_name = $resource_type->name;
             } else {
-                $acronym = '';
+                $resource_type_name = 'undefined';
             }
-            $sheet->setCellValue([2, $i], $acronym);
+            $sheet->setCellValue([2, $i], $resource_type_name);
             $sheet->setCellValue([3, $i], $project->status);
 
             $j = 4;
