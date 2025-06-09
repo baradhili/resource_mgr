@@ -266,7 +266,7 @@ class CapacityController extends Controller
         });
 
 
-Log::info("resourceCapacity " . json_encode($resourceCapacity));
+// Log::info("resourceCapacity " . json_encode($resourceCapacity));
         // walk the resourceCapacity array output to spreadsheet
         $row = 2;
         foreach ($resourceCapacity as $resourceID => $resource) {
