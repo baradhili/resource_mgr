@@ -131,9 +131,9 @@ class UserController extends Controller
             $user->attachTeam($team);
             // $user->teams()->attach($team->id);
         }
-        if (!$resource || !$user->currentTeam) {
-            if (is_null($resource->resource_type) || $resource->resource_type !== $user->currentTeam?->resource_type) {
-                $resource->resource_type = $user->currentTeam?->resource_type;
+        if ($resource && $user->currentTeam) {
+            if (is_null($resource->resource_type) || $resource->resource_type !== $user->currentTeam->resource_type) {
+                $resource->resource_type = $user->currentTeam->resource_type;
             } 
         }
 
