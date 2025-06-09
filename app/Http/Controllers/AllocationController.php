@@ -146,7 +146,7 @@ class AllocationController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
         $user = Auth::user();
         if (! $user->can('allocations.create')) {
@@ -173,7 +173,7 @@ class AllocationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id): View
+    public function show($id): View|RedirectResponse
     {
         $user = Auth::user();
         if (! $user->can('allocations.show')) {
