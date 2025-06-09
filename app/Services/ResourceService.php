@@ -71,6 +71,8 @@ class ResourceService
                     })
                     ->with('contracts')->get()
             );
+            // Remove duplicates that may result from multiple merge operations
+            $resources = $resources->unique('id');
             // Log::info("resources: " . json_encode($resources));
         }
 
