@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
 use App\Models\Resource;
+use App\Models\Demand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -70,8 +72,21 @@ class ProjectController extends Controller
 
                 return $resource;
             });
+        //get open demands for this project
+        $demands = Demand::selectRaw('resource_type, MIN(demand_date) as start, MAX(demand_date) as end, AVG(fte) as fte')
+            ->where('projects_id', $project->id)
+            ->where('fte', '>', 0)
+            ->groupBy('resource_type')
+            ->get()
+            ->map(function ($demand) {
+                $demand->start = date('M-Y', strtotime($demand->start));
+                $demand->end = date('M-Y', strtotime($demand->end));
+                $demand->resource_type = \App\Models\ResourceType::find($demand->resource_type)->name;
 
-        return view('project.show', compact('project', 'resources'));
+                return $demand;
+            });
+
+        return view('project.show', compact('project', 'resources', 'demands'));
     }
 
     /**
