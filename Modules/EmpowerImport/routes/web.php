@@ -14,6 +14,8 @@ use Modules\EmpowerImport\App\Http\Controllers\EmpowerImportController;
 |
 */
 
-Route::group([], function () {
-    Route::post('/import/empower', [EmpowerImportController::class, 'importEmpower'])->name('import.EmpowerImport');
+// Before, this route was publicly reachable with no auth or access control:
+Route::middleware(['web', 'auth', 'verified'])->group(function () {
+    Route::post('/import/empower', [EmpowerImportController::class, 'importEmpower'])
+        ->name('import.empower');   // kebab-case for consistency
 });
