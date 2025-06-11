@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace Modules\EmpowerImport\App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use App\Models\Allocation;
 use App\Models\ChangeRequest;
 use App\Models\Demand;
@@ -13,14 +15,15 @@ use App\Models\ResourceType;
 use App\Models\Team;
 use App\Models\Plugin;
 use App\Services\CacheService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use avadim\FastExcelReader\Excel;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class ImportController extends Controller
+class EmpowerImportController extends Controller
 {
     protected $cacheService;
 
@@ -40,23 +43,9 @@ class ImportController extends Controller
     private $columnProjectEnd = 'G';
 
     private $columnDataStart = 'H';
-
     public function __construct(CacheService $cacheService)
     {
         $this->cacheService = $cacheService;
-    }
-
-    public function index()
-    {
-        // get a list of Plugins of type Import
-        $plugins = Plugin::where('type', 'Import')->get();
-        // Add an attribute to each plugin for teh "displayName" where we take its plugin name and make it readable
-        foreach ($plugins as $key => $plugin) {
-            $plugins[$key]->displayName = preg_replace('/Import$/', '', $plugin->name);
-            $plugins[$key]->displayName = preg_replace('/([a-z])([A-Z])/', '$1 $2', $plugins[$key]->displayName);
-        }
-
-        return view('import.index', compact('plugins'));
     }
 
     /**
@@ -78,7 +67,7 @@ class ImportController extends Controller
      *
      * @return RedirectResponse
      */
-    public function populateAllocations(Request $request)
+    public function importEmpower(Request $request): RedirectResponse
     {
         if ($request->hasFile('file')) {
             $uploadedFile = $request->file('file');
@@ -173,7 +162,7 @@ class ImportController extends Controller
                         $projectID = $this->checkProject($rowData);
                         // first replace the "resource name" with a resource_type id
                         $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
-                        
+
                         // Check if the resource type belongs to a team aka someone is going to manage this demand - otherwise skip
                         $belongsToTeam = $ownedResourceTypes->contains(function ($resourceType) use ($resourceName) {
                             return strtolower($resourceType->name) === strtolower($resourceName);
@@ -276,266 +265,5 @@ class ImportController extends Controller
         $projectID = $project->id;
 
         return $projectID;
-    }
-
-    public function reviewDemands()
-    {
-        $stagedDemands = StagingDemand::where('status', '<>', 'Rejected')
-            ->with('project')
-            ->get();
-        $demands = Demand::all();
-        $changes = [];
-        // TODO figure out how to check for changes where a demand or an allocation is deleted
-        foreach ($stagedDemands as $stagedDemand) {
-
-            // Check if we have an existing Demand
-            $demand = $demands->firstWhere('projects_id', $stagedDemand->projects_id);
-            if ($demand) {
-                $demand = $demand->where('demand_date', $stagedDemand->demand_date)->first();
-            }
-
-            // If we have an existing demand then process as a change
-            if ($demand) {
-                if ($stagedDemand->fte != $demand->fte) {
-                    $lastChange = end($changes);
-
-                    if (
-                        $lastChange && $lastChange['project'] === $stagedDemand->project->name &&
-                        $lastChange['resource'] === $stagedDemand->resource_type &&
-                        $lastChange['new_ftes'] === $stagedDemand->fte &&
-                        Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedDemand->demand_date))
-                    ) {
-
-                        $changes[key($changes)]['end'] = $stagedDemand->demand_date;
-                    } else {
-                        $changes[] = [
-                            'id' => $stagedDemand->id,
-                            'project' => $stagedDemand->project->name,
-                            'project_id' => $stagedDemand->projects_id,
-                            'start' => $stagedDemand->demand_date,
-                            'end' => $stagedDemand->demand_date,
-                            'resource' => $stagedDemand->resource_type,
-                            'old_ftes' => $demand->fte,
-                            'new_ftes' => $stagedDemand->fte,
-                        ];
-                    }
-                }
-            } else {
-                // Check if this demand has already been allocated
-                $allocation = Allocation::where('projects_id', $stagedDemand->projects_id)
-                    ->where('allocation_date', $stagedDemand->demand_date)
-                    ->first();
-
-                if ($allocation) {
-                    continue;
-                }
-                // otherise compact if there are sequential identical FTE allocations
-                $lastChange = end($changes);
-
-                if (
-                    $lastChange && $lastChange['project'] === $stagedDemand->project->name &&
-                    $lastChange['resource'] === $stagedDemand->resource_type &&
-                    $lastChange['new_ftes'] === $stagedDemand->fte &&
-                    Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedDemand->demand_date))
-                ) {
-
-                    $changes[key($changes)]['end'] = $stagedDemand->demand_date;
-                } else {
-                    $changes[] = [
-                        'id' => $stagedDemand->id,
-                        'project' => $stagedDemand->project->name,
-                        'project_id' => $stagedDemand->projects_id,
-                        'start' => $stagedDemand->demand_date,
-                        'end' => $stagedDemand->demand_date,
-                        'resource' => $stagedDemand->resource_type,
-                        'old_ftes' => 0,
-                        'new_ftes' => $stagedDemand->fte,
-                    ];
-                }
-            }
-        }
-
-        return view('import.reviewDemands', compact('changes'));
-    }
-
-    public function reviewAllocations()
-    {
-        $stagedAllocations = StagingAllocation::where('status', '<>', 'Rejected')->get();
-        $allocations = Allocation::all();
-        $changes = [];
-
-        foreach ($stagedAllocations as $stagedAllocation) {
-            $allocation = $allocations->firstWhere('projects_id', $stagedAllocation->projects_id);
-            if ($allocation) {
-                $allocation = $allocation->where('allocation_date', $stagedAllocation->allocation_date)->first();
-            }
-
-            if ($allocation) {
-                if ($stagedAllocation->fte != $allocation->fte) {
-                    $lastChange = end($changes);
-
-                    if (
-                        $lastChange && $lastChange['project'] === $stagedAllocation->project->name &&
-                        $lastChange['resource'] === $stagedAllocation->resource_type &&
-                        $lastChange['new_ftes'] === $stagedAllocation->fte &&
-                        Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedAllocation->allocation_date))
-                    ) {
-
-                        $changes[key($changes)]['end'] = $stagedAllocation->allocation_date;
-                    } else {
-                        $changes[] = [
-                            'id' => $stagedAllocation->id,
-                            'project' => $stagedAllocation->project->name,
-                            'project_id' => $stagedAllocation->projects_id,
-                            'start' => $stagedAllocation->allocation_date,
-                            'end' => $stagedAllocation->allocation_date,
-                            'resource' => $stagedAllocation->resource->full_name,
-                            'old_ftes' => $allocation->fte,
-                            'new_ftes' => $stagedAllocation->fte,
-                        ];
-                    }
-                }
-            } else {
-                $lastChange = end($changes);
-
-                if (
-                    $lastChange && $lastChange['project'] === $stagedAllocation->project->name &&
-                    $lastChange['resource'] === $stagedAllocation->resource_type &&
-                    $lastChange['new_ftes'] === $stagedAllocation->fte &&
-                    Carbon::parse($lastChange['end'])->addMonth()->isSameDay(Carbon::parse($stagedAllocation->allocation_date))
-                ) {
-
-                    $changes[key($changes)]['end'] = $stagedAllocation->allocation_date;
-                } else {
-                    $changes[] = [
-                        'id' => $stagedAllocation->id,
-                        'project' => $stagedAllocation->project->name,
-                        'project_id' => $stagedAllocation->projects_id,
-                        'start' => $stagedAllocation->allocation_date,
-                        'end' => $stagedAllocation->allocation_date,
-                        'resource' => $stagedAllocation->resource_type,
-                        'old_ftes' => 0,
-                        'new_ftes' => $stagedAllocation->fte,
-                    ];
-                }
-            }
-        }
-
-        return view('import.reviewAllocations', compact('changes'));
-    }
-
-    public function handleReviewAction(Request $request)
-    {
-        $referringURL = $request->headers->get('referer');
-        $validatedData = $request->validate([
-            'change' => 'required|array',
-            'action' => 'required|string|in:Accept,Reject',
-            'type' => 'required|string|in:Demand,Allocation',
-        ]);
-
-        $change = $validatedData['change'];
-        $action = $validatedData['action'];
-        $type = $validatedData['type'];
-
-        if ($type === 'Demand') {
-            if ($action === 'Accept') {
-                // Handle acceptance logic for Demand
-                // Example: Update Demand model with new data
-                Log::info('accepted demand: ' . print_r($change, true));
-                if ($change['end'] = $change['start']) {
-                    $project = Project::where('name', $change['project'])->first();
-                    $change['project_id'] = $project->id;
-                    $demand = Demand::firstOrCreate([
-                        'projects_id' => $change['project_id'],
-                        'demand_date' => $change['start'],
-                    ], [
-                        'fte' => $change['new_ftes'],
-                        'status' => 'Proposed',
-                        'resource_type' => $change['resource'],
-                    ]);
-                    StagingDemand::where('id', $change['id'])->delete();
-                    Artisan::call('app:refresh-cache');
-                } else {
-                    // we have a range of months
-                    $project = Project::where('name', $change['project'])->first();
-                    $change['project_id'] = $project->id;
-
-                    $currentDate = Carbon::parse($change['start']);
-                    $endDate = Carbon::parse($change['end']);
-
-                    while ($currentDate->lte($endDate)) {
-                        Demand::firstOrCreate([
-                            'projects_id' => $change['project_id'],
-                            'demand_date' => $currentDate->format('Y-m-d'),
-                        ], [
-                            'fte' => $change['new_ftes'],
-                            'status' => 'Proposed',
-                            'resource_type' => $change['resource'],
-                        ]);
-                        $currentDate->addMonth();
-                    }
-
-                    StagingDemand::where('id', $change['id'])->delete();
-                    Artisan::call('app:refresh-cache');
-
-                }
-
-            } elseif ($action === 'Reject') {
-                // Handle rejection logic for Demand
-                // Example: Remove or ignore changes
-                Log::info('rejected demand: ' . print_r($change, true));
-                StagingDemand::where('id', $change['id'])->update(['status' => 'Rejected']);
-            }
-        } elseif ($type === 'Allocation') {
-            if ($action === 'Accept') {
-                $allocation = Allocation::firstOrCreate([
-                    'projects_id' => $change['project_id'],
-                    'allocation_date' => $change['start'],
-                ], [
-                    'fte' => $change['new_ftes'],
-                    'status' => 'Proposed',
-                    'resource_type' => $change['resource'],
-                ]);
-                StagingAllocation::where('id', $change['id'])->delete();
-                Artisan::call('app:refresh-cache');
-            } elseif ($action === 'Reject') {
-                Log::info('rejected allocation: ' . print_r($change, true));
-                StagingAllocation::where('id', $change['id'])->update(['status' => 'Rejected']);
-                Artisan::call('app:refresh-cache');
-            }
-        }
-
-        // Return response, e.g., redirect or JSON response
-        return redirect($referringURL)->with('success', 'Action processed successfully.');
-    }
-
-    public function importHolidays()
-    {
-        $url = 'https://data.gov.au/data/dataset/b1bc6077-dadd-4f61-9f8c-002ab2cdff10/resource/33673aca-0857-42e5-b8f0-9981b4755686/download/australian-public-holidays-combined-2021-2025.csv';
-        $client = new \GuzzleHttp\Client;
-        $response = $client->get($url);
-        $stream = $response->getBody();
-        $rows = array_map('str_getcsv', explode("\n", $stream));
-        $header = array_shift($rows);
-        $data = [];
-        foreach ($rows as $row) {
-            $data[] = array_combine($header, $row);
-        }
-        foreach (array_slice($data, 1) as $holiday) { // Skip the first row
-            $region = Region::where('jurisdiction', strtolower($holiday['Jurisdiction']))->first();
-            if ($region) {
-                $holidayData = [
-                    'region_id' => $region->id,
-                    'date' => $holiday['Date'],
-                    'name' => $holiday['Holiday Name'],
-                ];
-                PublicHoliday::updateOrCreate([
-                    'region_id' => $region->id,
-                    'date' => $holiday['Date'],
-                ], $holidayData);
-            }
-        }
-
-        return redirect()->back()->with('success', 'Public Holidays imported successfully.');
     }
 }

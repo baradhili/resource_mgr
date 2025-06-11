@@ -1,0 +1,12 @@
+{
+    "name": "EmpowerImport",
+    "alias": "empowerimport",
+    "description": "A module for importing Empower data",
+    "type": "Import",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\EmpowerImport\\App\\Providers\\EmpowerImportServiceProvider"
+    ],
+    "files": []
+}

@@ -95,11 +95,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('locations', LocationController::class);
         Route::resource('resource-types', ResourceTypeController::class);
         Route::get('/import', [ImportController::class, 'index'])->name('import.index');
-        Route::post('/import/empower', [ImportController::class, 'populateAllocations'])->name('import.empower');
-        Route::get('/import/review/demands', [ImportController::class, 'reviewDemands'])->name('import.review.demands');
-        Route::get('/import/review/allocations', [ImportController::class, 'reviewAllocations'])->name('import.review.allocations');
-        Route::post('/import/review/actions', [ImportController::class, 'handleReviewAction'])->name('import.review.action');
-        Route::get('/import/holidays', [ImportController::class, 'importHolidays'])->name('import.holidays');
+        // Route::post('/import/empower', [ImportController::class, 'populateAllocations'])->name('import.empower');
+        // Route::get('/import/review/demands', [ImportController::class, 'reviewDemands'])->name('import.review.demands');
+        // Route::get('/import/review/allocations', [ImportController::class, 'reviewAllocations'])->name('import.review.allocations');
+        // Route::post('/import/review/actions', [ImportController::class, 'handleReviewAction'])->name('import.review.action');
+        // Route::get('/import/holidays', [ImportController::class, 'importHolidays'])->name('import.holidays');
         Route::resource('public-holidays', PublicHolidayController::class);
         Route::resource('sites', SiteController::class);
         Route::resource('domains', DomainController::class);

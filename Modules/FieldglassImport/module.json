@@ -1,0 +1,12 @@
+{
+    "name": "FieldglassImport",
+    "alias": "fieldglassimport",
+    "description": "A module for importing contract data from Fieldglass",
+    "type": "Import",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\FieldglassImport\\App\\Providers\\FieldglassImportServiceProvider"
+    ],
+    "files": []
+}

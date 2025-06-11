@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/empowerimport",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\EmpowerImport\\": "",
+            "Modules\\EmpowerImport\\App\\": "app/",
+            "Modules\\EmpowerImport\\Database\\Factories\\": "database/factories/",
+            "Modules\\EmpowerImport\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\EmpowerImport\\Tests\\": "tests/"
+        }
+    }
+}
