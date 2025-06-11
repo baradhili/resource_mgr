@@ -77,10 +77,18 @@ class ProjectController extends Controller
             ->get()
             ->groupBy('resource_type')
             ->map(function ($demandsByResourceType) {
-                $start = $demandsByResourceType->sortBy('demand_date')->first()->demand_date;
-                $end = $demandsByResourceType->sortByDesc('demand_date')->first()->demand_date;
+                $demandsByResourceTypeWithFTE = $demandsByResourceType->filter(function ($demand) {
+                    return $demand->fte > 0;
+                });
+                $start = $demandsByResourceTypeWithFTE->sortBy('demand_date')->first()->demand_date;
+                $end = $demandsByResourceTypeWithFTE->sortByDesc('demand_date')->first()->demand_date;
                 $resourceType = \App\Models\ResourceType::find($demandsByResourceType->first()->resource_type)->name;
-                $avgFTE = $demandsByResourceType->avg('fte');
+
+                $demandsInTimeRange = $demandsByResourceType->filter(function ($demand) use ($start, $end) {
+                    return $demand->demand_date >= $start && $demand->demand_date <= $end;
+                });
+
+                $avgFTE = $demandsInTimeRange->avg('fte');
 
                 return [
                     'start' => date('M-Y', strtotime($start)),
@@ -89,7 +97,7 @@ class ProjectController extends Controller
                     'fte' => $avgFTE
                 ];
             });
-Log::info("demands: ".json_encode($demands));
+
         return view('project.show', compact('project', 'resources','demands'));
     }
 
