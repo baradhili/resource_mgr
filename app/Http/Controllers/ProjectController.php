@@ -73,32 +73,20 @@ class ProjectController extends Controller
                 return $resource;
             });
         //get open demands for this project
-        $demands = Demand::where('projects_id', $project->id)
-            ->get()
+        $demands = Demand::selectRaw('resource_type, MIN(demand_date) as start, MAX(demand_date) as end, AVG(fte) as fte')
+            ->where('projects_id', $project->id)
+            ->where('fte', '>', 0)
             ->groupBy('resource_type')
-            ->map(function ($demandsByResourceType) {
-                $demandsByResourceTypeWithFTE = $demandsByResourceType->filter(function ($demand) {
-                    return $demand->fte > 0;
-                });
-                $start = $demandsByResourceTypeWithFTE->sortBy('demand_date')->first()->demand_date;
-                $end = $demandsByResourceTypeWithFTE->sortByDesc('demand_date')->first()->demand_date;
-                $resourceType = \App\Models\ResourceType::find($demandsByResourceType->first()->resource_type)->name;
+            ->get()
+            ->map(function ($demand) {
+                $demand->start = date('M-Y', strtotime($demand->start));
+                $demand->end = date('M-Y', strtotime($demand->end));
+                $demand->resource_type = \App\Models\ResourceType::find($demand->resource_type)->name;
 
-                $demandsInTimeRange = $demandsByResourceType->filter(function ($demand) use ($start, $end) {
-                    return $demand->demand_date >= $start && $demand->demand_date <= $end;
-                });
-
-                $avgFTE = $demandsInTimeRange->avg('fte');
-
-                return [
-                    'start' => date('M-Y', strtotime($start)),
-                    'end' => date('M-Y', strtotime($end)),
-                    'resource_type' => $resourceType,
-                    'fte' => $avgFTE
-                ];
+                return $demand;
             });
 
-        return view('project.show', compact('project', 'resources','demands'));
+        return view('project.show', compact('project', 'resources', 'demands'));
     }
 
     /**
