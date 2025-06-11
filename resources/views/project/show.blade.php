@@ -53,6 +53,16 @@
                                 @endforeach
                             </ul>
                         </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Open Demands:</strong>
+                            <ul>
+                                @foreach ($demands as $key => $demand)
+                                    <li>{{ $demand['resource_type'] }} ({{ number_format($demand['fte'] * 100, 2) }}% average FTE)
+                                        <small>{{ $demand['start'] }} - {{ $demand['end'] }}</small></li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        
                     </div>
                 </div>
             </div>

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
 use App\Models\Resource;
+use App\Models\Demand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -70,8 +72,25 @@ class ProjectController extends Controller
 
                 return $resource;
             });
+        //get open demands for this project
+        $demands = Demand::where('projects_id', $project->id)
+            ->get()
+            ->groupBy('resource_type')
+            ->map(function ($demandsByResourceType) {
+                $start = $demandsByResourceType->sortBy('demand_date')->first()->demand_date;
+                $end = $demandsByResourceType->sortByDesc('demand_date')->first()->demand_date;
+                $resourceType = \App\Models\ResourceType::find($demandsByResourceType->first()->resource_type)->name;
+                $avgFTE = $demandsByResourceType->avg('fte');
 
-        return view('project.show', compact('project', 'resources'));
+                return [
+                    'start' => date('M-Y', strtotime($start)),
+                    'end' => date('M-Y', strtotime($end)),
+                    'resource_type' => $resourceType,
+                    'fte' => $avgFTE
+                ];
+            });
+Log::info("demands: ".json_encode($demands));
+        return view('project.show', compact('project', 'resources','demands'));
     }
 
     /**
