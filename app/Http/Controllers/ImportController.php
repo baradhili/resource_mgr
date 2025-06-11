@@ -11,6 +11,7 @@ use App\Models\Region;
 use App\Models\Resource;
 use App\Models\ResourceType;
 use App\Models\Team;
+use App\Models\Plugin;
 use App\Services\CacheService;
 use avadim\FastExcelReader\Excel;
 use Carbon\Carbon;
@@ -47,7 +48,15 @@ class ImportController extends Controller
 
     public function index()
     {
-        return view('import.index');
+        // get a list of Plugins of type Import
+        $plugins = Plugin::where('type', 'Import')->get();
+        // Add an attribute to each plugin for teh "displayName" where we take its plugin name and make it readable
+        foreach ($plugins as $key => $plugin) {
+            $plugins[$key]->displayName = preg_replace('/Import$/', '', $plugin->name);
+            $plugins[$key]->displayName = preg_replace('/([a-z])([A-Z])/', '$1 $2', $plugins[$key]->displayName);
+        }
+
+        return view('import.index', compact('plugins'));
     }
 
     /**
