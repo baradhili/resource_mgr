@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\FieldglassImport\App\Http\Controllers\FieldglassImportController;
+use Modules\EmpowerImport\App\Http\Controllers\EmpowerImportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,4 +14,6 @@ use Modules\FieldglassImport\App\Http\Controllers\FieldglassImportController;
 |
 */
 
-Route::post('/import/fieldglass', [FieldglassImportController::class, 'importFieldglass'])->name('import.FieldglassImport');
+Route::group([], function () {
+    Route::post('/import/empower', [EmpowerImportController::class, 'importEmpower'])->name('import.EmpowerImport');
+});

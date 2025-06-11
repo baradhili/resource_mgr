@@ -38,4 +38,26 @@ class ChangeRequest extends Model
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
+
+    // Accessors to handle JSON fields
+    public function getOldValueAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
+    public function getNewValueAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
+    // Mutators to handle JSON fields
+    public function setOldValueAttribute($value)
+    {
+        $this->attributes['old_value'] = json_encode($value);
+    }
+
+    public function setNewValueAttribute($value)
+    {
+        $this->attributes['new_value'] = json_encode($value);
+    }
 }
