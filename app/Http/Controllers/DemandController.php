@@ -61,7 +61,16 @@ class DemandController extends Controller
         // Get the user
         $user = Auth::user();
         // Get the resource types that the user owns
-        $resource_types = $user->ownedTeams->pluck('resource_type')->toArray();
+        // Keep only numeric, non-null IDs and cast to int once
+        $resource_types = array_values(
+            array_map(
+                'intval',
+                array_filter(
+                    $user->ownedTeams->pluck('resource_type')->toArray(),
+                    'is_numeric'
+                )
+            )
+        );
         // If the user doesn't own any resource types, return the home view
         if (empty($resource_types)) {
             return view('home');
