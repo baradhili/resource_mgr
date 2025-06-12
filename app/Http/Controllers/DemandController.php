@@ -37,7 +37,9 @@ class DemandController extends Controller
      */
     public function index(Request $request): View
     {
-        // Build our next twelve month array
+        // We need to display a list of projects with their demand for resources
+        // in the next 12 months. We'll build an array of the months and their
+        // corresponding year and month name for the view.
         $nextTwelveMonths = [];
 
         for ($i = 0; $i < 12; $i++) {
@@ -50,50 +52,62 @@ class DemandController extends Controller
             ];
         }
 
-        // Start and end dates for the period
+        // The period we're interested in is from the start of the current month
+        // to the start of the following year. We'll get the start date of the
+        // current month and the start date of the following year.
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
-        // Get user
+        // Get the user
         $user = Auth::user();
+        // Get the resource types that the user owns
         $resource_types = $user->ownedTeams->pluck('resource_type')->toArray();
+        // If the user doesn't own any resource types, return the home view
         if (empty($resource_types)) {
             return view('home');
         }
 
-        // Collect resources with contracts in the next 12 months
+        // Get the resources with contracts in the next 12 months
         $resources = $this->resourceService->getResourceList();
 
-        // Collect the projects_id from demands in our window
-        $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
-            ->whereIn('resource_type', $resource_types)
+        // Get the projects_id from demands in our window
+        $demandProjectIds = Demand::whereBetween('demand_date', [$startDate, $endDate])
+            ->whereIn('resource_type', array_map('intval', $resource_types))
             ->pluck('projects_id')
             ->unique()
             ->values()
             ->all();
 
         // Eager load the projects with their names and demands
-        $projects = Project::whereIn('id', $demandIDs)
+        $projects = Project::whereIn('id', $demandProjectIds)
             ->with('demands')
             ->get();
 
+        // Create an array of project data
         $data = [];
         foreach ($projects as $project) {
-            $resource_type = Demand::where('projects_id', '=', $project->id)->value('resource_type');
-            if (is_numeric($resource_type)) {
-                $resource_type = ResourceType::findOrFail($resource_type)->name;
+            // Get the resource type for the project
+            $resourceType = Demand::where('projects_id', '=', $project->id)->value('resource_type');
+            // If the project doesn't have a resource type, continue to the next project
+            if (!in_array($resourceType, $resource_types)) {
+                continue;
             }
-            if ($resource_type) {
-                $words = explode(' ', trim($resource_type));
-                $acronym = '';
-                for ($i = 0; $i < min(2, count($words)); $i++) {
-                    $acronym .= strtoupper(substr($words[$i], 0, 1));
-                }
-            } else {
-                $acronym = '';
+            // Get the acronym for the resource type
+            if (is_numeric($resourceType)) {
+                $resourceType = ResourceType::findOrFail($resourceType)->name;
             }
 
-            $demandData = [
+            $acronym = '';
+            if ($resourceType) {
+                $words = explode(' ', trim($resourceType));
+                $acronym = strtoupper(substr($words[0], 0, 1));
+                if (count($words) > 1) {
+                    $acronym .= strtoupper(substr($words[1], 0, 1));
+                }
+            }
+
+            // Create the project data array
+            $projectData = [
                 'id' => $project->id,
                 'name' => $project->name,
                 'empowerID' => $project->empowerID, // Collect empowerID
@@ -101,6 +115,7 @@ class DemandController extends Controller
                 'demands' => [],
             ];
 
+            // Loop through the months and get the total allocation for the project
             foreach ($nextTwelveMonths as $month) {
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 $totalAllocation = Demand::where('demand_date', '=', $monthStartDate)
@@ -109,13 +124,16 @@ class DemandController extends Controller
                     ->first();
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
+                // If the total allocation is greater than 0, add the allocation to the project data
                 if ($totalAllocation > 0) {
-                    $demandData['demands'][$key] = $totalAllocation;
+                    $projectData['demands'][$key] = $totalAllocation;
                 }
             }
 
-            $data[] = $demandData;
+            // Add the project data to the data array
+            $data[] = $projectData;
         }
+
         // Filter out entries with an empty demands array
         $data = array_filter($data, function ($item) {
             return !empty($item['demands']);
@@ -126,12 +144,15 @@ class DemandController extends Controller
         $perPage = 10; // Set the number of items per page
         $offset = ($page * $perPage) - $perPage;
 
+        // Get the results for the current page
         $result = array_slice($data, $offset, $perPage, true);
+        // Create a paginator instance
         $paginator = new LengthAwarePaginator($result, count($data), $perPage, $page, [
             'path' => $request->url(),
             'query' => $request->query(),
         ]);
 
+        // Return the view
         return view('demand.index', compact('paginator', 'nextTwelveMonths', 'resources'))
             ->with('i', ($request->input('page', 1) - 1) * $perPage);
     }
