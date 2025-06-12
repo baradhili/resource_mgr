@@ -81,7 +81,7 @@ class DemandController extends Controller
 
         // Get the projects_id from demands in our window
         $demandProjectIds = Demand::whereBetween('demand_date', [$startDate, $endDate])
-            ->whereIn('resource_type', array_map('intval', $resource_types))
+            ->whereIn('resource_type', $resource_types)
             ->pluck('projects_id')
             ->unique()
             ->values()
@@ -96,14 +96,14 @@ class DemandController extends Controller
         $data = [];
         foreach ($projects as $project) {
             // Get the resource type for the project
-            $resourceType = Demand::where('projects_id', '=', $project->id)->value('resource_type');
+            $resourceType = optional($project->demands->first())->resource_type;
             // If the project doesn't have a resource type, continue to the next project
             if (!in_array($resourceType, $resource_types)) {
                 continue;
             }
             // Get the acronym for the resource type
             if (is_numeric($resourceType)) {
-                $resourceType = ResourceType::findOrFail($resourceType)->name;
+                $resourceType = ResourceType::findOrFail($resourceType)->name?? 'N/A';
             }
 
             $acronym = '';
