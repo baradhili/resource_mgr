@@ -33,7 +33,11 @@ class DemandController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Displays a paginated list of projects with their resource demand allocations for the next 12 months.
+     *
+     * Retrieves projects with demands matching the authenticated user's owned resource types, aggregates monthly FTE allocations, and presents the data in a paginated view. If the user does not own any resource types, redirects to the home view.
+     *
+     * @return View The demand index view with paginated project demand data, timeline months, and available resources.
      */
     public function index(Request $request): View
     {
