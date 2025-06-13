@@ -22,24 +22,23 @@ class CacheService
             ];
         });
 
-        $resources = Resource::with([
-            'contracts' => function ($query) {
-                $query->where('start_date', '<=', now())
-                    ->where('end_date', '>=', now())
-                    ->orWhere(function ($query) {
-                        $query->where('start_date', '>', now())
-                            ->where('start_date', '<=', Carbon::now()->addMonth());
-                    });
-            },
-            'leaves'
-        ])->get();
+        +$resources = Resource::whereHas('contracts', function ($q) {
+            $q->where('start_date', '<=', now())
+                ->where('end_date', '>=', now())
+                ->orWhere(function ($q) {
+                    $q->where('start_date', '>', now())
+                        ->where('start_date', '<=', Carbon::now()->addMonth());
+                });
+        })
+            ->with(['contracts', 'leaves'])
+            ->get();
 
         $resourceAvailability = [];
 
         foreach ($resources as $resource) {
             $resourceAvailability[$resource->id] = ['name' => $resource->full_name];
 
-            $currentContract = $resource->contracts->first();
+            $currentContract = $resource->contracts->sortby('start_date')->reverse()->first();
 
             if ($currentContract) {
                 $contractStartDate = Carbon::parse($currentContract->start_date);
