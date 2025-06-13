@@ -22,7 +22,7 @@ class CacheService
             ];
         });
 
-        +$resources = Resource::whereHas('contracts', function ($q) {
+        $resources = Resource::whereHas('contracts', function ($q) {
             $q->where('start_date', '<=', now())
                 ->where('end_date', '>=', now())
                 ->orWhere(function ($q) {
