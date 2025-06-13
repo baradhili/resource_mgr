@@ -47,7 +47,7 @@
                                                 <td>{{ $plugin->displayName }}</td>
                                                 <td>
                                                     <dialog id="dialog-{{ $plugin->name }}">
-                                                        <form action="{{ route('import.' . $plugin->name) }}" method="POST"
+                                                        <form action="{{ route( $plugin->route) }}" method="POST"
                                                             enctype="multipart/form-data">
                                                             @csrf
                                                             <div class="modal-header">

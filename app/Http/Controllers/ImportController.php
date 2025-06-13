@@ -46,16 +46,30 @@ class ImportController extends Controller
         $this->cacheService = $cacheService;
     }
 
+    /**
+     * Displays a list of import plugins.
+     *
+     * Each plugin is modified to include a "displayName" attribute, which is the plugin name
+     * with spaces inserted before each capital letter. The plugin name is also modified to
+     * remove the "Import" suffix.
+     *
+     * Each plugin also has a "route" attribute added, which is a string in the format
+     * "import.<plugin name in lowercase>".
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index()
     {
         // get a list of Plugins of type Import
         $plugins = Plugin::where('type', 'Import')->get();
+
         // Add an attribute to each plugin for teh "displayName" where we take its plugin name and make it readable
         foreach ($plugins as $key => $plugin) {
             $plugins[$key]->displayName = preg_replace('/Import$/', '', $plugin->name);
             $plugins[$key]->displayName = preg_replace('/([a-z])([A-Z])/', '$1 $2', $plugins[$key]->displayName);
-        }
 
+            $plugins[$key]->route = "import.". strtolower($plugins[$key]->displayName);
+        }
         return view('import.index', compact('plugins'));
     }
 
