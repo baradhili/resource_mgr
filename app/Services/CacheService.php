@@ -102,8 +102,12 @@ class CacheService
                             // Use year-month as the key
                             $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
-                            // Add the calculated base availability to the resource availability array
-                            $resourceAvailability[$resource->id]['availability'][$key] = $resourceAvailability[$resource->id]['availability'][$key] - $leaveAvailability;
+                            // Add the calculated base availability to the resource availability array - also handle if leave is booked past current availability (ie contract ending)
+                            if (isset($resourceAvailability[$resource->id]['availability'][$key])) {
+                                $resourceAvailability[$resource->id]['availability'][$key] = max(0, $resourceAvailability[$resource->id]['availability'][$key] - $leaveAvailability);
+                            } else {
+                                $resourceAvailability[$resource->id]['availability'][$key] = 0;
+                            }
 
                         }
                     }
