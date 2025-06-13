@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\LeaveRequest;
 use App\Models\Leave;
 use App\Models\Resource;
+use App\Services\CacheService;
 use App\Services\ResourceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,50 +15,77 @@ use Illuminate\View\View;
 
 class LeaveController extends Controller
 {
-    private $resourceService;
+    protected $cacheService;
 
-    public function __construct(ResourceService $resourceService)
+    protected $resourceService;
+
+    public function __construct(CacheService $cacheService, ResourceService $resourceService)
     {
+        $this->cacheService = $cacheService;
         $this->resourceService = $resourceService;
     }
 
     /**
      * Display a listing of the resource.
+     *
+     * This is the main method that will grab all the leaves that are
+     * associated with resources. It will filter the results based on
+     * the following criteria:
+     *  - If the user asks for a specific region, it will only grab
+     *    resources from that region
+     *  - If the user asks for only current leaves, it will filter out
+     *    all leaves that have end dates in the past
+     *  - If the user asks for leaves that match a specific search
+     *    term, it will only grab leaves that have a resource whose
+     *    full_name matches the search term
+     *
+     * The method will then paginate the results and return the view
+     * with the paginated results and the search/filter options
      */
     public function index(Request $request): View
     {
+        // Get the user who is making the request
         $user = auth()->user();
-        // check if they are asking for a region
+
+        // Get the region ID from the request, if it exists
         $regionID = $request->input('region_id');
-        // Collect our resources who have a current contract
+
+        // Get the list of resources that have a current contract
         $resources = $this->resourceService->getResourceList($regionID);
 
-        // collect teh regions from teh resources->region
+        // Get the list of regions from the resources->region
         $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
+        // Get the old parameter from the request, if it exists
         $old = $request->query('old');
+
+        // Get the search parameter from the request, if it exists
         $search = $request->query('search');
 
-        // assemble the query based on old and search values
-
+        // Build the query based on the old and search values
         $query = Leave::query()
             ->whereIn('resources_id', $resources->pluck('id'));
 
-        if (! $old) {
+        // If the user asked for only current leaves, filter out all leaves that have end dates in the past
+        if (!$old) {
             $query->where('end_date', '>=', now());
         }
 
+        // If the user asked for a specific search term, filter out all leaves that don't match the search term
         if ($search) {
             $query->whereHas('resource', function ($resourceQuery) use ($search) {
                 $resourceQuery->where('full_name', 'like', "%$search%");
             });
         }
 
+        // Execute the query and get the results
         $leaveResult = $query->get();
 
         // Get the current page from the request
         $page = $request->input('page', 1);
-        $perPage = 10; // Define the number of items per page
+
+        // Set the number of items per page
+        $perPage = 10;
 
         // Paginate the collection
         $leaves = new LengthAwarePaginator(
@@ -68,9 +96,9 @@ class LeaveController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
+        // Return the view with the paginated results and the search/filter options
         return view('leave.index', compact('leaves', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $leaves->perPage());
-
     }
 
     /**
@@ -91,6 +119,9 @@ class LeaveController extends Controller
     public function store(LeaveRequest $request): RedirectResponse
     {
         Leave::create($request->validated());
+
+        //refesh availability
+        $this->cacheService->cacheResourceAvailability();
 
         return Redirect::route('leaves.index')
             ->with('success', 'Leave created successfully.');
@@ -124,6 +155,9 @@ class LeaveController extends Controller
     public function update(LeaveRequest $request, Leave $leave): RedirectResponse
     {
         $leave->update($request->validated());
+
+        //refesh availability
+        $this->cacheService->cacheResourceAvailability();
 
         return Redirect::route('leaves.index')
             ->with('success', 'Leave updated successfully');
