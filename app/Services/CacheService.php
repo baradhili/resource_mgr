@@ -12,112 +12,103 @@ class CacheService
 {
     public function cacheResourceAvailability()
     {
-        $nextTwelveMonths = [];
-
-        for ($i = -1; $i < 12; $i++) {
+        $nextTwelveMonths = collect(range(-1, 11))->map(function ($i) {
             $date = Carbon::now()->addMonthsNoOverflow($i);
-            $nextTwelveMonths[] = [
+            return [
                 'year' => $date->year,
                 'month' => $date->month,
                 'monthName' => $date->format('M'),
                 'monthFullName' => $date->format('F'),
             ];
-        }
+        });
 
-        $resources = Resource::whereHas('contracts', function ($query) {
-            $query->where(function ($query) {
+        $resources = Resource::with([
+            'contracts' => function ($query) {
                 $query->where('start_date', '<=', now())
-                    ->where('end_date', '>=', now());
-            })->orWhere(function ($query) {
-                $query->where('start_date', '>', now())
-                    ->where('start_date', '<=', Carbon::now()->addMonth());
-            });
-        })->get();
+                    ->where('end_date', '>=', now())
+                    ->orWhere(function ($query) {
+                        $query->where('start_date', '>', now())
+                            ->where('start_date', '<=', Carbon::now()->addMonth());
+                    });
+            },
+            'leaves'
+        ])->get();
+
+        $resourceAvailability = [];
 
         foreach ($resources as $resource) {
+            $resourceAvailability[$resource->id] = ['name' => $resource->full_name];
 
-            $resourceAvailability[$resource->id] = [
-                'name' => $resource->full_name,
-            ];
-            $currentContract = $resource->contracts()->where('start_date', '<=', now())
-                ->where('end_date', '>=', now())
-                ->first();
+            $currentContract = $resource->contracts->first();
 
             if ($currentContract) {
-                // Calculate base availability for each month
                 $contractStartDate = Carbon::parse($currentContract->start_date);
                 $contractEndDate = Carbon::parse($currentContract->end_date);
 
-                foreach ($nextTwelveMonths as $month) {
+                $nextTwelveMonths->each(function ($month) use ($resource, $contractStartDate, $contractEndDate, $currentContract, &$resourceAvailability) {
                     $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                     $monthEndDate = $monthStartDate->copy()->endOfMonth();
 
-                    if (
-                        $contractStartDate->isBetween($monthStartDate, $monthEndDate) ||
-                        $contractEndDate->isBetween($monthStartDate, $monthEndDate) ||
-                        ($contractStartDate->lessThanOrEqualTo($monthStartDate) && $contractEndDate->greaterThanOrEqualTo($monthEndDate))
-                    ) {
-                        // If the contract overlaps with the month, calculate availability
-                        if (
-                            $contractStartDate->isSameMonth($monthStartDate) ||
-                            $contractEndDate->isSameMonth($monthEndDate)
-                        ) {
-                            // If the contract start_date or end_date lands in this month, calculate the percentage of the month inside the contract
-                            $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
-                            $contractDaysInMonth = min($contractEndDate, $monthEndDate)->diffInDays(max($contractStartDate, $monthStartDate)) + 1;
-                            $baseAvailability = round(($contractDaysInMonth / $daysInMonth) * $currentContract->availability, 2);
-                        } else {
-                            // Otherwise, it will be the availability
-                            $baseAvailability = $currentContract->availability;
-                        }
-                        // Use year-month as the key
-                        $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-
-                        // Add the calculated base availability to the resource availability array
+                    if ($this->datesOverlap($contractStartDate, $contractEndDate, $monthStartDate, $monthEndDate)) {
+                        $baseAvailability = $this->calculateBaseAvailability($contractStartDate, $contractEndDate, $monthStartDate, $monthEndDate, $currentContract->availability);
+                        $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                         $resourceAvailability[$resource->id]['availability'][$key] = $baseAvailability;
                     }
-                    // now check for leave
-                    foreach ($resource->leaves as $leave) {
-                        $leaveStartDate = Carbon::parse($leave->start_date);
-                        $leaveEndDate = Carbon::parse($leave->end_date);
+                });
 
-                        if (
-                            $leaveStartDate->isBetween($monthStartDate, $monthEndDate) ||
-                            $leaveEndDate->isBetween($monthStartDate, $monthEndDate) ||
-                            ($leaveStartDate->lessThanOrEqualTo($monthStartDate) && $leaveEndDate->greaterThanOrEqualTo($monthEndDate))
-                        ) {
-                            // If the leave overlaps with the month, calculate availability
-                            if (
-                                $leaveStartDate->isSameMonth($monthStartDate) ||
-                                $leaveEndDate->isSameMonth($monthEndDate)
-                            ) {
-                                // If the leave start_date or end_date lands in this month, calculate the percentage of the month inside the leave
-                                $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
-                                $leaveDaysInMonth = min($leaveEndDate, $monthEndDate)->diffInDays(max($leaveStartDate, $monthStartDate)) + 1;
-                                $leaveAvailability = round(($leaveDaysInMonth / $daysInMonth) * 1.00, 2);
-                            } else {
-                                // Otherwise, it will be 100
-                                $leaveAvailability = 1.00;
-                            }
-                            // Use year-month as the key
-                            $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $resource->leaves->each(function ($leave) use ($resource, &$resourceAvailability, $nextTwelveMonths) {
+                    $leaveStartDate = Carbon::parse($leave->start_date);
+                    $leaveEndDate = Carbon::parse($leave->end_date);
 
-                            // Add the calculated base availability to the resource availability array - also handle if leave is booked past current availability (ie contract ending)
+                    $nextTwelveMonths->each(function ($month) use ($resource, $leaveStartDate, $leaveEndDate, &$resourceAvailability) {
+                        $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
+                        $monthEndDate = $monthStartDate->copy()->endOfMonth();
+                        $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+
+                        if ($this->datesOverlap($leaveStartDate, $leaveEndDate, $monthStartDate, $monthEndDate)) {
+                            $leaveAvailability = $this->calculateLeaveAvailability($leaveStartDate, $leaveEndDate, $monthStartDate, $monthEndDate);
+
                             if (isset($resourceAvailability[$resource->id]['availability'][$key])) {
                                 $resourceAvailability[$resource->id]['availability'][$key] = max(0, $resourceAvailability[$resource->id]['availability'][$key] - $leaveAvailability);
                             } else {
                                 $resourceAvailability[$resource->id]['availability'][$key] = 0;
                             }
-
                         }
-                    }
-                }
+                    });
+                });
             }
-
         }
 
-        // Cache the resourceAvailability data
         Cache::put('resourceAvailability', $resourceAvailability, now()->addDays(1));
+    }
+
+    private function datesOverlap($start1, $end1, $start2, $end2)
+    {
+        return $start1->isBetween($start2, $end2) ||
+            $end1->isBetween($start2, $end2) ||
+            ($start1->lessThanOrEqualTo($start2) && $end1->greaterThanOrEqualTo($end2));
+    }
+
+    private function calculateBaseAvailability($contractStartDate, $contractEndDate, $monthStartDate, $monthEndDate, $availability)
+    {
+        if ($contractStartDate->isSameMonth($monthStartDate) || $contractEndDate->isSameMonth($monthEndDate)) {
+            $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
+            $contractDaysInMonth = min($contractEndDate, $monthEndDate)->diffInDays(max($contractStartDate, $monthStartDate)) + 1;
+            return round(($contractDaysInMonth / $daysInMonth) * $availability, 2);
+        }
+
+        return $availability;
+    }
+
+    private function calculateLeaveAvailability($leaveStartDate, $leaveEndDate, $monthStartDate, $monthEndDate)
+    {
+        if ($leaveStartDate->isSameMonth($monthStartDate) || $leaveEndDate->isSameMonth($monthEndDate)) {
+            $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
+            $leaveDaysInMonth = min($leaveEndDate, $monthEndDate)->diffInDays(max($leaveStartDate, $monthStartDate)) + 1;
+            return round(($leaveDaysInMonth / $daysInMonth) * 1.00, 2);
+        }
+
+        return 1.00;
     }
 
     public function cacheResourceAllocation()
@@ -151,7 +142,7 @@ class CacheService
 
         // Collect the availability
         $resourceAvailability = Cache::get('resourceAvailability');
-        if (! Cache::has('resourceAvailability')) {
+        if (!Cache::has('resourceAvailability')) {
             $this->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
@@ -171,7 +162,7 @@ class CacheService
                     ->where('resources_id', '=', $resource->id)
                     ->sum('fte');
                 // Use year-month as the key
-                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                 // Get the availability for the month
                 // Get the availability for the current month
                 $availability = isset($resourceAvailability[$resource->id]['availability'][$key]) ? (float) $resourceAvailability[$resource->id]['availability'][$key] : 0.0;
