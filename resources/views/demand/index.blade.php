@@ -93,7 +93,7 @@
                                                     method="POST">
                                                     @can('demands.editFullDemand')
                                                         <a class="btn btn-sm btn-success"
-                                                            href="{{ route('demands.editFullDemand', $item['id'] ?? '') }}"><i
+                                                            href="{{ route('demands.editFullDemand', ['project' => $item['id'] ?? '', 'resource_type' => $item['type_id'] ?? '']) }}"><i
                                                                 class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @endcan
                                                     @csrf
