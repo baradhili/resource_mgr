@@ -121,7 +121,7 @@ class DemandController extends Controller
                 'name' => $project->name,
                 'empowerID' => $project->empowerID, // Collect empowerID
                 'type' => $acronym,
-                'type_id' => $resourceType,
+                'type_name' => $resourceType,
                 'demands' => [],
             ];
 
