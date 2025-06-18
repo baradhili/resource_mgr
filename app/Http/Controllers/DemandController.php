@@ -321,6 +321,16 @@ class DemandController extends Controller
         $demand->fte = $firstDemand->fte;
         $demand->projects_id = $project->id;
 
+        //make sure we keep these for comparison
+        session()->put('old_demand', [
+            'projects_id' => $demand->projects_id,
+            'start_date' => $demand->start_date,
+            'end_date' => $demand->end_date,
+            'status' => $demand->status,
+            'resource_type' => $demand->resource_type,
+            'fte' => $demand->fte,
+        ]);
+
         // Pass the data to the view
         $projects = Project::all();
         $resourceTypes = ResourceType::all();
@@ -337,14 +347,24 @@ class DemandController extends Controller
      */
     public function update(Request $request, $projects_id): RedirectResponse
     {
+        //pull all "old" data for comparison
+        $oldDemand = session()->get('old_demand', []);
+
+        $old_projects_id = $oldDemand['projects_id'] ?? null;
+        $old_start_date = $oldDemand['start_date'] ?? null;
+        $old_end_date = $oldDemand['end_date'] ?? null;
+        $old_status = $oldDemand['status'] ?? null;
+        $old_resource_type = $oldDemand['resource_type'] ?? null;
+        $old_fte = $oldDemand['fte'] ?? null;
+
         $project = Project::where('name', $request->input('name'))->firstOrFail();
         $demand = Demand::where('projects_id', $project->id)
             ->where('demand_date', $request->input('old_start_date'))
             ->first();
 
-        $oldProjects_id = $request->input('old_projects_id');
+        $oldProjects_id = $old_projects_id;
 
-        $storedDemand = Demand::where('projects_id', $request->input('old_start_date'))
+        $storedDemand = Demand::where('projects_id', $old_start_date)
             ->get()
             ->keyBy('demand_date')
             ->toArray();

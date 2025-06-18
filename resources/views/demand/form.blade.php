@@ -1,11 +1,4 @@
 <div class="row padding-1 p-1">
-    <input type="hidden" name="old_name" value="{{ old('name', $demand->name) }}">
-    <input type="hidden" name="old_start_date" value="{{ old('start_date', $demand->start_date) }}">
-    <input type="hidden" name="old_end_date" value="{{ old('end_date', $demand->end_date) }}">
-    <input type="hidden" name="old_status" value="{{ old('status', $demand->status) }}">
-    <input type="hidden" name="old_resource_type" value="{{ old('resource_type', $demand->resource_type) }}">
-    <input type="hidden" name="old_fte" value="{{ old('fte', $demand->fte) }}">
-    <input type="hidden" name="old_projects_id" value="{{ old('projects_id', $demand->projects_id) }}">
     <div class="col-md-12">
         <div class="form-group mb-2 mb20">
             <label for="projects_id" class="form-label">{{ __('Projects') }}</label>
