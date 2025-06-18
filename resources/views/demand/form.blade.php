@@ -75,7 +75,7 @@
         <div class="form-group mb-2 mb20">
             <label for="fte" class="form-label">{{ __('FTE') }}</label>
             <input type="number" step="0.01" name="fte" class="form-control @error('fte') is-invalid @enderror"
-                value="{{ old('fte', $demand?->fte) }}" id="fte" placeholder="FTE">
+                value="{{ old('fte', number_format($demand?->fte, 2)) }}" id="fte" placeholder="FTE">
             {!! $errors->first('fte', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
 
