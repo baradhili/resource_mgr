@@ -318,7 +318,7 @@ class DemandController extends Controller
         $demand->end_date = $demands->max('end') ? date('Y-m-01', strtotime($demands->max('end'))) : null;
         $demand->status = $firstDemand->status;
         $demand->resource_type = $resource_type->id;
-        $demand->fte = $demands->first()->fte;
+        $demand->fte = $firstDemand->fte;
         $demand->projects_id = $project->id;
 
         // Pass the data to the view
