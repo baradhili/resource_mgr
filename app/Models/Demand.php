@@ -37,7 +37,7 @@ class Demand extends Model
         return $this->belongsTo(\App\Models\Project::class, 'projects_id', 'id');
     }
 
-    public function resource_type(): BelongsTo
+    public function resourcType(): BelongsTo
     {
         return $this->belongsTo(\App\Models\ResourceType::class, 'resource_type', 'id');
     }
