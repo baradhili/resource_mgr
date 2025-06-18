@@ -1,4 +1,11 @@
 <div class="row padding-1 p-1">
+    <input type="hidden" name="old_name" value="{{ old('name', $demand->name) }}">
+    <input type="hidden" name="old_start_date" value="{{ old('start_date', $demand->start_date) }}">
+    <input type="hidden" name="old_end_date" value="{{ old('end_date', $demand->end_date) }}">
+    <input type="hidden" name="old_status" value="{{ old('status', $demand->status) }}">
+    <input type="hidden" name="old_resource_type" value="{{ old('resource_type', $demand->resource_type) }}">
+    <input type="hidden" name="old_fte" value="{{ old('fte', $demand->fte) }}">
+    <input type="hidden" name="old_projects_id" value="{{ old('projects_id', $demand->projects_id) }}">
     <div class="col-md-12">
         <div class="form-group mb-2 mb20">
             <label for="projects_id" class="form-label">{{ __('Projects') }}</label>
@@ -61,21 +68,25 @@
 
         <div class="form-group mb-2 mb20">
             <label for="resource_type" class="form-label">{{ __('Resource Type') }}</label>
-            <select name="resource_type" class="form-control @error('resource_type') is-invalid @enderror" id="resource_type">
+            <select name="resource_type" class="form-control @error('resource_type') is-invalid @enderror"
+                id="resource_type">
                 <option value="">{{ __('Select a Resource Type') }}</option>
                 @foreach ($resourceTypes as $type)
-                    <option value="{{ $type->id }}" @if(old('resource_type', $demand?->resource_type) == $type->id) selected @endif>
+                    <option value="{{ $type->id }}" @if (old('resource_type', $demand?->resource_type) == $type->id) selected @endif>
                         {{ $type->name }}
                     </option>
                 @endforeach
             </select>
-            {!! $errors->first('resource_type', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+            {!! $errors->first(
+                'resource_type',
+                '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>',
+            ) !!}
         </div>
 
         <div class="form-group mb-2 mb20">
             <label for="fte" class="form-label">{{ __('FTE') }}</label>
             <input type="number" step="0.01" name="fte" class="form-control @error('fte') is-invalid @enderror"
-                value="{{ old('fte', $demand?->fte) }}" id="fte" placeholder="FTE">
+                value="{{ old('fte', number_format($demand?->fte, 2)) }}" id="fte" placeholder="FTE">
             {!! $errors->first('fte', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
 
