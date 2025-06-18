@@ -16,6 +16,6 @@ use Modules\FieldglassImport\App\Http\Controllers\FieldglassImportController;
 
 Route::middleware(['web', 'auth', 'verified'])->group(function () {
     Route::post('/import/fieldglass', [FieldglassImportController::class, 'importFieldglass'])
-        ->name(strtolower(config('fieldglassimport.type')).'-'.config('fieldglassimport.name'));
+        ->name('import.fieldglass');
 });
 
