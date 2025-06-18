@@ -55,8 +55,8 @@
                                 <tbody>
                                     @foreach ($paginator as $item)
                                         <tr>
-                                            <td><a
-                                                    href="{{ route('projects.show', $item['id'] ?? '') }}">{{ $item['empowerID'] ?? '' }} - {{ $item['name'] ?? '' }}</a>
+                                            <td><a href="{{ route('projects.show', $item['id'] ?? '') }}">{{ $item['empowerID'] ?? '' }}
+                                                    - {{ $item['name'] ?? '' }}</a>
                                             </td>
                                             <td>{{ $item['type'] ?? '-' }} </td>
                                             <!-- Populate availability for each month -->
@@ -93,7 +93,7 @@
                                                     method="POST">
                                                     @can('demands.editFullDemand')
                                                         <a class="btn btn-sm btn-success"
-                                                            href="{{ route('demands.editFullDemand', $item['id'] ?? '') }}"><i
+                                                            href="{{ route('demands.editFullDemand', ['project' => $item['id'] ?? '', 'resource_type' => $item['type_name'] ?? '']) }}"><i
                                                                 class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @endcan
                                                     @csrf
