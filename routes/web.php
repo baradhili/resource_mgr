@@ -57,7 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/contracts/clean', [ContractController::class, 'cleanProjects'])->name('contracts.clean');
     Route::resource('contracts', ContractController::class);
     Route::get('/demands/export', [DemandController::class, 'exportDemands'])->name('demands.export');
-    Route::get('/demands/{project}/editFullDemand', [DemandController::class, 'editFullDemand'])->name('demands.editFullDemand');
+    Route::get('/demands/{project}/editFullDemand/{resource_type}', [DemandController::class, 'editFullDemand'])->name('demands.editFullDemand');
     Route::resource('demands', DemandController::class);
     Route::resource('leaves', LeaveController::class);
     Route::get('/projects/search', [ProjectController::class, 'search'])->name('projects.search');
