@@ -103,7 +103,7 @@ class DemandController extends Controller
             }
             // Get the acronym for the resource type
             if (is_numeric($resourceType)) {
-                $resourceType = ResourceType::findOrFail($resourceType)->name?? 'N/A';
+                $resourceType = ResourceType::findOrFail($resourceType)->name ?? 'N/A';
             }
 
             $acronym = '';
@@ -121,6 +121,7 @@ class DemandController extends Controller
                 'name' => $project->name,
                 'empowerID' => $project->empowerID, // Collect empowerID
                 'type' => $acronym,
+                'type_id' => $resourceType,
                 'demands' => [],
             ];
 
@@ -271,23 +272,56 @@ class DemandController extends Controller
      * Edit the overall demand of a project
      *
      * @param  int  $project_id  The id of the project
+     * @param string $resource_type  The name of the resource type we're looking for
      */
-    public function editFullDemand($project_id): View
+    public function editFullDemand($project_id, $resource_type): View
     {
-        $demandArray = Demand::where('projects_id', $project_id)
-            ->whereBetween('demand_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
+        // Find the project we're interested in
+        $project = Project::find($project_id);
+
+        // Find the resource type we're interested in
+        $resource_type = ResourceType::where('name', $resource_type)->first();
+
+        // Get all demands for the project, grouped by resource type, and only
+        // where the FTE is greater than 0
+        $demands = Demand::selectRaw('resource_type, MIN(demand_date) as start, MAX(demand_date) as end, AVG(fte) as fte')
+            ->where('projects_id', $project->id)
+            ->where('fte', '>', 0)
+            ->groupBy('resource_type')
             ->get();
 
-        $demand = new \stdClass;
-        $demand->name = $demandArray->first()->project->name;
-        $demand->start_date = Carbon::parse($demandArray->min('demand_date'))->format('Y-m-d');
-        $demand->end_date = Carbon::parse($demandArray->max('demand_date'))->format('Y-m-d');
-        $demand->status = $demandArray->first()->status;
-        $demand->resource_type = $demandArray->first()->resource_type;
-        $demand->fte = $demandArray->first()->fte;
-        $demand->projects_id = $project_id;
-        $demand->demand_id = $demandArray->first()->id;
+        // Map the results of the query to a new collection, converting the
+        // start and end dates to 'M-Y' format
+        $demands = $demands->map(function ($demand) {
+            $demand->start = date('M-Y', strtotime($demand->start));
+            $demand->end = date('M-Y', strtotime($demand->end));
 
+            // Find the resource type name for the resource type id
+            $demand->resource_type = ResourceType::find($demand->resource_type)->name;
+
+            return $demand;
+        });
+
+        // Find the first demand of the project, which will be used to fill in
+        // the form
+        $firstDemand = Demand::where('projects_id', $project->id)
+            ->where('resource_type', $resource_type->id)
+            ->first();
+
+        // Create a new stdClass object to hold the data for the form
+        $demand = new \stdClass;
+
+        // Fill in the form data
+        $demand->demand_id = 1;
+        $demand->name = $project->name;
+        $demand->start_date = $demands->min('start') ? date('Y-m-01', strtotime($demands->min('start'))) : null;
+        $demand->end_date = $demands->max('end') ? date('Y-m-01', strtotime($demands->max('end'))) : null;
+        $demand->status = $firstDemand->status;
+        $demand->resource_type = $resource_type->id;
+        $demand->fte = $demands->first()->fte;
+        $demand->projects_id = $project->id;
+
+        // Pass the data to the view
         $projects = Project::all();
         $resourceTypes = ResourceType::all();
 
@@ -296,41 +330,28 @@ class DemandController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $projects_id
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $projects_id): RedirectResponse
     {
-        // if (!is_numeric($request->input('projects_id'))) {
-        //     $project = Project::where('name', $request->input('projects_id'))->first();
-        //     $projectID = $project->id ?? null;
-        //     if (is_null($projectID)) {
-        //         $project = Project::updateOrCreate(
-        //             ['name' => $request->input('projects_id')]
-        //         );
-        //         $projects_id = $project->id;
-        //     }
-        // } else {
-        // $projects_id = $request->input('projects_id');
-        // }
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
-            'status' => 'required|string',
-            'resource_type' => 'required|string',
-            'fte' => 'required|numeric',
-            'demand_id' => 'required|numeric',
-        ]);
+        $project = Project::where('name', $request->input('name'))->firstOrFail();
+        $demand = Demand::where('projects_id', $project->id)
+            ->where('demand_date', $request->input('old_start_date'))
+            ->first();
 
-        $demand = Demand::findOrFail($request->input('demand_id'));
+        $oldProjects_id = $request->input('old_projects_id');
 
-        $oldProjects_id = $demand->projects_id;
-
-        $storedDemand = Demand::where('projects_id', $demand->oldProjects_id)
+        $storedDemand = Demand::where('projects_id', $request->input('old_start_date'))
             ->get()
             ->keyBy('demand_date')
             ->toArray();
 
         $startDate = Carbon::parse($request->input('start_date'));
         $endDate = Carbon::parse($request->input('end_date'));
+
         $minDemandDate = array_key_first($storedDemand);
         $maxDemandDate = array_key_last($storedDemand);
 
@@ -342,7 +363,9 @@ class DemandController extends Controller
 
             while ($monthStartDate->lte($monthEndDate)) {
                 $demandLength = min($monthEndDate, $monthStartDate->copy()->endOfMonth())->diffInDays($monthStartDate);
+
                 $fte = $request->input('fte') * $demandLength / $monthStartDate->diffInDays($monthStartDate->copy()->endOfMonth());
+
                 Demand::create([
                     'demand_date' => $monthStartDate,
                     'fte' => $fte,
@@ -350,9 +373,9 @@ class DemandController extends Controller
                     'resource_type' => $request->input('resource_type'),
                     'projects_id' => $projects_id,
                 ]);
+
                 $monthStartDate->addMonth();
             }
-
         }
 
         Demand::where('projects_id', $oldProjects_id)
