@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Mpociot\Teamwork\TeamworkTeam;
@@ -23,6 +24,7 @@ use Mpociot\Teamwork\TeamworkTeam;
  */
 class Team extends TeamworkTeam
 {
+    use HasFactory;
     protected $perPage = 20;
 
     /**
