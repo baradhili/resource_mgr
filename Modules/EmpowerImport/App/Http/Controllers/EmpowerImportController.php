@@ -78,7 +78,7 @@ class EmpowerImportController extends Controller
                 return strtolower($name);
             })->toArray();
 
-            // collect resource types that have an associated team/resource manager
+            // collect resource types that have an associated team/resource manager - TODO don't get resources who's contract has ended
             $ownedResourceTypes = Team::select('resource_type')->distinct()->get()->pluck('resourceType')->unique();
 
             // Initialize missingResources array
@@ -163,14 +163,15 @@ class EmpowerImportController extends Controller
                         // first replace the "resource name" with a resource_type id
                         $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
 
-                        // Check if the resource type belongs to a team aka someone is going to manage this demand - otherwise skip
+                        // Check if the resource type belongs to a team aka someone is going to manage this demand 
                         $belongsToTeam = $ownedResourceTypes->contains(function ($resourceType) use ($resourceName) {
                             return strtolower($resourceType->name) === strtolower($resourceName);
                         });
-                        if ($belongsToTeam) {
+                        if ($belongsToTeam) { //if it belongs to a team, insert it into demand, otherwise skip
 
                             $rowData[$this->columnResourceName] = $resourceType ? $resourceType->id : null;
-                            // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
+                            Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
+                            // we should ignore past demand 
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
                                 $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
@@ -180,7 +181,7 @@ class EmpowerImportController extends Controller
                                     ->first();
                                 // if its a change
                                 if ($existingDemand && $existingDemand->fte != $fte) {
-                                    // Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
+                                    Log::info("Warning: FTE for demand {$projectID} on date {$monthYear[$i]} has changed from {$existingDemand->fte} to $fte");
                                     ChangeRequest::create([
                                         'record_type' => Demand::class,
                                         'record_id' => $existingDemand->id,
@@ -205,6 +206,8 @@ class EmpowerImportController extends Controller
                                     ]);
                                 }
                             }
+                        } else {
+                            // Log::info("Skipping demand resource type {$resourceName} as it does not belong to a team");
                         }
                     }
                 }
