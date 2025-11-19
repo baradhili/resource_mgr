@@ -122,6 +122,7 @@ class ImportController extends Controller
 
             // Collect up the dates in row 5
             foreach ($sheet->nextRow() as $rowNum => $rowData) {
+
                 if ($rowNum == 5) { // Grab header row
                     // Step through columns 'G' on until blank, capture each filled column into array as monthYear
                     $monthYear = [];

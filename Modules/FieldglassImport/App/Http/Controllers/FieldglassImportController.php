@@ -91,14 +91,14 @@ class FieldglassImportController extends Controller
                         ->orderBy('start_date', 'desc')
                         ->first();
                     if ($contract != null) {
-                        Log:info("contract found");
+                        // Log:info("contract found");
                         $importWorkerStart = (new DateTime())->setTimestamp($rowData[$this->columnWorkerStartDate])->format('Y-m-d');
                         $importWorkerEnd = (new DateTime())->setTimestamp($rowData[$this->columnWorkOrderEndDate])->format('Y-m-d');
                         $storedContractStart = (new DateTime())->setTimestamp(strtotime($contract->start_date))->format('Y-m-d');
                         $storedContractEnd = (new DateTime())->setTimestamp(strtotime($contract->end_date))->format('Y-m-d');  
                         //check if contract dates are correct
                         if ($storedContractStart != $importWorkerStart) {
-                            Log::info("contract start date incorrect");
+                            // Log::info("contract start date incorrect");
                             ChangeRequest::create([
                                 'record_type' => Contract::class,
                                 'record_id' => $contract->id,

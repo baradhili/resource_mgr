@@ -4,7 +4,10 @@ namespace App\Widgets;
 
 use App\Models\Demand;
 use App\Models\Project;
+use App\Services\CacheService;
+use App\Services\ResourceService;
 use Arrilot\Widgets\AbstractWidget;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class UpcomingDemand extends AbstractWidget
@@ -15,6 +18,16 @@ class UpcomingDemand extends AbstractWidget
      * @var array
      */
     protected $config = [];
+
+    protected $cacheService;
+
+    protected $resourceService;
+
+    public function __construct(CacheService $cacheService, ResourceService $resourceService)
+    {
+        $this->cacheService = $cacheService;
+        $this->resourceService = $resourceService;
+    }
 
     /**
      * Treat this method as a controller action.
@@ -33,6 +46,19 @@ class UpcomingDemand extends AbstractWidget
                 'monthName' => $date->format('F'),
             ];
         }
+
+        // Collect our resources who have a current contract
+        $resources = $this->resourceService->getResourceList(null, false);
+        //extract unique resource types
+        $resource_types = array_unique(
+            array_map(
+                function ($resource) {
+                    return $resource['resource_type'];
+                },
+                $resources->toArray()
+            )
+        );
+        
 
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
@@ -62,9 +88,10 @@ class UpcomingDemand extends AbstractWidget
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 $totalAllocation = Demand::where('demand_date', '=', $monthStartDate)
                     ->where('projects_id', '=', $project->id)
+                    ->whereIn('resource_type', $resource_types)
                     ->pluck('fte')
                     ->first();
-                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($totalAllocation > 0) {
@@ -75,7 +102,7 @@ class UpcomingDemand extends AbstractWidget
 
         $yearMonthSums = [];
         foreach ($nextThreeMonths as $month) {
-            $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+            $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
             $yearMonthSums[$key] = 0;
         }
         foreach ($demandArray as $projectId => $projectInfo) {
@@ -84,7 +111,7 @@ class UpcomingDemand extends AbstractWidget
                 // $date = Carbon::createFromFormat('Y-m', $yearMonth);
                 // $yearMonthShortName = $date->format('M');
 
-                if (! isset($yearMonthSums[$yearMonth])) {
+                if (!isset($yearMonthSums[$yearMonth])) {
                     $yearMonthSums[$yearMonth] = 0;
                 }
                 $yearMonthSums[$yearMonth] += (float) $demand;

@@ -69,6 +69,7 @@ class EmpowerImportController extends Controller
      */
     public function importEmpower(Request $request): RedirectResponse
     {
+        Log::info("importEmpower");
         if ($request->hasFile('file')) {
             $uploadedFile = $request->file('file');
             $fileName = $uploadedFile->getClientOriginalName();
@@ -77,10 +78,10 @@ class EmpowerImportController extends Controller
             $resourceTypes = ResourceType::all()->pluck('name')->map(function ($name) {
                 return strtolower($name);
             })->toArray();
-
+Log::info("got resource types");
             // collect resource types that have an associated team/resource manager - TODO don't get resources who's contract has ended
             $ownedResourceTypes = Team::select('resource_type')->distinct()->get()->pluck('resourceType')->unique();
-
+Log::info("got owned resource types");
             // Initialize missingResources array
             $missingResources = [];
             // Generate the desired file name
@@ -89,14 +90,15 @@ class EmpowerImportController extends Controller
 
             // Store the uploaded file with the generated name
             $path = $uploadedFile->storeAs('uploads', $fileName);
-
+Log::info("importing {$fileName}");
             // Open XLSX-file
             $excel = Excel::open(Storage::path($path));
-
+Log::info("opened file");
             $sheet = $excel->getSheet('Dataset_Empower');
 
             // Collect up the dates in row 5
             foreach ($sheet->nextRow() as $rowNum => $rowData) {
+                Log::info("importing rows {$rowNum}");
                 if ($rowNum == 5) { // Grab header row
                     // Step through columns 'G' on until blank, capture each filled column into array as monthYear
                     $monthYear = [];
