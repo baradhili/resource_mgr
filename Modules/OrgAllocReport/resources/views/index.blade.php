@@ -35,6 +35,7 @@
                                         <th>Current Focus</th>
                                         <th>Status</th>
                                         <th>Allocation</th>
+                                        <th>Supervisor</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,6 +49,7 @@
                                                     <td>~</td>
                                                     <td>Active</td>
                                                     <td>{{  $project->allocatedThisMonth }}</td>
+                                                    <td>{{ $resource->user->reports_to->name ?? '' }}</td>
                                                 </tr>
                                             @endif
                                         @endforeach
