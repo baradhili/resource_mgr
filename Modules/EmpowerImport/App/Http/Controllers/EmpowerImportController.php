@@ -178,54 +178,8 @@ class EmpowerImportController extends Controller
 
     private function handleDemand(Excel $excel)
     {
-        $sheet = $excel->getSheet('ADO');
-
-        // Collect up the dates in row 5
-        foreach ($sheet->nextRow() as $rowNum => $rowData) {
-            // Log::info("importing rows {$rowNum}");
-            
-            if ($rowNum < 3) { // Skip first 5 rows
-                continue;
-            } elseif ($rowData[$this->columnDemandType] != null) {
-        Log::info("rowData:".json_encode($rowData));
-                foreach ($rowData as $columnLetter => $columnValue) {
-        // Log::info("columnLetter:{$columnLetter}, columnValue:{$columnValue}"); 
-                $demandID = $rowData[$this->columnDemandID] ?? null;
-                $demandType = $rowData[$this->columnDemandType] ?? null; //Demand Request  | Resource Request
-                $demandTitle = $rowData[$this->columnDemandTitle] ?? null; // eg Request ID 62- Demand Request - Solution Architect- Dean.Stocks@riotinto.com
-                $demandOwner = $rowData[$this->columnDemandOwner] ?? null; // Watson, Bret (IST)
-                $demandStatus = $rowData[$this->columnDemandStatus] ?? null; //Filled Internally  | Cancelled | Done | Interviews | Hold | Capacity Review | Role to Recruitment | Role Approved | Vendor Briefing | Source CV's | Shortlist CV's | Vendor Offer | Vendor Acceptance | Security Checks | Account Creation | PO Approval
-                $demandDuration = $rowData[$this->columnDemandDuration] ?? null; // eg. 3 - 6 months | 4 weeks | 10  | 3months |  57 weeks  | min 6 months   | 8 Months for PFS   |  4 months -  extended into 2026 for the right fit.
-                $demandCapacity = $rowData[$this->columnDemandCapacity] ?? null; // 50% (2.5 days a week)
-                $demandFunded = $rowData[$this->columnDemandFunded] ?? null; // Yes | No
-                $demandDetails = $rowData[$this->columnDemandDetails] ?? null; //Portfolio Epic 643931 OTRF - Operational Technology Reference Architecture  | Environmental Data Management System PFS | Third Party Trading - Commercial Digital  | S2844 & S3138  | MW1277 - IT Automation Portfolio  | S3218 - RTLi Internal Labour  | S3252 Digital Track Inspections (DTI) Implementation Phase
-                $demandLastChange = $rowData[$this->columnDemandLastChange] ?? null; // 1764073713
-                $demandExpectedStart = $rowData[$this->columnDemandExpectedStart] ?? null; //1767600000
-                // $demandDemandMonth = $rowData[$this->columnDemandDemandMonth] ?? null;
-                // $demandUnallocated = $rowData[$this->columnDemandUnallocated] ?? null;
-                // $demandInScope = $rowData[$this->columnDemandInScope] ?? null;
-                // $demandFTE = $rowData[$this->columnDemandFTE] ?? null;
-                    // if ($columnLetter >= $this->columnDataStart && !is_null($columnValue)) {
-                    //     // $monthYear[] = $columnValue;
-                    //     // $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
-                    // }
-
-
-                }
-            }
-                    Log::info("DemandID: ". $demandID);
-        Log::info("DemandType: ". $demandType);
-        Log::info("DemandTitle: ". $demandTitle);
-        Log::info("DemandOwner: ". $demandOwner);
-        Log::info("DemandStatus: ". $demandStatus);
-        Log::info("DemandDuration: ". $demandDuration);
-        Log::info("DemandCapacity: ". $demandCapacity);
-        Log::info("DemandFunded: ". $demandFunded);
-        Log::info("DemandDetails: ". $demandDetails);
-        Log::info("DemandLastChange: ". $demandLastChange);
-        Log::info("DemandExpectedStart: ". $demandExpectedStart);
-
-        }
+       
+    
         return true;
     }
 
@@ -352,5 +306,59 @@ class EmpowerImportController extends Controller
             }
         }
         return true;
+    }
+
+    private function convertExcelDate($dateValue)
+    {
+        $unixDate = ($dateValue); // * 86400;
+        return gmdate("Y-m-d", $unixDate);
+        //   'where Y is YYYY, m is MM, and d is DD
+    }
+
+    private function cleanDurationData($durationData)
+    {
+        preg_match('/(\d+(?:\.\d+)?)\s*(years?|months?|weeks?|days?)?/i', $durationData, $matches);
+        $value = (float) $matches[1];
+        $unit = isset($matches[2]) ? strtolower($matches[2]) : 'months';
+        switch ($unit) {
+            case 'years':
+                $value *= 12;
+                break;
+            case 'months':
+                break;
+            case 'weeks':
+                $value *= (7 / 30);
+                break;
+            case 'days':
+                $value /= 30;
+                break;
+        }
+        return $value;
+    }
+
+    private function cleanProjectName($projectName)
+    {
+        // find the project or create a new one
+        // extract EmpowerID or project name from demand details
+        preg_match('/([A-Z])(\d{4})|([A-Za-z\s\-]+(?:\s-\s)?([A-Za-z\s]+(?:\s\d+)?)?)/', $projectName, $matches);
+        $demandEmpowerID = $matches[1] ?? null;
+        $demandProjectName = $matches[3] ?? null;
+        // Look up the project in the Project Model
+        $project = null;
+        if (!is_null($demandEmpowerID)) {
+            $project = Project::where('empowerID', $demandEmpowerID)->first();
+        } elseif (!is_null($demandProjectName)) {
+            $project = Project::where('name', 'LIKE', "%{$demandProjectName}%")->first();
+        }
+        // if we have a match thenus it, otherwise flag
+        if (!is_null($project)) {
+            $projectID = $project->id;
+            Log::info("found a project for {{$projectName}} - {{$project->empoerID}}");
+        } else {
+            $projectID = null;
+            Log::info("could not find a project for {{$projectName}}");
+        }
+
+        return $projectID;
     }
 }
