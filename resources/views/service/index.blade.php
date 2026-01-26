@@ -74,6 +74,11 @@
                                                             onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
                                                                 class="fas fa-trash"></i> {{ __('Delete') }}</button>
                                                     @endcan
+                                                    
+                                                        <a class="btn btn-sm btn-primary"
+                                                            href="{{ route('services.downloadDocx', $service->id) }}"><i
+                                                                class="fas fa-download"></i> {{ __('Download Docx') }}</a>
+                                                    
                                                 </form>
                                             </td>
                                         </tr>

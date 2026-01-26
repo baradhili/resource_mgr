@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\Settings;
+use GrahamCampbell\Markdown\Facades\Markdown;
+use Illuminate\Support\Str;
 
 class ServiceController extends Controller
 {
@@ -93,7 +98,7 @@ class ServiceController extends Controller
         $service = Service::find($id);
         // Decode the JSON data for required_skills
         $service->required_skills = json_decode($service->required_skills, true) ?? [];
-        Log::info('skills: '.json_encode($service->required_skills));
+        Log::info('skills: ' . json_encode($service->required_skills));
         // Fetch all skill names for the whitelist
         $skills = Skill::pluck('skill_name')->toArray();
 
@@ -132,5 +137,54 @@ class ServiceController extends Controller
 
         return Redirect::route('services.index')
             ->with('success', 'Service deleted successfully');
+    }
+
+    public function downloadDocx(int $id)
+    {
+        $service = Service::findOrFail($id);
+
+        // Convert Markdown to HTML (includes GFM tables)
+        $html = Markdown::convertToHtml($service->description);
+
+        // Allow table tags + basic formatting
+        $allowedTags = '<p><h1><h2><h3><h4><h5><h6><strong><b><em><i><u><ul><ol><li><br><blockquote>'
+            . '<table><thead><tbody><tr><th><td>';
+
+        $cleanHtml = strip_tags($html, $allowedTags);
+
+        // Optional: Normalize whitespace but preserve table cell content
+        // Remove excessive spaces between tags, but not inside text
+        $cleanHtml = preg_replace('/>\s+</', '><', $cleanHtml); // no space between tags
+        $cleanHtml = trim($cleanHtml);
+
+        if ($cleanHtml === '') {
+            $cleanHtml = '<p>No description available.</p>';
+        }
+
+        // Configure PHPWord
+        Settings::setOutputEscapingEnabled(true);
+
+        $phpWord = new PhpWord();
+        $phpWord->setDefaultFontName('Calibri');
+        $phpWord->setDefaultFontSize(11);
+
+        $section = $phpWord->addSection([
+            'marginTop' => 720,
+            'marginBottom' => 720,
+            'marginLeft' => 1080,
+            'marginRight' => 1080,
+        ]);
+
+        // Add HTML (now with safe table support)
+        \PhpOffice\PhpWord\Shared\Html::addHtml($section, $cleanHtml, false, false);
+
+        $fileName = 'service_' . $service->id . '_' . Str::slug($service->service_name) . '.docx';
+
+        return response()->streamDownload(function () use ($phpWord) {
+            $writer = IOFactory::createWriter($phpWord, 'Word2007');
+            $writer->save('php://output');
+        }, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ]);
     }
 }

@@ -34,9 +34,9 @@
                                 </form>
                                 &nbsp;
                                 <a href="{{ route('capacity.export') }}" class="btn btn-success btn-sm float-right"
-                                        data-placement="left">
-                                        {{ __('Export') }}
-                                    </a>
+                                    data-placement="left">
+                                    {{ __('Export') }}
+                                </a>
                             </div>
                         </div>
                     </div>

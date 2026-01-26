@@ -1,0 +1,12 @@
+{
+    "name": "OrgAllocReport",
+    "alias": "orgallocreport",
+    "description": "A module for generating allocation reports",
+    "type": "Report",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\OrgAllocReport\\App\\Providers\\OrgAllocReportServiceProvider"
+    ],
+    "files": []
+}
