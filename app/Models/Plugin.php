@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Model;
 class Plugin extends Model
 {
     use HasFactory;
-    protected $perPage = 20;
 
     /**
      * The attributes that are mass assignable.

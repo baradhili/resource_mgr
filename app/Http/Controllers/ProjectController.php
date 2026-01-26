@@ -20,13 +20,14 @@ class ProjectController extends Controller
     public function index(Request $request): View
     {
         $search = $request->query('search');
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
 
         $projects = Project::when($search, function ($query, $search) {
             return $query->where(function ($query) use ($search) {
                 $query->where('empowerID', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
             });
-        })->paginate($request->input('perPage', 10));
+        })->paginate($perPage);
 
         return view('project.index', compact('projects'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());

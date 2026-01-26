@@ -16,7 +16,7 @@ class ResourceTypeController extends Controller
      */
     public function index(Request $request): View
     {
-        $resourceTypes = ResourceType::paginate($request->input('perPage', 10));
+        $resourceTypes = ResourceType::paginate(max(1, min((int) $request->input('perPage', 10), 100)));
 
         return view('resource-type.index', compact('resourceTypes'))
             ->with('i', ($request->input('page', 1) - 1) * $resourceTypes->perPage());

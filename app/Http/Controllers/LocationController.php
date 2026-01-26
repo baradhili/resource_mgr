@@ -17,7 +17,8 @@ class LocationController extends Controller
      */
     public function index(Request $request): View
     {
-        $locations = Location::with('region')->paginate($request->input('perPage', 10));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
+        $locations = Location::with('region')->paginate($perPage);
 
         return view('location.index', compact('locations'))
             ->with('i', ($request->input('page', 1) - 1) * $locations->perPage());

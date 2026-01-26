@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ResourceSkill extends Model
 {
     use HasFactory;
-    protected $perPage = 20;
 
     protected $table = 'resource_skill';
 

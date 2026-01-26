@@ -21,7 +21,8 @@ class ResourceSkillController extends Controller
      */
     public function index(Request $request): View
     {
-        $resourceSkills = ResourceSkill::paginate($request->input('perPage', 10));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
+        $resourceSkills = ResourceSkill::paginate($perPage);
 
         return view('resource-skill.index', compact('resourceSkills'))
             ->with('i', ($request->input('page', 1) - 1) * $resourceSkills->perPage());

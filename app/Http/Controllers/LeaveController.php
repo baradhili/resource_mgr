@@ -81,9 +81,9 @@ class LeaveController extends Controller
         // Execute the query and get the results
         $leaveResult = $query->get();
 
-        // Get the current page from the request
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', 10);
+        // Get and sanitize pagination inputs
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
 
         // Paginate the collection
         $leaves = new LengthAwarePaginator(
@@ -95,7 +95,7 @@ class LeaveController extends Controller
         );
 
         return view('leave.index', compact('leaves', 'regions'))
-            ->with('i', ($request->input('page', 1) - 1) * $leaves->perPage());
+            ->with('i', ($page - 1) * $perPage);
     }
 
     /**

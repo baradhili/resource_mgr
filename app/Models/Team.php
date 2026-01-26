@@ -25,7 +25,6 @@ use Mpociot\Teamwork\TeamworkTeam;
 class Team extends TeamworkTeam
 {
     use HasFactory;
-    protected $perPage = 20;
 
     /**
      * The attributes that are mass assignable.

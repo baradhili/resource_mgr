@@ -30,11 +30,11 @@ class UserController extends Controller
             })
             ->values();
 
-        // Get the current page from the request
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', 10);
+        // Get and sanitize pagination inputs
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
         $users = new LengthAwarePaginator(
-            $usersQuery->forPage($request->input('page', 1), $perPage),
+            $usersQuery->forPage($page, $perPage),
             $usersQuery->count(),
             $perPage,
             $page,
@@ -42,7 +42,7 @@ class UserController extends Controller
         );
 
         return view('user.index', compact('users'))
-            ->with('i', $users->currentPage() * $users->perPage() - $users->perPage());
+            ->with('i', ($page - 1) * $perPage);
     }
 
     /**

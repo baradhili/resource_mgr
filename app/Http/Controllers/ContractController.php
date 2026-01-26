@@ -79,9 +79,9 @@ class ContractController extends Controller
         //     ->orderBy('end_date', 'asc')
         //     ->get();
 
-        // Get the current page from the request
-        $page = $request->input('page', 1);
-        $perPage = $request->input('perPage', 10); // Use request perPage if defined, otherwise default to 10
+        // Get and sanitize pagination inputs
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
 
         // Paginate the collection
         $contracts = new LengthAwarePaginator(
@@ -93,7 +93,7 @@ class ContractController extends Controller
         );
 
         return view('contract.index', compact('contracts', 'regions'))
-            ->with('i', ($request->input('page', 1) - 1) * $contracts->perPage());
+            ->with('i', ($page - 1) * $perPage);
 
     }
 

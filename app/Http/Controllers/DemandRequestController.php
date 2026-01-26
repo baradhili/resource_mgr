@@ -16,7 +16,8 @@ class DemandRequestController extends Controller
      */
     public function index(Request $request): View
     {
-        $requests = DemandRequest::paginate($request->input('perPage', 10));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
+        $requests = DemandRequest::paginate($perPage);
 
         return view('request.index', compact('requests'))
             ->with('i', ($request->input('page', 1) - 1) * $requests->perPage());

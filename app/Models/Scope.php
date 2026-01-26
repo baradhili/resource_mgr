@@ -23,7 +23,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Scope extends Model
 {
     use HasFactory;
-    protected $perPage = 20;
 
     /**
      * The attributes that are mass assignable.
