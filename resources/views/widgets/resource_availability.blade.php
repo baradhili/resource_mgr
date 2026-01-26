@@ -1,7 +1,7 @@
 <div>
     <div class="row">
         <div class="col mt-0">
-            <h5 class="card-title">Resource Availability</h5>
+            <h5 class="card-title">Resource Capacity</h5>
         </div>
 
         <div class="col-auto">

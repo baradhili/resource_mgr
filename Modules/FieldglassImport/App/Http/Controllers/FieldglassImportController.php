@@ -35,13 +35,11 @@ class FieldglassImportController extends Controller
 
     private $columnBillRateStandardTimeRateDay = 'H';
 
-    private $columnBillRateStandardTimeRateHr = 'I';
+    private $columnBillRateSTHalfDayDay = 'I';
 
-    private $columnBillRateSTHalfDayDay = 'J';
+    private $columnWorkerSupervisor = 'J';
 
-    private $columnCostCenter = 'K';
-
-    private $columnWorkerSupervisor = 'L';
+    private $sheetName = 'IS&T_Workers_-_S&A';
     /**
      * Import Fieldglass data into the system. This function
      * reads the uploaded file and stores the data in the database.
@@ -66,17 +64,18 @@ class FieldglassImportController extends Controller
             // Open XLSX-file
             $excel = Excel::open(Storage::path($path));
 
-            $sheet = $excel->getSheet('report');
+            $sheet = $excel->getSheet($this->sheetName);
 
         }
 
-        //top row is teh headings :- Worker, Cost Center Code, Worker Start Date, Work Order Start Date, Work Order End Date, Bill Rate [Standard Time Rate/Day], Bill Rate [Standard Time Rate/Hr], Bill Rate [ST_HalfDay/Day], Cost Center, Worker Supervisor
+        //top row is teh headings :- Worker ID, Work Order ID, Worker, Cost Center Code, Worker Start Date, Work Order Start Date, Work Order End Date, Bill Rate [Standard Time Rate/Day], Bill Rate [ST_HalfDay/Day], Worker Supervisor
         //For each row while tehre is a value in the Worker column
         //grab the first row
-        $headers = $sheet->nextRow();
+
         foreach ($sheet->nextRow() as $rowNum => $rowData) {
-            if ($rowNum == 1)
+            if ($rowNum == 1 || $rowNum == 2)
                 continue;
+            // Log::info(("rowData = ".json_encode($rowData)));
 
             if (isset($rowData[$this->columnWorker]) && $rowData[$this->columnWorker] != null) { // Ignore empty lines
                 $worker = $rowData[$this->columnWorker];
@@ -84,15 +83,22 @@ class FieldglassImportController extends Controller
                 $worker = str_replace(',', ';', $worker);
                 //find Resource
                 $resource = Resource::where('empowerID', $worker)->first();
+                // Log::info(("resource = ".json_encode($resource)));
                 if ($resource != null) {
 
                     //find current contract for resource
-                    $contract = Contract::where('resources_id', $resource->id)->first();
+                    $contract = Contract::where('resources_id', $resource->id)
+                        ->orderBy('start_date', 'desc')
+                        ->first();
                     if ($contract != null) {
+                        // Log:info("contract found");
                         $importWorkerStart = (new DateTime())->setTimestamp($rowData[$this->columnWorkerStartDate])->format('Y-m-d');
                         $importWorkerEnd = (new DateTime())->setTimestamp($rowData[$this->columnWorkOrderEndDate])->format('Y-m-d');
+                        $storedContractStart = (new DateTime())->setTimestamp(strtotime($contract->start_date))->format('Y-m-d');
+                        $storedContractEnd = (new DateTime())->setTimestamp(strtotime($contract->end_date))->format('Y-m-d');  
                         //check if contract dates are correct
-                        if ($contract->start_date != $importWorkerStart) {
+                        if ($storedContractStart != $importWorkerStart) {
+                            // Log::info("contract start date incorrect");
                             ChangeRequest::create([
                                 'record_type' => Contract::class,
                                 'record_id' => $contract->id,
@@ -103,11 +109,11 @@ class FieldglassImportController extends Controller
                                 // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                             ]);
                         }
-                        if ($contract->end_date != $importWorkerEnd) {
+                        if ($storedContractEnd != $importWorkerEnd) {
                             ChangeRequest::create([
                                 'record_type' => Contract::class,
                                 'record_id' => $contract->id,
-                                'field' => 'start_date',
+                                'field' => 'end_date',
                                 'old_value' => $contract->end_date,
                                 'new_value' => $importWorkerEnd,
                                 'status' => 'pending',

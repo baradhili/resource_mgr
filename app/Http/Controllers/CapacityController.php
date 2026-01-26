@@ -149,7 +149,7 @@ class CapacityController extends Controller
 
         // Get the current page from the request
         $page = $request->input('page', 1);
-        $perPage = 10; // Define the number of items per page
+        $perPage = 50; // Define the number of items per page
 
         // Paginate the collection
         $paginatedResourceCapacity = new LengthAwarePaginator(

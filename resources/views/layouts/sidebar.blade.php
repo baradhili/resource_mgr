@@ -166,6 +166,8 @@
                                         <ul id="reports" class="sidebar-dropdown list-unstyled collapse">
                                             <li class="sidebar-item"><a class="sidebar-link"
                                                     href="{{ route('orgreport.index') }}">Tenure</a></li>
+                                            <li class="sidebar-item"><a class="sidebar-link"
+                                                    href="{{ route('orgallocreport.index') }}">Allocations</a></li>
                                         </ul>
  
                                     </li>

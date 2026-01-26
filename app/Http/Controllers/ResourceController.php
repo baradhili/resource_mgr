@@ -75,7 +75,7 @@ class ResourceController extends Controller
         }
 
         if ($search) {
-            $resources = $resources->where('full_name', 'like', "%$search%");
+            $resources = $resources->where('full_name', 'like', "$search%");
         }
         // filter resourceAvailability by $resources
         $resourceAvailability = array_intersect_key($resourceAvailability, array_flip($resources->pluck('id')->toArray()));
@@ -85,7 +85,7 @@ class ResourceController extends Controller
 
         // Get the current page from the request
         $page = $request->input('page', 1);
-        $perPage = 10; // Define the number of items per page
+        $perPage = 50; // Define the number of items per page
 
         // Paginate the collection
         $paginatedResourceAvailability = new LengthAwarePaginator(
@@ -274,10 +274,12 @@ class ResourceController extends Controller
             }
 
         }
-
-        $projectIds = array_keys($allocationArray);
-        $projects = Project::whereIn('id', $projectIds)->get();
-
+	if (!isset($allocationArray)) {
+		    $allocationArray = [];
+	} else {
+		$projectIds = array_keys($allocationArray);
+        	$projects = Project::whereIn('id', $projectIds)->get();
+	}
         // Log::info("resource: {$resource->name} has allocated projects: " . print_r($allocationArray,true));
 
         return view('resource.allocations', compact('resource', 'allocationArray', 'projects', 'nextTwelveMonths'));

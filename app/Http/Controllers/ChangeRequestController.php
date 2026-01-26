@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Allocation;
 use App\Models\ChangeRequest;
 use App\Models\Demand;
+use App\Models\Contract;
 use App\Models\ResourceType;
 use App\Services\CacheService;
 use App\Services\ResourceService;
@@ -41,14 +42,14 @@ class ChangeRequestController extends Controller
 
         // get the resources we manage
         $resources = $this->resourceService->getResourceList()->pluck('id')->toArray();
-        // Log::info("resources: " . json_encode($resources));
+        //Log::info("resources: " . json_encode($resources));
 
         $showHistory = (int) $request->query('history', 0);
 
         $changeRequests = ChangeRequest::with(['record'])
             ->whereHasMorph(
                 'record',
-                [Allocation::class, Demand::class],
+                [Allocation::class, Demand::class, Contract::class],
                 function ($query, $type) use ($resources, $resourceTypes) {
                     if ($type === Allocation::class) {
                         $query->when(! empty($resources), function ($query) use ($resources) {
@@ -57,6 +58,10 @@ class ChangeRequestController extends Controller
                     } elseif ($type === Demand::class) {
                         $query->when(! empty($resourceTypes), function ($query) use ($resourceTypes) {
                             $query->whereIn('resource_type', $resourceTypes);
+                        });
+                    } elseif ($type == Contract::class) {
+                        $query->when(! empty($resources), function ($query) use ($resources) {
+                            $query->whereIn('resources_id', $resources);
                         });
                     }
                 }
@@ -78,8 +83,6 @@ class ChangeRequestController extends Controller
 
             } elseif ($changeRequest->record_type === Demand::class) {
                 $demand = $changeRequest->record;
-                // Log::info("checking if its one of our resource types - {$demand->resource_type}");
-                // if this isn't one of our $resource_types then remove from $changeRequests
 
                 // if $demand->resource_type is a number then find ResourceType->name
                 if (is_numeric($demand->resource_type)) {
@@ -87,6 +90,9 @@ class ChangeRequestController extends Controller
                 }
                 $changeRequest->subject = "{$demand->resource_type} on project {$demand->project->name} for date {$demand->demand_date}";
 
+            } elseif ($changeRequest->record_type === Contract::class) {
+                $contract = $changeRequest->record;
+                $changeRequest->subject = "{$contract->resource->full_name} "; //on project {$contract->project->name} for date {$contract->contract_date}
             }
         }
 
@@ -110,6 +116,10 @@ class ChangeRequestController extends Controller
             $demand = $changeRequest->record;
             $demand->{$changeRequest->field} = $changeRequest->new_value;
             $demand->save();
+        } elseif ($changeRequest->record_type === Contract::class) {
+            $contract = $changeRequest->record;
+            $contract->{$changeRequest->field} = $changeRequest->new_value;
+            $contract->save();
         }
 
         // Update the change request status

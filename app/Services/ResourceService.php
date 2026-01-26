@@ -36,12 +36,15 @@ class ResourceService
                     ->with([
                         'contracts' => function ($query) {
                             $query->where('start_date', '<=', now())
-                                ->where('end_date', '>=', now());
+                                ->where('end_date', '>=', now())
+                                ->orderBy('start_date', 'desc')
+                                ->orderBy('end_date', 'desc')
+                                ->limit(1);
                         },
                         'region',
                     ])->get()
             );
-            // Log::info("resources: " . json_encode($resources));
+            //  Log::info("resources: " . json_encode($resources));
         }
 
         if ($user->reportees->count() > 0) {

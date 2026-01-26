@@ -34,9 +34,9 @@
                                 </form>
                                 &nbsp;
                                 <a href="{{ route('capacity.export') }}" class="btn btn-success btn-sm float-right"
-                                        data-placement="left">
-                                        {{ __('Export') }}
-                                    </a>
+                                    data-placement="left">
+                                    {{ __('Export') }}
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -71,11 +71,19 @@
                                                             $month['year'] .
                                                             '-' .
                                                             str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                                                        $availability =
-                                                            $paginatedResourceCapacity[$key]['capacity'][$monthKey] ??
-                                                            '-';
+                                                        $availability = $paginatedResourceCapacity[$key]['capacity'][$monthKey] ?? '-';
                                                     @endphp
-                                                    <td>{{ $availability }}</td>
+                                                    @php
+                                                        $bgColor = match (true) {
+                                                            $availability <= 0 => '#fee2e2',
+                                                            $availability <= 25 => '#ffedd5',
+                                                            $availability <= 110 => '#dcfce7',
+                                                            default => '#fee2e2',
+                                                        };
+                                                    @endphp
+
+                                                    <td style="background-color: {{ $bgColor }};">{{ $availability }}
+                                                    </td>
                                                 @endforeach
                                             </tr>
                                         @endforeach

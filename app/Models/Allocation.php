@@ -2,21 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class Allocation
  *
- * @property $id
- * @property $allocation_date
- * @property $fte
- * @property $resources_id
- * @property $projects_id
- * @property $status
- * @property $source
- * @property $created_at
- * @property $updated_at
+ * @property int $id
+ * @property string $source
+ * @property string|null $allocation_date
+ * @property string|null $fte
+ * @property int $resources_id
+ * @property int $projects_id
+ * @property string|null $status
+ * @property string|null $created_at
+ * @property string|null $updated_at
  * @property Project $project
  * @property resource $resource
  *
@@ -24,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Allocation extends Model
 {
+    use HasFactory;
     protected $perPage = 20;
 
     /**
