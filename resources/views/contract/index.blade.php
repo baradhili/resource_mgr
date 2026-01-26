@@ -146,20 +146,7 @@
                         </div>
                     </div>
                 </div>
-                <form action="{{ route('contracts.index') }}" method="get">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <label for="perPage" class="form-label">{{ __('Items per page') }}</label>
-                            <select name="perPage" id="perPage" class="form-control" onchange="this.form.submit()">
-                                <option value="10" {{ request('perPage') == 10 ? 'selected' : '' }}>10</option>
-                                <option value="25" {{ request('perPage') == 25 ? 'selected' : '' }}>25</option>
-                                <option value="50" {{ request('perPage') == 50 ? 'selected' : '' }}>50</option>
-                                <option value="100" {{ request('perPage') == 100 ? 'selected' : '' }}>100</option>
-                            </select>
-                        </div>
-                        {!! $contracts->withQueryString()->links() !!}
-                    </div>
-                </form>
+                <x-pagination :paginator="$contracts" route="contracts.index" />
             </div>
         </div>
     </div>
