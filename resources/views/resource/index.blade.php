@@ -95,7 +95,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$paginatedResourceAvailability" route="resources.index" />
+                @include('partials.pagination', ['paginator' => $paginatedResourceAvailability, 'route' => 'resources.index'])
             </div>
         </div>
     </div>

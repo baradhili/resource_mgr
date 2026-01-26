@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$permissions" route="permissions.index" />
+                @include('partials.pagination', ['paginator' => $permissions, 'route' => 'permissions.index'])
             </div>
         </div>
     </div>

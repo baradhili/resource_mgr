@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$clients" route="clients.index" />
+                @include('partials.pagination', ['paginator' => $clients, 'route' => 'clients.index'])
             </div>
         </div>
     </div>

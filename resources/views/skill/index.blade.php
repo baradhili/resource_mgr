@@ -111,7 +111,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$skills" route="skills.index" />
+                @include('partials.pagination', ['paginator' => $skills, 'route' => 'skills.index'])
             </div>
         </div>
     </div>

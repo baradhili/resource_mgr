@@ -102,7 +102,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$paginatedResourceAllocation" route="allocations.index" />
+                @include('partials.pagination', ['paginator' => $paginatedResourceAllocation, 'route' => 'allocations.index'])
             </div>
         </div>
     </div>

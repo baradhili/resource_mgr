@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$publicHolidays" route="public-holidays.index" />
+                @include('partials.pagination', ['paginator' => $publicHolidays, 'route' => 'public-holidays.index'])
             </div>
         </div>
     </div>

@@ -71,7 +71,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$roles" route="roles.index" />
+                @include('partials.pagination', ['paginator' => $roles, 'route' => 'roles.index'])
             </div>
         </div>
     </div>

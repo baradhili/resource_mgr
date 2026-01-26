@@ -75,7 +75,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$fundingApprovalStages" route="funding-approval-stages.index" />
+                @include('partials.pagination', ['paginator' => $fundingApprovalStages, 'route' => 'funding-approval-stages.index'])
             </div>
         </div>
     </div>

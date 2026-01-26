@@ -70,7 +70,7 @@
                         </div>
                     </div>
                 </div>
-                <x-pagination :paginator="$termsAndConditions" route="terms-and-conditions.index" />
+                @include('partials.pagination', ['paginator' => $termsAndConditions, 'route' => 'terms-and-conditions.index'])
             </div>
         </div>
     </div>

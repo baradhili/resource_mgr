@@ -83,7 +83,7 @@ Leaves
                     </div>
                 </div>
             </div>
-            <x-pagination :paginator="$leaves" route="leaves.index" />
+            @include('partials.pagination', ['paginator' => $leaves, 'route' => 'leaves.index'])
         </div>
     </div>
 </div>
