@@ -64,7 +64,7 @@ class EstimateController extends Controller
     {
         $estimate = Estimate::find($id);
         $services = Service::all();
-        $termsAndConditions = TermAsndCondition::all();
+        $termsAndConditions = TermsAndCondition::all();
 
         return view('estimate.edit', compact('estimate', 'services', 'termsAndConditions'));
     }
