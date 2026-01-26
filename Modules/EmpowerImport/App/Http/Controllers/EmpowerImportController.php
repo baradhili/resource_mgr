@@ -96,6 +96,7 @@ class EmpowerImportController extends Controller
             $sheet = $excel->getSheet('Dataset_Empower');
 
             // Collect up the dates in row 5
+            $resourceName = null;
             foreach ($sheet->nextRow() as $rowNum => $rowData) {
                 if ($rowNum == 5) { // Grab header row
                     // Step through columns 'G' on until blank, capture each filled column into array as monthYear
@@ -103,7 +104,6 @@ class EmpowerImportController extends Controller
                     foreach ($rowData as $columnLetter => $columnValue) {
                         if ($columnLetter >= $this->columnDataStart && !is_null($columnValue)) {
                             $monthYear[] = $columnValue;
-                            $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
                         }
                     }
                 }
