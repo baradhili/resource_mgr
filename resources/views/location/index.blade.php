@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $locations->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $locations, 'route' => 'locations.index'])
             </div>
         </div>
     </div>

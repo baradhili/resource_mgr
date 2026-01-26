@@ -102,7 +102,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $paginatedResourceAllocation->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $paginatedResourceAllocation, 'route' => 'allocations.index'])
             </div>
         </div>
     </div>

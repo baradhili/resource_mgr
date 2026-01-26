@@ -75,7 +75,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $domains->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $domains, 'route' => 'domains.index'])
             </div>
         </div>
     </div>

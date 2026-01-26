@@ -70,7 +70,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $termsAndConditions->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $termsAndConditions, 'route' => 'terms-and-conditions.index'])
             </div>
         </div>
     </div>

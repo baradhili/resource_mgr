@@ -83,9 +83,9 @@ class ResourceController extends Controller
         // Convert the array to a collection
         $resourceAvailabilityCollection = collect($resourceAvailability);
 
-        // Get the current page from the request
-        $page = $request->input('page', 1);
-        $perPage = 50; // Define the number of items per page
+        // Get and sanitize pagination inputs
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
 
         // Paginate the collection
         $paginatedResourceAvailability = new LengthAwarePaginator(
@@ -96,9 +96,8 @@ class ResourceController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // return to the view
         return view('resource.index', compact('resources', 'paginatedResourceAvailability', 'nextTwelveMonths'))
-            ->with('i', ($request->input('page', 1) - 1) * $paginatedResourceAvailability->perPage());
+            ->with('i', ($page - 1) * $perPage);
     }
 
     /**

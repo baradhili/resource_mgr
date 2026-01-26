@@ -72,6 +72,7 @@
                         </table>
                     </div>
                 </div>
+                @include('partials.pagination', ['paginator' => $teams, 'route' => 'teams.index'])
             </div>
         </div>
     </div>

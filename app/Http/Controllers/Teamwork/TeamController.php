@@ -27,10 +27,8 @@ class TeamController extends Controller
     public function index(Request $request)
     {
         // TODO based on privs either show teams wher ethe user is a member, or show all teams
-
-        /**
-         * old */
-        $teams = Team::with('owner')->paginate();
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
+        $teams = Team::with('owner')->paginate($perPage);
 
         return view('teamwork.index', compact('teams'))
             ->with('i', ($request->input('page', 1) - 1) * $teams->perPage());

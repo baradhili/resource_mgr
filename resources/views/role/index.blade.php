@@ -71,7 +71,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $roles->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $roles, 'route' => 'roles.index'])
             </div>
         </div>
     </div>

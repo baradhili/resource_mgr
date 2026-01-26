@@ -96,8 +96,9 @@
                             </div>
                         </div>
                     </div>
-                    {!! $changeRequests->withQueryString()->links() !!}
+                    @include('partials.pagination', ['paginator' => $changeRequests, 'route' => 'change-requests.index'])
                 </div>
             </div>
         </div>
-    @endsection
+    </div>
+@endsection

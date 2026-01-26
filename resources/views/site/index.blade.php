@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $sites->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $sites, 'route' => 'sites.index'])
             </div>
         </div>
     </div>

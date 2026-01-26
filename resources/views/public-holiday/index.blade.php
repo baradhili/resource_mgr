@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $publicHolidays->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $publicHolidays, 'route' => 'public-holidays.index'])
             </div>
         </div>
     </div>

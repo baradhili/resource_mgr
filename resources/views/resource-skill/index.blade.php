@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $resourceSkills->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $resourceSkills, 'route' => 'resource-skills.index'])
             </div>
         </div>
     </div>

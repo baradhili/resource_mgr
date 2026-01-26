@@ -71,7 +71,7 @@ class ChangeRequestController extends Controller
             }, function ($query) {
                 return $query->where('status', 'pending');
             })
-            ->paginate();
+            ->paginate(max(1, min((int) $request->input('perPage', 10), 100)));
 
         // if the record type is allocation, get the allocation resource->full_name and insert into a new parameter "subject"
         $changeRequestsToRemove = [];

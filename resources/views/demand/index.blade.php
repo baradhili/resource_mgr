@@ -112,7 +112,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $paginator->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $paginator, 'route' => 'demands.index'])
             </div>
         </div>
         <script>

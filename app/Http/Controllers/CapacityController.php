@@ -147,9 +147,9 @@ class CapacityController extends Controller
         //     });
         // }
 
-        // Get the current page from the request
-        $page = $request->input('page', 1);
-        $perPage = 50; // Define the number of items per page
+        // Get and sanitize pagination inputs
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
 
         // Paginate the collection
         $paginatedResourceCapacity = new LengthAwarePaginator(
@@ -160,9 +160,8 @@ class CapacityController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // Log::info("paginated capacities " . json_encode($paginatedResourceCapacity));
         return view('capacity.index', compact('paginatedResourceCapacity', 'nextTwelveMonths', 'regions'))
-            ->with('i', ($request->input('page', 1) - 1) * $paginatedResourceCapacity->perPage());
+            ->with('i', ($page - 1) * $perPage);
 
     }
 

@@ -102,7 +102,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $requests->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $requests, 'route' => 'requests.index'])
             </div>
         </div>
     </div>

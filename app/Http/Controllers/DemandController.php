@@ -149,10 +149,10 @@ class DemandController extends Controller
             return !empty($item['demands']);
         });
 
-        // Pagination
-        $page = $request->input('page', 1);
-        $perPage = 10; // Set the number of items per page
-        $offset = ($page * $perPage) - $perPage;
+        // Pagination - sanitize inputs
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
+        $offset = ($page - 1) * $perPage;
 
         // Get the results for the current page
         $result = array_slice($data, $offset, $perPage, true);
@@ -164,7 +164,7 @@ class DemandController extends Controller
 
         // Return the view
         return view('demand.index', compact('paginator', 'nextTwelveMonths', 'resources'))
-            ->with('i', ($request->input('page', 1) - 1) * $perPage);
+            ->with('i', ($page - 1) * $perPage);
     }
 
     /**

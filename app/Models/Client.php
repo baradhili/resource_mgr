@@ -19,7 +19,6 @@ use Illuminate\Database\Eloquent\Model;
 class Client extends Model
 {
     use HasFactory;
-    protected $perPage = 20;
 
     /**
      * The attributes that are mass assignable.

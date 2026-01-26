@@ -75,7 +75,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $fundingApprovalStages->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $fundingApprovalStages, 'route' => 'funding-approval-stages.index'])
             </div>
         </div>
     </div>

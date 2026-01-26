@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $estimates->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $estimates, 'route' => 'estimates.index'])
             </div>
         </div>
     </div>

@@ -35,7 +35,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Estimate extends Model
 {
     use HasFactory;
-    protected $perPage = 20;
 
     /**
      * The attributes that are mass assignable.

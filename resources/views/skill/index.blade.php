@@ -111,7 +111,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $skills->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $skills, 'route' => 'skills.index'])
             </div>
         </div>
     </div>

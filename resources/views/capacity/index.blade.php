@@ -71,19 +71,17 @@
                                                             $month['year'] .
                                                             '-' .
                                                             str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                                                        $availability = $paginatedResourceCapacity[$key]['capacity'][$monthKey] ?? '-';
+                                                        $rawValue =
+                                                            $paginatedResourceCapacity[$key]['capacity'][$monthKey] ??
+                                                            null;
+                                                        $isNumeric = is_numeric($rawValue);
+                                                        $availability = $isNumeric ? $rawValue : '-';
+                                                        $cellClass = '';
+                                                        if ($isNumeric) {
+                                                            $cellClass = $rawValue < 0 ? 'table-danger' : ($rawValue > 0 ? 'table-success' : '');
+                                                        }
                                                     @endphp
-                                                    @php
-                                                        $bgColor = match (true) {
-                                                            $availability <= 0 => '#fee2e2',
-                                                            $availability <= 25 => '#ffedd5',
-                                                            $availability <= 110 => '#dcfce7',
-                                                            default => '#fee2e2',
-                                                        };
-                                                    @endphp
-
-                                                    <td style="background-color: {{ $bgColor }};">{{ $availability }}
-                                                    </td>
+                                                    <td class="{{ $cellClass }}">{{ $availability }}</td>
                                                 @endforeach
                                             </tr>
                                         @endforeach
@@ -99,7 +97,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $paginatedResourceCapacity->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $paginatedResourceCapacity, 'route' => 'capacity.index'])
             </div>
         </div>
     </div>

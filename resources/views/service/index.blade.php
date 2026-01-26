@@ -88,7 +88,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $services->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $services, 'route' => 'services.index'])
             </div>
         </div>
     </div>

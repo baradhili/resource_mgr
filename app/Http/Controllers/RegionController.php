@@ -16,7 +16,7 @@ class RegionController extends Controller
      */
     public function index(Request $request): View
     {
-        $regions = Region::paginate();
+        $regions = Region::paginate(max(1, min((int) $request->input('perPage', 10), 100)));
 
         return view('region.index', compact('regions'))
             ->with('i', ($request->input('page', 1) - 1) * $regions->perPage());

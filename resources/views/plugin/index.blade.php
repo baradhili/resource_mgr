@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $plugins->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $plugins, 'route' => 'plugins.index'])
             </div>
         </div>
     </div>

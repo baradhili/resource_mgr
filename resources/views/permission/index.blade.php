@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $permissions->withQueryString()->links() !!}
+                @include('partials.pagination', ['paginator' => $permissions, 'route' => 'permissions.index'])
             </div>
         </div>
     </div>

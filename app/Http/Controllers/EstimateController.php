@@ -18,7 +18,7 @@ class EstimateController extends Controller
      */
     public function index(Request $request): View
     {
-        $estimates = Estimate::paginate();
+        $estimates = Estimate::paginate(max(1, min((int) $request->input('perPage', 10), 100)));
 
         return view('estimate.index', compact('estimates'))
             ->with('i', ($request->input('page', 1) - 1) * $estimates->perPage());
@@ -64,7 +64,7 @@ class EstimateController extends Controller
     {
         $estimate = Estimate::find($id);
         $services = Service::all();
-        $termsAndConditions = TermAsndCondition::all();
+        $termsAndConditions = TermsAndCondition::all();
 
         return view('estimate.edit', compact('estimate', 'services', 'termsAndConditions'));
     }
