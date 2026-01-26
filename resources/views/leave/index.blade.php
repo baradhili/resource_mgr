@@ -83,7 +83,7 @@ Leaves
                     </div>
                 </div>
             </div>
-            {!! $leaves->withQueryString()->links() !!}
+            <x-pagination :paginator="$leaves" route="leaves.index" />
         </div>
     </div>
 </div>

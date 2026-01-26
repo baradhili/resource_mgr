@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $locations->withQueryString()->links() !!}
+                <x-pagination :paginator="$locations" route="locations.index" />
             </div>
         </div>
     </div>

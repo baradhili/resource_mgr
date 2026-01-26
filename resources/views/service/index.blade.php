@@ -83,7 +83,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $services->withQueryString()->links() !!}
+                <x-pagination :paginator="$services" route="services.index" />
             </div>
         </div>
     </div>

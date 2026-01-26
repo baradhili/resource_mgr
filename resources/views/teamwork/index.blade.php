@@ -72,6 +72,7 @@
                         </table>
                     </div>
                 </div>
+                <x-pagination :paginator="$teams" route="teams.index" />
             </div>
         </div>
     </div>

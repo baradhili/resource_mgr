@@ -16,7 +16,7 @@ class PublicHolidayController extends Controller
      */
     public function index(Request $request): View
     {
-        $publicHolidays = PublicHoliday::paginate();
+        $publicHolidays = PublicHoliday::paginate($request->input('perPage', 10));
 
         return view('public-holiday.index', compact('publicHolidays'))
             ->with('i', ($request->input('page', 1) - 1) * $publicHolidays->perPage());

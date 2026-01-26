@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $plugins->withQueryString()->links() !!}
+                <x-pagination :paginator="$plugins" route="plugins.index" />
             </div>
         </div>
     </div>

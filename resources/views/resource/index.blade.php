@@ -95,7 +95,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $paginatedResourceAvailability->withQueryString()->links() !!}
+                <x-pagination :paginator="$paginatedResourceAvailability" route="resources.index" />
             </div>
         </div>
     </div>

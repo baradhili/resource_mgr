@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $permissions->withQueryString()->links() !!}
+                <x-pagination :paginator="$permissions" route="permissions.index" />
             </div>
         </div>
     </div>

@@ -16,7 +16,7 @@ class TermsAndConditionController extends Controller
      */
     public function index(Request $request): View
     {
-        $termsAndConditions = TermsAndCondition::paginate();
+        $termsAndConditions = TermsAndCondition::paginate($request->input('perPage', 10));
 
         return view('terms-and-condition.index', compact('termsAndConditions'))
             ->with('i', ($request->input('page', 1) - 1) * $termsAndConditions->perPage());

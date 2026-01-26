@@ -64,7 +64,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $resourceTypes->withQueryString()->links() !!}
+                <x-pagination :paginator="$resourceTypes" route="resource-types.index" />
             </div>
         </div>
     </div>

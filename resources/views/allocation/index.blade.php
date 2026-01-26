@@ -102,7 +102,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $paginatedResourceAllocation->withQueryString()->links() !!}
+                <x-pagination :paginator="$paginatedResourceAllocation" route="allocations.index" />
             </div>
         </div>
     </div>

@@ -18,7 +18,7 @@ class EstimateController extends Controller
      */
     public function index(Request $request): View
     {
-        $estimates = Estimate::paginate();
+        $estimates = Estimate::paginate($request->input('perPage', 10));
 
         return view('estimate.index', compact('estimates'))
             ->with('i', ($request->input('page', 1) - 1) * $estimates->perPage());

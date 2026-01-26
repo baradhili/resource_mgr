@@ -16,7 +16,7 @@ class DomainController extends Controller
      */
     public function index(Request $request): View
     {
-        $domains = Domain::paginate();
+        $domains = Domain::paginate($request->input('perPage', 10));
 
         return view('domain.index', compact('domains'))
             ->with('i', ($request->input('page', 1) - 1) * $domains->perPage());

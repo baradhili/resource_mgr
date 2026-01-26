@@ -70,7 +70,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $termsAndConditions->withQueryString()->links() !!}
+                <x-pagination :paginator="$termsAndConditions" route="terms-and-conditions.index" />
             </div>
         </div>
     </div>

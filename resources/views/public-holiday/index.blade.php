@@ -68,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $publicHolidays->withQueryString()->links() !!}
+                <x-pagination :paginator="$publicHolidays" route="public-holidays.index" />
             </div>
         </div>
     </div>

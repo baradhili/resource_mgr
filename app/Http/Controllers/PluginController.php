@@ -16,7 +16,7 @@ class PluginController extends Controller
      */
     public function index(Request $request): View
     {
-        $plugins = Plugin::paginate();
+        $plugins = Plugin::paginate($request->input('perPage', 10));
 
         return view('plugin.index', compact('plugins'))
             ->with('i', ($request->input('page', 1) - 1) * $plugins->perPage());

@@ -127,7 +127,7 @@ class AllocationController extends Controller
 
         // Get the current page from the request
         $page = $request->input('page', 1);
-        $perPage = 10; // Define the number of items per page
+        $perPage = $request->input('perPage', 10);
 
         // Paginate the collection
         $paginatedResourceAllocation = new LengthAwarePaginator(
@@ -138,7 +138,6 @@ class AllocationController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // Log::info("paginated allocations " . json_encode($paginatedResourceAllocation));
         return view('allocation.index', compact('paginatedResourceAllocation', 'nextTwelveMonths', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $paginatedResourceAllocation->perPage());
     }

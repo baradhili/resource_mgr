@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $estimates->withQueryString()->links() !!}
+                <x-pagination :paginator="$estimates" route="estimates.index" />
             </div>
         </div>
     </div>

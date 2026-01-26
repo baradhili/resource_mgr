@@ -66,7 +66,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $sites->withQueryString()->links() !!}
+                <x-pagination :paginator="$sites" route="sites.index" />
             </div>
         </div>
     </div>

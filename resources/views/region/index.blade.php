@@ -73,7 +73,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $regions->withQueryString()->links() !!}
+                <x-pagination :paginator="$regions" route="regions.index" />
             </div>
         </div>
     </div>

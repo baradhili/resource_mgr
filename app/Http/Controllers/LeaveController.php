@@ -83,9 +83,7 @@ class LeaveController extends Controller
 
         // Get the current page from the request
         $page = $request->input('page', 1);
-
-        // Set the number of items per page
-        $perPage = 10;
+        $perPage = $request->input('perPage', 10);
 
         // Paginate the collection
         $leaves = new LengthAwarePaginator(
@@ -96,7 +94,6 @@ class LeaveController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // Return the view with the paginated results and the search/filter options
         return view('leave.index', compact('leaves', 'regions'))
             ->with('i', ($request->input('page', 1) - 1) * $leaves->perPage());
     }

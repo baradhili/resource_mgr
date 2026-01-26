@@ -111,7 +111,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $skills->withQueryString()->links() !!}
+                <x-pagination :paginator="$skills" route="skills.index" />
             </div>
         </div>
     </div>

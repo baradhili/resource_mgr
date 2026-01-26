@@ -151,7 +151,7 @@ class DemandController extends Controller
 
         // Pagination
         $page = $request->input('page', 1);
-        $perPage = 10; // Set the number of items per page
+        $perPage = $request->input('perPage', 10);
         $offset = ($page * $perPage) - $perPage;
 
         // Get the results for the current page

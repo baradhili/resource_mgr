@@ -88,7 +88,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $projects->withQueryString()->links() !!}
+                <x-pagination :paginator="$projects" route="projects.index" />
             </div>
         </div>
     </div>

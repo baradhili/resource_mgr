@@ -16,7 +16,7 @@ class FundingApprovalStageController extends Controller
      */
     public function index(Request $request): View
     {
-        $fundingApprovalStages = FundingApprovalStage::paginate();
+        $fundingApprovalStages = FundingApprovalStage::paginate($request->input('perPage', 10));
 
         return view('funding-approval-stage.index', compact('fundingApprovalStages'))
             ->with('i', ($request->input('page', 1) - 1) * $fundingApprovalStages->perPage());

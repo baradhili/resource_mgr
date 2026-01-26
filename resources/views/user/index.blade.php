@@ -84,7 +84,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $users->withQueryString()->links() !!}
+                <x-pagination :paginator="$users" route="users.index" />
             </div>
         </div>
     </div>

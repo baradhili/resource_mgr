@@ -32,7 +32,7 @@ class UserController extends Controller
 
         // Get the current page from the request
         $page = $request->input('page', 1);
-        $perPage = 10;
+        $perPage = $request->input('perPage', 10);
         $users = new LengthAwarePaginator(
             $usersQuery->forPage($request->input('page', 1), $perPage),
             $usersQuery->count(),

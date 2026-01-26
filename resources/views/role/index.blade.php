@@ -71,7 +71,7 @@
                         </div>
                     </div>
                 </div>
-                {!! $roles->withQueryString()->links() !!}
+                <x-pagination :paginator="$roles" route="roles.index" />
             </div>
         </div>
     </div>

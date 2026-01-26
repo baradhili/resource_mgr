@@ -18,7 +18,7 @@ class ServiceController extends Controller
      */
     public function index(Request $request): View
     {
-        $services = Service::paginate();
+        $services = Service::paginate($request->input('perPage', 10));
 
         // Decode the JSON data for required_skills and extract the values
         foreach ($services as $service) {

@@ -26,7 +26,7 @@ class ProjectController extends Controller
                 $query->where('empowerID', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
             });
-        })->paginate();
+        })->paginate($request->input('perPage', 10));
 
         return view('project.index', compact('projects'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());

@@ -16,7 +16,7 @@ class SiteController extends Controller
      */
     public function index(Request $request): View
     {
-        $sites = Site::paginate();
+        $sites = Site::paginate($request->input('perPage', 10));
 
         return view('site.index', compact('sites'))
             ->with('i', ($request->input('page', 1) - 1) * $sites->perPage());
