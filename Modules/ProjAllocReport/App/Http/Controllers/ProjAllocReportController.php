@@ -46,9 +46,14 @@ class ProjAllocReportController extends Controller
         Log::info("saResourceType: " . json_encode($saResourceType));
         if (!$saResourceType) {
             // If no Solution Architect type found, return empty report
+            $monthHeaders = [];
+            for ($i = 0; $i < 4; $i++) {
+                $monthHeaders[] = Carbon::now()->addMonths($i)->format('M-y');
+            }
             return view('projallocreport::index', [
-                'projectAllocations' => collect(),
-                'months' => $months,
+                'headers' => ['Project Name', 'Resource Name', ...$monthHeaders],
+                'rows' => [],
+                'hasData' => false,
             ]);
         }
 
@@ -150,7 +155,7 @@ class ProjAllocReportController extends Controller
                 return number_format($val, 2, '.', ''); // Consistent 2-decimal formatting
             }, $monthKeys);
 
-            
+
             if (array_reduce($values, fn($carry, $val) => $carry && $val === '0.00', true)) {
                 continue;
             }
@@ -161,7 +166,7 @@ class ProjAllocReportController extends Controller
                 'values' => $values
             ];
 
-            
+
         }
 
         // Sort rows: Project A-Z → Resource A-Z
