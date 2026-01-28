@@ -94,7 +94,7 @@ class ResourceAvailability extends AbstractWidget
 
             }
         }
-Log::info("resourceCapacity: " . json_encode($resourceCapacity));
+// Log::info("resourceCapacity: " . json_encode($resourceCapacity));
         $resourceCapacity = collect($resourceCapacity);
         foreach ($resourceCapacity as $key => &$capacity) {
             $resource = Resource::find($key);

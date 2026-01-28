@@ -3,16 +3,18 @@
 namespace Modules\OrgAllocReport\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Allocation;
+use App\Models\Contract;
 use App\Models\Project;
 use App\Models\Resource;
 use App\Models\ResourceType;
+use App\Models\User;
+use App\Models\Allocation;
 use App\Services\CacheService;
 use App\Services\ResourceService;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
+use Carbon\Carbon;
 
 class OrgAllocReportController extends Controller
 {
@@ -27,151 +29,61 @@ class OrgAllocReportController extends Controller
     }
 
     /**
-     * Display a listing of active projects with Solution Architect allocations.
+     * Display a listing of the resource.
      */
     public function index(Request $request): View
     {
-        // Define the date range: current month to 3 months ahead (4 months total)
-        $startDate = Carbon::now()->startOfMonth();
-        $endDate = Carbon::now()->addMonths(3)->endOfMonth();
-
-        // Generate month labels for the report columns
-        $months = [];
-        for ($i = 0; $i < 4; $i++) {
-            $months[] = Carbon::now()->addMonths($i)->format('M Y');
-        }
-        Log::info("months: " . json_encode($months));
-        // Find the Solution Architect resource type
-        $saResourceType = ResourceType::where('name', 'like', '%Solution Architect%')->first();
-        Log::info("saResourceType: " . json_encode($saResourceType));
-        if (!$saResourceType) {
-            // If no Solution Architect type found, return empty report
-            return view('orgallocreport::index', [
-                'projectAllocations' => collect(),
-                'months' => $months,
-            ]);
-        }
-
-        //Find all Allocations they are running during the date range
-        $allocations = Allocation::whereBetween('allocation_date', [$startDate, $endDate])
-            ->get();
-        Log::info("allocations: " . json_encode($allocations));
-
-        //Get all projects from allocations
-        $projectIds = $allocations->pluck('projects_id')->toArray();
-        Log::info("projectIds: " . json_encode($projectIds));
-        $projects = Project::whereIn('id', $projectIds)->get();
-        Log::info("projects: " . json_encode($projects));
-
-        // Collect all resources allocated from Allocation
-        $resourceIds = $allocations->pluck('resources_id')->toArray();
-        Log::info("resourceIds: " . json_encode($resourceIds));
-        $resources = Resource::whereIn('id', $resourceIds)->get();
-        Log::info("resources: " . json_encode($resources));
-        // Filter $resources by resource type = saResourceType
-        $resources = $resources->filter(function ($resource) use ($saResourceType) {
-            return $resource->resource_type === $saResourceType->id;
-        });
-        Log::info("filtered resources: " . json_encode($resources));
-        // filter resources by current contracts
-        $resources = $resources->filter(function ($resource) {
-            return $resource->contracts()->where('end_date', '>=', now())->exists();
-        });
-        Log::info("filtered contract resources: " . json_encode($resources));
-
-        // Now get all allocations matching the $resources from Allocations in the date range
-        $allocations = Allocation::whereBetween('allocation_date', [$startDate, $endDate])
-            ->whereIn('resources_id', $resources->pluck('id')->toArray())
-            ->get();
-        Log::info("allocations: " . json_encode($allocations));
-
-        // Generate CORRECT month keys (Y-m) and headers (M-y) for 4-month window
-        $monthKeys = [];    // Grouping keys: ['2026-01', '2026-02', ...]
-        $monthHeaders = []; // Display headers: ['Jan-26', 'Feb-26', ...]
-        for ($i = 0; $i < 4; $i++) {
-            $date = Carbon::now()->addMonths($i);
-            $monthKeys[] = $date->format('Y-m');
-            $monthHeaders[] = $date->format('M-y'); // CRITICAL: Matches "mmm-yy" requirement
-        }
-        Log::info("Pivot month keys: " . json_encode($monthKeys));
-        Log::info("Pivot headers: " . json_encode($monthHeaders));
-
-        // Exit early if no allocations after filtering
-        if ($allocations->isEmpty()) {
-            return view('orgallocreport::index', [
-                'headers' => ['Project Name', 'Resource Name', ...$monthHeaders],
-                'rows' => [],
-                'hasData' => false
-            ]);
-        }
-
-        // Build efficient lookups from FINAL allocations (fixes stale project/resource references)
-        $projectIds = $allocations->pluck('projects_id')->unique();
-        $projectLookup = Project::whereIn('id', $projectIds)->get()->keyBy('id');
-        $resourceLookup = $resources->keyBy('id'); // Uses your pre-filtered $resources collection
-        Log::info("projectLookup: " . json_encode($projectLookup));
-        Log::info("resourceLookup: " . json_encode($resourceLookup));
-        // Aggregate FTE: [project_id][resource_id][month_key] = SUM(fte)
-        $dataMatrix = [];
-        foreach ($allocations as $alloc) {
-            // Skip invalid dates (defensive)
-            try {
-                $monthKey = Carbon::parse($alloc->allocation_date)->format('Y-m');
-            } catch (\Exception $e) {
-                Log::warning("Invalid allocation_date skipped: {$alloc->allocation_date}", ['id' => $alloc->id]);
-                continue;
+        $user = auth()->user();
+        // check if they are asking for a region
+        $regionID = $request->input('region_id');
+        // Collect our resources who have a current contract
+        $resources = $this->resourceService->getResourceList($regionID);
+        // collect teh regions from teh resources->region
+        $regions = $resources->pluck('region')->filter()->unique()->values()->all();
+        // insert resource_type object into resource
+        foreach ($resources as $resource) {
+            $resource->resource_type_obj = ResourceType::find($resource->resource_type);
+            $resource->user_obj = $resource->user;
+            // update the $resource->user->reports to teh associated user object
+            $resource->user->reports_to = User::find($resource->user->reports);
+            // calculate tenure in years between contract start and end date, round to 1 decimal place
+            if ($resource->contracts && count($resource->contracts) > 0) {
+                //add [c] to the end of thie full_name
+                if ($resource->contracts[0]->permanent == 0) $resource->full_name = $resource->full_name . ' [c]';
+                $firstContract = $resource->contracts[0];
+                if ($firstContract->start_date && $firstContract->end_date) {
+                    $startDate = \Carbon\Carbon::parse($firstContract->start_date);
+                    $endDate = \Carbon\Carbon::parse($firstContract->end_date);
+                    $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
+                }
             }
+            // find the project ids from teh resource's current allocations
+            $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $resource->contracts->first()->end_date])->get();
+            $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
+            $projects = Project::whereIn('id', $uniqueProjectIds)->get();
+            $currentProjects = $projects;
 
-            // Skip months outside our 4-month window (shouldn't happen, but safe)
-            if (!in_array($monthKey, $monthKeys))
-                continue;
+            // get this month's allocation per project and attach to the currentProjects object
 
-            $pid = $alloc->projects_id;
-            $rid = $alloc->resources_id;
-            $fte = floatval($alloc->fte ?? 0);
-            if ($fte > 0) {
-                $dataMatrix[$pid][$rid][$monthKey] = ($dataMatrix[$pid][$rid][$monthKey] ?? 0) + $fte;
+            foreach ($currentProjects as $project) {
+                $allocatedThisMonth = $project->allocations()
+                    ->where('resources_id', '=', $resource->id)
+                    ->whereBetween('allocation_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
+                    ->pluck('fte')
+                    ->first();
+                $project->allocatedThisMonth = $allocatedThisMonth;
             }
+            $resource->currentProjects = $currentProjects;
+Log::info("resource: " . json_encode($resource));
         }
 
-        // Build unique project-resource rows with sorted names
-        $rows = [];
-        foreach ($allocations->unique(fn($a) => "{$a->projects_id}_{$a->resources_id}")->values() as $alloc) {
-            $pid = $alloc->projects_id;
-            $rid = $alloc->resources_id;
-
-            // Get names with fallbacks (handles missing relationships)
-            $projectName = $projectLookup[$pid]->name ?? "Project #{$pid}";
-            $resourceName = ($resourceLookup[$rid] ?? null)?->full_name ?? "Resource #{$rid}";
-
-            // Build FTE values for all 4 months (0.00 if no allocation)
-            $values = array_map(function ($key) use ($pid, $rid, $dataMatrix) {
-                $val = $dataMatrix[$pid][$rid][$key] ?? 0;
-                return number_format($val, 2, '.', ''); // Consistent 2-decimal formatting
-            }, $monthKeys);
-
-            $rows[] = [
-                'project_name' => $projectName,
-                'resource_name' => $resourceName,
-                'values' => $values
-            ];
-        }
-
-        // Sort rows: Project A-Z → Resource A-Z
-        usort($rows, function ($a, $b) {
-            return [$a['project_name'], $a['resource_name']] <=> [$b['project_name'], $b['resource_name']];
-        });
-
-        // Prepare final view data
-        $headers = ['Project Name', 'Resource Name', ...$monthHeaders];
-
-        return view('orgallocreport::index', [
-            'headers' => $headers,
-            'rows' => $rows,
-            'hasData' => true,
-            // Optional: Pass raw data for JS processing if needed
-            // 'rawAllocations' => $allocations 
-        ]);
-
+        // sort by tenure decending
+        // $resources = $resources->sortByDesc('tenure');
+        // remove any resources where tenure is < 1.5 years or their top contract in contracts has permanent = 1
+        // $resources = $resources->filter(function ($resource) {
+        //     return $resource->tenure >= 1.5 && !$resource->contracts->first()->permanent;
+        // });
+        // Log::info("resource: " . json_encode($resources));
+        return view('orgallocreport::index', compact('resources', 'regions'));
     }
 }
