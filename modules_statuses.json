@@ -2,5 +2,6 @@
     "OrgReport": true,
     "FieldglassImport": true,
     "EmpowerImport": true,
-    "OrgAllocReport": true
+    "OrgAllocReport": true,
+    "ProjAllocReport": true
 }

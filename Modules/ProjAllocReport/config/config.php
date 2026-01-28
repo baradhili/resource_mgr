@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'name' => 'OrgAllocReport',
+    'name' => 'ProjAllocReport',
     'description' => 'A module for generating allocation reports',
     'type' => 'Report',
-    'sidebar_name' => 'Allocations by resource',
+    'sidebar_name' => 'Allocations by Project',
 ];

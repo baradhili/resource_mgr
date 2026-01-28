@@ -41,6 +41,7 @@
         @include('layouts.login')
     @endauth
 
+    @stack('scripts')
 
 </body>
 

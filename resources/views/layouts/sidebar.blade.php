@@ -163,12 +163,15 @@
                                                 <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
                                             </svg> <span class="align-middle">Reports</span>
                                         </a>
-                                        <ul id="reports" class="sidebar-dropdown list-unstyled collapse">
+                                        <!-- <ul id="reports" class="sidebar-dropdown list-unstyled collapse">
                                             <li class="sidebar-item"><a class="sidebar-link"
                                                     href="{{ route('orgreport.index') }}">Tenure</a></li>
                                             <li class="sidebar-item"><a class="sidebar-link"
                                                     href="{{ route('orgallocreport.index') }}">Allocations</a></li>
-                                        </ul>
+                                        </ul> -->
+                                        <ul id="reports" class="sidebar-dropdown list-unstyled collapse">
+    <li class="sidebar-item text-muted">Loading reports...</li>
+</ul>
  
                                     </li>
                                 @endcan
@@ -189,3 +192,28 @@
     </div>
 
 </nav>
+
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('{{ route('api.sidebar.reports') }}', {
+        headers: { 'Accept': 'text/html' }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to load reports');
+        return response.text();
+    })
+    .then(html => {
+        document.getElementById('reports').outerHTML = html;
+    })
+    .catch(error => {
+        console.error('Report sidebar error:', error);
+        document.getElementById('reports').innerHTML = `
+            <li class="sidebar-item text-danger">
+                <span class="sidebar-link">Reports unavailable</span>
+            </li>`;
+    });
+});
+</script>
+@endpush
