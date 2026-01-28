@@ -23,52 +23,51 @@
                     @endif
 
                     <div class="card-body bg-white">
-                        @if ($projectAllocations->isEmpty())
-                            <div class="alert alert-info">
-                                <p>No active projects with Solution Architect allocations found for the selected period.</p>
+                        @if (!$hasData || empty($rows))
+                            <div class="alert alert-info d-flex align-items-center">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <span>No active projects with Solution Architect allocations found for the next 4
+                                    months.</span>
                             </div>
                         @else
                             <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="thead">
+                                <table class="table table-bordered table-hover align-middle" style="font-size: 0.9rem;">
+                                    <thead class="table-light fw-bold">
                                         <tr>
-                                            <th>Project</th>
-                                            <th>Project Manager</th>
-                                            <th>Resource Name</th>
-                                            @foreach ($months as $month)
-                                                <th class="text-center">{{ $month }}</th>
+                                            @foreach ($headers as $header)
+                                                <th class="text-center py-2 px-3 bg-gradient"
+                                                    style="background-color: #f8f9fa; border-right: 1px solid #dee2e6;">
+                                                    {{ $header }}
+                                                </th>
                                             @endforeach
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $lastProjectId = null; @endphp
-                                        @foreach ($projectAllocations as $allocation)
-                                            <tr>
-                                                @if ($lastProjectId !== $allocation['project_id'])
-                                                    <td>
-                                                        <strong>{{ $allocation['project_empower_id'] }}</strong><br>
-                                                        <small>{{ $allocation['project_name'] }}</small>
-                                                    </td>
-                                                    <td>{{ $allocation['project_manager'] }}</td>
-                                                @else
-                                                    <td></td>
-                                                    <td></td>
-                                                @endif
-                                                <td>{{ $allocation['resource_name'] }}</td>
-                                                @foreach ($allocation['monthly_allocations'] as $monthAlloc)
-                                                    <td class="text-center">
-                                                        @if ($monthAlloc !== null)
-                                                            {{ number_format($monthAlloc, 2) }}
-                                                        @else
-                                                            <span class="text-muted">-</span>
-                                                        @endif
+                                        @foreach ($rows as $row)
+                                            <tr class="border-bottom">
+                                                <td class="fw-bold text-nowrap" style="min-width: 180px;">
+                                                    {{ $row['project_name'] }}
+                                                </td>
+                                                <td class="text-nowrap" style="min-width: 150px;">
+                                                    {{ $row['resource_name'] }}
+                                                </td>
+                                                @foreach ($row['values'] as $val)
+                                                    <td class="text-center fw-medium {{ $val !== '0.00' ? 'bg-light-primary text-primary' : 'text-muted opacity-50' }}"
+                                                        style="min-width: 70px;">
+                                                        {{ $val === '0.00' ? '-' : $val }}
                                                     </td>
                                                 @endforeach
                                             </tr>
-                                            @php $lastProjectId = $allocation['project_id']; @endphp
                                         @endforeach
                                     </tbody>
                                 </table>
+
+                                {{-- Optional: Add export button below table --}}
+                                <div class="mt-3 text-end">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="copyTableToClipboard()">
+                                        <i class="bi bi-clipboard"></i> Copy to Clipboard
+                                    </button>
+                                </div>
                             </div>
                         @endif
                     </div>
@@ -77,3 +76,29 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+function copyTableToClipboard() {
+    const table = document.querySelector('.table-bordered');
+    if (!table) return;
+    
+    const range = document.createRange();
+    range.selectNode(table);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    
+    // Show feedback
+    const btn = event.target.closest('button');
+    const original = btn.innerHTML;
+    btn.innerHTML = '<i class="bi bi-check2"></i> Copied!';
+    btn.classList.replace('btn-outline-secondary', 'btn-success');
+    setTimeout(() => {
+        btn.innerHTML = original;
+        btn.classList.replace('btn-success', 'btn-outline-secondary');
+    }, 1500);
+}
+</script>
+@endpush
