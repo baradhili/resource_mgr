@@ -11,8 +11,12 @@
                 <div class="card">
                     <div class="card-header">
                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <!-- Dynamic Title: Shows Client Name if selected -->
                             <span id="card_title">
                                 {{ __('Active Projects - Solution Architect Allocations') }}
+                                @if($selectedClientId && $clients)
+                                    {{ ' - ' . $clients->find($selectedClientId)->name }}
+                                @endif
                             </span>
                             
                             <!-- Client Filter Form -->
@@ -55,7 +59,10 @@
                                 <table class="table table-bordered table-hover align-middle" style="font-size: 0.9rem;">
                                     <thead class="table-light fw-bold">
                                         <tr>
-                                            @foreach ($headers as $header)
+                                            @foreach ($headers as $index => $header)
+                                                @if ($index === 0 && $selectedClientId)
+                                                    @continue
+                                                @endif
                                                 <th class="text-center py-2 px-3 bg-gradient"
                                                     style="background-color: #f8f9fa; border-right: 1px solid #dee2e6;">
                                                     {{ $header }}
@@ -66,12 +73,15 @@
                                     <tbody>
                                         @foreach ($rows as $row)
                                             <tr class="border-bottom">
-                                                <!-- New Client Name Column -->
-                                                <td class="text-muted text-nowrap" style="min-width: 150px; font-size: 0.85em;">
-                                                    {{ $row['client_name'] }}
-                                                </td>
+                                                
+                                                <!-- Client Name Column (Hidden if filtered by client) -->
+                                                @if (!$selectedClientId)
+                                                    <td class="text-muted text-nowrap" style="min-width: 150px; font-size: 0.85em;">
+                                                        {{ $row['client_name'] }}
+                                                    </td>
+                                                @endif
 
-                                                <!-- Project Name Column (Updated Style) -->
+                                                <!-- Project Name Column -->
                                                 <td class="fw-bold text-nowrap" style="min-width: 180px;">
                                                     {{ $row['project_name'] }}
                                                 </td>
