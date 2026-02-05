@@ -35,7 +35,7 @@ class Project extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['client_id','start_date', 'end_date', 'empowerID', 'name', 'projectManager', 'status'];
+    protected $fillable = ['client_id', 'start_date', 'end_date', 'empowerID', 'name', 'projectManager', 'status'];
 
     /**
      * Get the allocations for the project.
@@ -47,14 +47,14 @@ class Project extends Model
         return $this->hasMany(\App\Models\Allocation::class, 'projects_id', 'id');
     }
 
-     /**
+    /**
      * Get the client that owns the project.
      */
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
     }
-    
+
     /**
      * Get the demands for the project.
      *

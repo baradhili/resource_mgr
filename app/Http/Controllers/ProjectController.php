@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
+use App\Models\Client;
 use App\Models\Project;
 use App\Models\Resource;
 use App\Models\Demand;
@@ -20,14 +21,19 @@ class ProjectController extends Controller
     public function index(Request $request): View
     {
         $search = $request->query('search');
-        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
+        $perPage = max(1, min((int) $request->input('perPage', 100), 100));
 
-        $projects = Project::when($search, function ($query, $search) {
-            return $query->where(function ($query) use ($search) {
-                $query->where('empowerID', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
-            });
-        })->paginate($perPage);
+        $projects = Project::with('client')
+            ->when($search, function ($query, $search) {
+                return $query->where(function ($query) use ($search) {
+                    $query->where('empowerID', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%")
+                        ->orWhereHas('client', function ($q) use ($search) {
+                            $q->where('name', 'like', "%$search%");
+                        });
+                });
+            })
+            ->paginate($perPage);
 
         return view('project.index', compact('projects'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
@@ -39,8 +45,9 @@ class ProjectController extends Controller
     public function create(): View
     {
         $project = new Project;
+        $clients = Client::orderBy('name')->get();
 
-        return view('project.create', compact('project'));
+        return view('project.create', compact('project', 'clients'));
     }
 
     /**
@@ -59,7 +66,8 @@ class ProjectController extends Controller
      */
     public function show($id): View
     {
-        $project = Project::with('allocations')->find($id);
+        $project = Project::with(['client', 'allocations'])->find($id);
+        
         $resources = $project->allocations
             ->pluck('resources_id')
             ->unique()
@@ -73,6 +81,7 @@ class ProjectController extends Controller
 
                 return $resource;
             });
+        
         //get open demands for this project
         $demands = Demand::selectRaw('resource_type, MIN(demand_date) as start, MAX(demand_date) as end, AVG(fte) as fte')
             ->where('projects_id', $project->id)
@@ -95,9 +104,10 @@ class ProjectController extends Controller
      */
     public function edit($id): View
     {
-        $project = Project::find($id);
+        $project = Project::with('client')->find($id);
+        $clients = Client::orderBy('name')->get();
 
-        return view('project.edit', compact('project'));
+        return view('project.edit', compact('project', 'clients'));
     }
 
     /**
@@ -118,4 +128,5 @@ class ProjectController extends Controller
         return Redirect::route('projects.index')
             ->with('success', 'Project deleted successfully');
     }
+
 }

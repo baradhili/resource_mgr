@@ -37,6 +37,10 @@
                             {{ $project->name }}
                         </div>
                         <div class="form-group mb-2 mb20">
+                            <strong>{{ __('Client') }}:</strong>
+                            {{ $project->client->name ?? '-' }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
                             <strong>{{ __('Project Manager') }}:</strong>
                             {{ $project->projectManager }}
                         </div>
