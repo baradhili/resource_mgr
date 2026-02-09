@@ -15,7 +15,7 @@
                             <span id="card_title">
                                 {{ __('Active Projects - Solution Architect Allocations') }}
                                 @if($selectedClientId && $clients)
-                                    {{ ' - ' . $clients->find($selectedClientId)->name }}
+                                    {{ ' - ' . ($clients->find($selectedClientId)?->name ?? '') }}
                                 @endif
                             </span>
                             
