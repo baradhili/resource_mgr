@@ -46,10 +46,9 @@ class CapacityController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth()->user();
         // check if they are asking for a region
         $regionID = $request->input('region_id');
-        $search = $request->query('search');
+        $page = max(1, (int) $request->input('page', 1));
         $page = max(1, (int) $request->input('page', 1));
         $perPage = max(1, min((int) $request->input('perPage', 10), 100));
         $nextTwelveMonths = [];
