@@ -7,7 +7,7 @@
 <?php
 // Fetch clients for the filter dropdown.
 // We use 'name' as both key and value to match the controller's search logic on client names.
- $clients = \App\Models\Client::orderBy('name')->pluck('name', 'name');
+$clients = \App\Models\Client::orderBy('name')->pluck('name', 'name');
 ?>
 
 @section('content')
@@ -25,31 +25,33 @@
                             <div class="float-right d-flex align-items-center">
                                 <form action="{{ route('projects.index') }}" method="get"
                                     class="d-inline-flex align-items-center" id="filterForm">
-                                    
+
                                     <!-- Text Search -->
                                     <div class="input-group input-group-sm" style="width: 250px;">
                                         <input type="text" class="form-control" id="search" name="search"
                                             placeholder="Search Name, ID..." value="{{ request('search') }}"
                                             onkeydown="if (event.keyCode == 13) { document.getElementById('filterForm').submit(); return false; }">
-                                        
+
                                         <!-- Client Filter Dropdown -->
                                         <div class="input-group-append">
                                             <select class="form-control" id="client_filter" onchange="filterByClient()"
                                                 style="max-width: 150px; border-left: 0;">
                                                 <option value="">Filter by Client...</option>
-                                                @foreach($clients as $client)
-                                                    <option value="{{ $client }}" {{ request('search') == $client ? 'selected' : '' }}>
-                                                        {{ $client }}
-                                                    </option>
+                                                @foreach ($clients as $client)
+                                                    <option value="{{ $client->id }}"
+                                                        @if (request('client_id') == $client->id) selected @endif>
+                                                        {{ $client->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-                                    
+
                                     &nbsp;
-                                    @can('projects.create')<a href="{{ route('projects.create') }}" class="btn btn-primary btn-sm">
-                                        {{ __('Create New') }}
-                                    </a>@endcan
+                                    @can('projects.create')
+                                        <a href="{{ route('projects.create') }}" class="btn btn-primary btn-sm">
+                                            {{ __('Create New') }}
+                                        </a>
+                                    @endcan
                                 </form>
                             </div>
                         </div>
@@ -91,17 +93,23 @@
                                             <td>
                                                 <form action="{{ route('projects.destroy', $project->id) }}"
                                                     method="POST">
-                                                    @can('projects.show')<a class="btn btn-sm btn-primary "
-                                                        href="{{ route('projects.show', $project->id) }}"><i
-                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>@endcan
-                                                    @can('projects.edit')<a class="btn btn-sm btn-success"
-                                                        href="{{ route('projects.edit', $project->id) }}"><i
-                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>@endcan
+                                                    @can('projects.show')
+                                                        <a class="btn btn-sm btn-primary "
+                                                            href="{{ route('projects.show', $project->id) }}"><i
+                                                                class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    @endcan
+                                                    @can('projects.edit')
+                                                        <a class="btn btn-sm btn-success"
+                                                            href="{{ route('projects.edit', $project->id) }}"><i
+                                                                class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                    @endcan
                                                     @csrf
                                                     @method('DELETE')
-                                                    @can('projects.destroy')<button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
-                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>@endcan
+                                                    @can('projects.destroy')
+                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                            onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                                class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    @endcan
                                                 </form>
                                             </td>
                                         </tr>
@@ -118,18 +126,16 @@
 
     <script>
         function filterByClient() {
-            var select = document.getElementById('client_filter');
-            var searchInput = document.getElementById('search');
-            
-            // If a client is selected, populate the search input and submit
-            if (select.value) {
-                searchInput.value = select.value;
-                document.getElementById('filterForm').submit();
-            } else {
-                // If the user selects the "Filter by Client..." empty option, clear search and submit
-                searchInput.value = '';
-                document.getElementById('filterForm').submit();
+            var selectedClient = $('#client_filter').find(':selected').val();
+            var searchQuery = request('search');
+            var url = '{{ route('projects.index') }}';
+            if (selectedClient) {
+                url += '?client_id=' + selectedClient;
             }
+            if (searchQuery) {
+                url += (url.includes('?') ? '&' : '?') + 'search=' + searchQuery;
+            }
+            window.location.href = url;
         }
     </script>
 @endsection
