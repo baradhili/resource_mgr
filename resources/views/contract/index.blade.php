@@ -70,7 +70,7 @@
                                         @endphp
                                         <tr>
                                             <td>
-                                                {{ $contract->resource->full_name }}
+                                                <a href="{{ route('resources.allocations', $contract->resources_id) }}">{{ $contract->resource->full_name }}</a>
                                                 @if ($monthsDifference <= 3)
                                                     @if ($monthsDifference >= 2)
                                                         <span data-toggle="tooltip" data-placement="top"
