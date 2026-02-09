@@ -66,7 +66,7 @@ class ProjectController extends Controller
      */
     public function show($id): View
     {
-        $project = Project::with(['client', 'allocations'])->find($id);
+        $project = Project::with(['client', 'allocations'])->findOrFail($id);
         
         $resources = $project->allocations
             ->pluck('resources_id')
@@ -104,7 +104,7 @@ class ProjectController extends Controller
      */
     public function edit($id): View
     {
-        $project = Project::with('client')->find($id);
+        $project = Project::with('client')->findOrFail($id);
         $clients = Client::orderBy('name')->get();
 
         return view('project.edit', compact('project', 'clients'));
