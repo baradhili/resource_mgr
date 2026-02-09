@@ -48,9 +48,14 @@ class ClientController extends Controller
      */
     public function show($id): View
     {
-        $client = Client::find($id);
+        // Find the client or fail (404 if not found)
+        $client = Client::findOrFail($id);
 
-        return view('client.show', compact('client'));
+        // Get the projects associated with this client, paginated
+        // You can adjust the number (10) to however many projects you want per page
+        $projects = $client->projects()->paginate(10);
+
+        return view('client.show', compact('client', 'projects'));
     }
 
     /**

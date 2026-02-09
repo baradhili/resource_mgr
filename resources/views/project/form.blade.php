@@ -3,12 +3,12 @@
         
         <div class="form-group mb-2 mb20">
             <label for="start_date" class="form-label">{{ __('Start Date') }}</label>
-            <input type="text" name="start_date" class="form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date', $project?->start_date) }}" id="start_date" placeholder="Start Date">
+            <input type="date" name="start_date" class="form-control @error('start_date') is-invalid @enderror" value="{{ old('start_date', $project?->start_date) }}" id="start_date" placeholder="Start Date">
             {!! $errors->first('start_date', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
             <label for="end_date" class="form-label">{{ __('End Date') }}</label>
-            <input type="text" name="end_date" class="form-control @error('end_date') is-invalid @enderror" value="{{ old('end_date', $project?->end_date) }}" id="end_date" placeholder="End Date">
+            <input type="date" name="end_date" class="form-control @error('end_date') is-invalid @enderror" value="{{ old('end_date', $project?->end_date) }}" id="end_date" placeholder="End Date">
             {!! $errors->first('end_date', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
@@ -21,6 +21,22 @@
             <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $project?->name) }}" id="name" placeholder="Name">
             {!! $errors->first('name', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
+
+        <div class="form-group mb-2 mb20">
+            <label for="client_id" class="form-label">{{ __('Client') }}</label>
+            <select name="client_id" id="client_id" class="form-control @error('client_id') is-invalid @enderror">
+                <option value="">{{ __('Select Client') }}</option>
+                @if(isset($clients))
+                    @foreach($clients as $client)
+                        <option value="{{ $client->id }}" {{ old('client_id', $project->client_id ?? null) == $client->id ? 'selected' : '' }}>
+                            {{ $client->name }}
+                        </option>
+                    @endforeach
+                @endif
+            </select>
+            {!! $errors->first('client_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+        </div>
+
         <div class="form-group mb-2 mb20">
             <label for="project_manager" class="form-label">{{ __('Projectmanager') }}</label>
             <input type="text" name="projectManager" class="form-control @error('projectManager') is-invalid @enderror" value="{{ old('projectManager', $project?->projectManager) }}" id="project_manager" placeholder="Projectmanager">

@@ -22,9 +22,14 @@ class ProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'empowerID' => 'string',
-            'name' => 'string',
-            'projectManager' => 'string',
+            'client_id' => 'required|exists:clients,id',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'empowerID' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'projectManager' => 'required|string|max:255',
+            // Must match exactly one of the ENUM values defined in your SQL table
+            'status' => 'nullable|in:Proposed,Active,Cancelled,Completed,On Hold,Prioritised', 
         ];
     }
 }
