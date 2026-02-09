@@ -67,7 +67,7 @@
                                                 <td>
                                                     @if(strtolower($project->status) == 'active')
                                                         <span class="badge badge-success">{{ $project->status }}</span>
-                                                    @elseif(strtolower($project->status) == 'closed' || strtolower($project->status) == 'inactive')
+                                                    @elseif(in_array(strtolower($project->status), ['cancelled', 'completed', 'on hold']))
                                                         <span class="badge badge-secondary">{{ $project->status }}</span>
                                                     @else
                                                         <span class="badge badge-info">{{ $project->status }}</span>

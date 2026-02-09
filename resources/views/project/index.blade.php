@@ -86,7 +86,7 @@ $clients = \App\Models\Client::orderBy('name')->pluck('name', 'name');
                                             <td>{{ $project->end_date }}</td>
                                             <td>{{ $project->empowerID }}</td>
                                             <td>{{ $project->name }}</td>
-                                            <td>{{ $project->client->name ?? '-' }}</td> <!-- Client Name Display -->
+                                            <td>{{ $project->client?->name ?? '-' }}</td> <!-- Client Name Display -->
                                             <td>{{ $project->projectManager }}</td>
                                             <td>{{ $project->status }}</td>
 
