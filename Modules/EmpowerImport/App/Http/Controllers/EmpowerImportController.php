@@ -13,6 +13,7 @@ use App\Models\Region;
 use App\Models\Resource;
 use App\Models\ResourceType;
 use App\Models\Team;
+use App\Models\Client;
 use App\Models\Plugin;
 use App\Services\CacheService;
 use Illuminate\Http\Request;
@@ -42,8 +43,9 @@ class EmpowerImportController extends Controller
     private $columnProjectStart = 'F';
 
     private $columnProjectEnd = 'G';
+    private $columnProjectClient = 'H';
 
-    private $columnDataStart = 'H';
+    private $columnDataStart = 'I';
 
     private $columnDemandID = 'A';
     private $columnDemandType = 'B';
@@ -143,43 +145,59 @@ class EmpowerImportController extends Controller
     private function checkProject($rowData)
     {
         $empowerID = $rowData[$this->columnEmpowerID];
+
+        // Clean project name
         $projectName = preg_replace('/[^\x00-\x7F]/', '', $rowData[$this->columnProjectName]);
-        $project = Project::where('empowerID', $empowerID)->first();
-        $projectID = $project->id ?? null;
-        $projectStatus = $rowData[$this->columnProjectStatus];
+
+        // --- Handle Client Relationship ---
+        $clientName = trim($rowData[$this->columnProjectClient]);
+        // FirstOrCreate checks if a client with this name exists. If not, it creates one.
+        $client = Client::firstOrCreate(['name' => $clientName]);
+        // ----------------------------------
+
         $projectOwner = $rowData[$this->columnProjectOwner];
         // clean up projectOwner - truncate any org suffix that may be in there
         $projectOwner = preg_replace('/\s*\([^)]*\)\s*$/', '', $projectOwner);
         $projectOwner = trim($projectOwner);
-        // data is in excel like 15/05/24 needs to be in 2024-05-15
-        $projectStart = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectStart])->format('Y-m-d');
-        $projectEnd = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectEnd])->format('Y-m-d');
-        // check if project exists and check start and end for changes
-        if (!is_null($projectID)) {
-            $projectInDB = Project::find($projectID);
-            if ($projectInDB->start_date != $projectStart || $projectInDB->end_date != $projectEnd) {
-                // do stuff later if we need to
-            }
-        }
-        // for the moment we won't handle changes
-        $project = Project::updateOrCreate(
-            ['empowerID' => $empowerID],
-            [
-                'name' => $projectName,
-                'start_date' => $projectStart,
-                'end_date' => $projectEnd,
-                'projectManager' => $projectOwner,
-            ]
-        );
-        $projectID = $project->id;
 
-        return $projectID;
+        // data is in excel like 15/05/24 needs to be in 2024-05-15
+        // Added check to ensure data exists before parsing to avoid Carbon errors
+        $projectStart = !empty($rowData[$this->columnProjectStart])
+            ? Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectStart])->format('Y-m-d')
+            : null;
+
+        $projectEnd = !empty($rowData[$this->columnProjectEnd])
+            ? Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectEnd])->format('Y-m-d')
+            : null;
+
+        $projectStatus = $this->cleanProjectStatus($rowData[$this->columnProjectStatus]);
+
+        // IMPROVEMENT: We do not need to manually find the project before updateOrCreate.
+        // updateOrCreate handles the "check if exists" logic internally.
+        // The redundant query has been removed to improve performance.
+
+        // Prepare the attributes to update
+        $attributes = [
+            'name' => $projectName,
+            'start_date' => $projectStart,
+            'end_date' => $projectEnd,
+            'projectManager' => $projectOwner,
+            'client_id' => $client->id, // Link the client
+            'status' => $projectStatus ?? null, // Added status saving (was extracted but not saved in original)
+        ];
+
+        $project = Project::updateOrCreate(
+            ['empowerID' => $empowerID], // Criteria to find the project
+            $attributes                   // Data to update or create
+        );
+
+        return $project->id;
     }
 
     private function handleDemand(Excel $excel)
     {
-       
-    
+
+
         return true;
     }
 
@@ -360,5 +378,43 @@ class EmpowerImportController extends Controller
         }
 
         return $projectID;
+    }
+
+    /**
+     * Maps raw status strings from the import file to valid database ENUM values.
+     *
+     * @param string $rawStatus The status string from the import file.
+     * @return string|null The cleaned status matching the DB ENUM, or null if no match.
+     */
+    private function cleanProjectStatus($rawStatus)
+    {
+        // Trim whitespace to ensure accurate matching
+        $status = trim($rawStatus);
+
+        // Mapping of Import Values => Database ENUM Values
+        $mapping = [
+            // Early stage maps to Proposed
+            'Idea' => 'Proposed',
+            'Concept Ready' => 'Proposed',
+            'Readiness' => 'Proposed',
+
+            // Active delivery/planning stages map to Active
+            'Initiate' => 'Active',
+            'Plan' => 'Active',
+            'Project Start' => 'Active',
+            'Execute/Verify' => 'Active',
+            'Program Delivery' => 'Active',
+            'Commission/Handover' => 'Active',
+
+            // Closing stages map to Completed
+            'Project Complete' => 'Completed',
+            'Program Completed' => 'Completed',
+            'Benefit/Close' => 'Completed',
+            'Program Close' => 'Completed',
+        ];
+
+        // Return the mapped value, or null if the status isn't recognized
+        // (Since the DB column is nullable, returning null is safe)
+        return $mapping[$status] ?? null;
     }
 }
