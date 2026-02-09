@@ -39,12 +39,10 @@ class CapacityController extends Controller
     }
 
     /**
-     * Return the paginated collection with the next twelve months and the regions
-     * associated with the resources
+     * Display paginated resource capacity with region filtering.
      *
-     * @param int $page
-     * @param int $perPage
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * `@param`  \Illuminate\Http\Request  $request
+     * `@return` \Illuminate\View\View
      */
     public function index(Request $request)
     {
