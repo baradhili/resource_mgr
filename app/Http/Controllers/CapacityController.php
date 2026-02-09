@@ -38,14 +38,23 @@ class CapacityController extends Controller
         $this->resourceService = $resourceService;
     }
 
+    /**
+     * Return the paginated collection with the next twelve months and the regions
+     * associated with the resources
+     *
+     * @param int $page
+     * @param int $perPage
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
     public function index(Request $request)
     {
         $user = auth()->user();
         // check if they are asking for a region
         $regionID = $request->input('region_id');
         $search = $request->query('search');
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
         $nextTwelveMonths = [];
-
         for ($i = 0; $i < 12; $i++) {
             $date = Carbon::now()->addMonthsNoOverflow($i);
             $nextTwelveMonths[] = [
@@ -56,11 +65,12 @@ class CapacityController extends Controller
             ];
         }
 
-        // Collect our resources who have a current contract
-        $resources = $this->resourceService->getResourceList(null, true);
+        // Collect our resources from resourceService        
+        $resources = $this->resourceService->getResourceList($regionID, true);
 
-        // collect teh regions from teh resources->region
+        // collect the regions from the resources->region
         $regions = $resources->pluck('region')->filter()->unique()->values()->all();
+
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
@@ -140,16 +150,6 @@ class CapacityController extends Controller
             }
         }
 
-        // filter the collection by resource->region_id
-        // if ($regionID) {
-        //     $resourceCapacity = $resourceCapacity->filter(function ($value, $key) use ($regionID) {
-        //         return $value['resource']->region_id == $regionID;
-        //     });
-        // }
-
-        // Get and sanitize pagination inputs
-        $page = max(1, (int) $request->input('page', 1));
-        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
 
         // Paginate the collection
         $paginatedResourceCapacity = new LengthAwarePaginator(
@@ -265,7 +265,7 @@ class CapacityController extends Controller
         });
 
 
-// Log::info("resourceCapacity " . json_encode($resourceCapacity));
+        // Log::info("resourceCapacity " . json_encode($resourceCapacity));
         // walk the resourceCapacity array output to spreadsheet
         $row = 2;
         foreach ($resourceCapacity as $resourceID => $resource) {

@@ -19,6 +19,9 @@
                             <div class="float-right d-flex align-items-center">
                                 <form action="{{ route('capacity.index') }}" method="get"
                                     class="d-inline-flex align-items-center" id="filterForm">
+                                    <!-- Retain view vars -->
+                                    <input type="hidden" name="perPage" value="{{ request('perPage', 10) }}">
+                                    <input type="hidden" name="regions" value="{{ request('regions', 'All') }}">
 
                                     <select class="form-control" id="region_id" name="region_id" style="width: auto;"
                                         onchange="document.getElementById('filterForm').submit(); return false;">
