@@ -28,7 +28,18 @@ class ProjAllocReportController extends Controller
     }
 
     /**
-     * Display a listing of active projects with Solution Architect allocations.
+     * Display a report of Solution Architect allocations for active projects over a four-month window.
+     *
+     * The report aggregates FTE per project × resource per month and is constrained to allocations
+     * whose allocation_date falls within the current month through three months ahead.
+     *
+     * @param Request $request Optional filter parameters; supports `client_id` to limit results to a specific client.
+     * @return View The rendered index view containing:
+     *              - `headers`: column headings (Client Name, Project Name, Resource Name, and four month headers),
+     *              - `rows`: array of rows each with `client_name`, `project_name`, `resource_name`, and `values` (four monthly FTE strings),
+     *              - `hasData`: boolean indicating whether any rows are present,
+     *              - `clients`: list of clients for the filter dropdown,
+     *              - `selectedClientId`: the `client_id` value from the request (if any).
      */
     public function index(Request $request): View
     {

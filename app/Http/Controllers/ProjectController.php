@@ -16,7 +16,13 @@ use Illuminate\Support\Facades\Log;
 class ProjectController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a paginated, searchable list of projects.
+     *
+     * Supports an optional `search` query parameter to filter projects by empowerID, project name,
+     * or related client name. The `perPage` input controls items per page (clamped between 1 and 100,
+     * default 100).
+     *
+     * @return \Illuminate\View\View The project index view containing `projects` (paginated list) and `i` (page offset).
      */
     public function index(Request $request): View
     {
@@ -40,7 +46,9 @@ class ProjectController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display the project creation form.
+     *
+     * @return \Illuminate\View\View The creation view populated with an empty `Project` instance (`$project`) and a collection of `Client` records (`$clients`) ordered by name.
      */
     public function create(): View
     {
@@ -62,7 +70,15 @@ class ProjectController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display a project's details, its associated resources, and aggregated open demands.
+     *
+     * The view data includes:
+     * - `project`: the Project model with related client and allocations.
+     * - `resources`: unique Resource models referenced by the project's allocations; each resource has a boolean `current` flag indicating whether it has any allocation on or after the current month and a `resourceType_name` property with the related resource type's name.
+     * - `demands`: aggregated open demands for the project grouped by resource type; each demand entry has `start` and `end` formatted as `Mon-Year` and `resource_type` replaced by the resource type's name, with `fte` representing the average FTE where FTE > 0.
+     *
+     * @param int $id The ID of the project to display.
+     * @return \Illuminate\View\View The project show view populated with `project`, `resources`, and `demands`.
      */
     public function show($id): View
     {
@@ -100,7 +116,10 @@ class ProjectController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Display the edit form for a specified project.
+     *
+     * @param int $id The ID of the project to edit.
+     * @return \Illuminate\View\View The project edit view populated with the `project` model and `clients` list.
      */
     public function edit($id): View
     {
@@ -121,6 +140,12 @@ class ProjectController extends Controller
             ->with('success', 'Project updated successfully');
     }
 
+    /**
+     * Delete the specified project by ID and redirect to the projects listing.
+     *
+     * @param int|string $id The ID of the project to delete.
+     * @return \Illuminate\Http\RedirectResponse A redirect to the projects index route with a `success` flash message confirming deletion.
+     */
     public function destroy($id): RedirectResponse
     {
         Project::find($id)->delete();

@@ -30,7 +30,9 @@ class Client extends Model
     protected $fillable = ['name', 'contact_details'];
 
     /**
-     * Get the projects for the client.
+     * Get the client's projects.
+     *
+     * @return HasMany The has-many relation linking this client to its Project models.
      */
     public function projects(): HasMany
     {

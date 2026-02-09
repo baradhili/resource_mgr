@@ -44,7 +44,11 @@ class ClientController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified client and its paginated projects.
+     *
+     * @param int|string $id The ID of the client to display.
+     * @return \Illuminate\View\View The view displaying the client and its paginated projects.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException If a client with the given ID does not exist.
      */
     public function show($id): View
     {

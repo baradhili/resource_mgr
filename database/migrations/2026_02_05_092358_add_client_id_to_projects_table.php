@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
-     */
+         * Add a nullable `client_id` column to the `projects` table and create a foreign key referencing `clients.id` with cascade on delete.
+         */
     public function up(): void
     {
         Schema::table('projects', function (Blueprint $table) {
@@ -18,7 +18,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Drop the foreign key constraint on `client_id` and remove the `client_id` column from the `projects` table.
      */
     public function down(): void
     {

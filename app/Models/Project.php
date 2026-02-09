@@ -38,9 +38,9 @@ class Project extends Model
     protected $fillable = ['client_id', 'start_date', 'end_date', 'empowerID', 'name', 'projectManager', 'status'];
 
     /**
-     * Get the allocations for the project.
+     * Retrieve allocations related to the project.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany Has-many relation to App\Models\Allocation instances keyed by `projects_id`.
      */
     public function allocations(): HasMany
     {
@@ -49,6 +49,8 @@ class Project extends Model
 
     /**
      * Get the client that owns the project.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo The client relationship for this project.
      */
     public function client(): BelongsTo
     {
@@ -56,9 +58,9 @@ class Project extends Model
     }
 
     /**
-     * Get the demands for the project.
+     * Retrieve the demands associated with the project.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany A has-many relation for Demand models belonging to the project.
      */
     public function demands(): HasMany
     {

@@ -135,13 +135,14 @@ class EmpowerImportController extends Controller
     }
 
     /**
-     * Given a row of data from the import file, this function checks if the project exists,
-     * and if it does, checks if the start and end dates have changed. It then creates or
-     * updates the project in the database.
-     *
-     * @param  array  $rowData  the row of data from the import file
-     * @return int the id of the project in the database
-     */
+         * Ensure a Project exists for the given import row, creating or updating it and linking the associated Client.
+         *
+         * Creates a Client when necessary based on the row's client name, normalizes project fields (name, manager, start/end dates, status)
+         * and writes them to the database via updateOrCreate.
+         *
+         * @param array $rowData Row data from the import containing project and client fields.
+         * @return int The database id of the created or updated Project.
+         */
     private function checkProject($rowData)
     {
         $empowerID = $rowData[$this->columnEmpowerID];
@@ -194,6 +195,15 @@ class EmpowerImportController extends Controller
         return $project->id;
     }
 
+    /**
+     * Placeholder for processing demand data from the provided Excel workbook.
+     *
+     * Intended to parse and import demand records from the workbook's sheets,
+     * but currently performs no operations.
+     *
+     * @param \avadim\FastExcelReader\Excel $excel The opened Excel workbook containing demand data.
+     * @return bool `true` indicating the placeholder completed without making changes.
+     */
     private function handleDemand(Excel $excel)
     {
 
@@ -354,6 +364,14 @@ class EmpowerImportController extends Controller
         return $value;
     }
 
+    /**
+     * Locate a Project by extracting an EmpowerID or a name fragment from a raw project string and return its id.
+     *
+     * Extracts either an EmpowerID (e.g., single uppercase letter followed by four digits) or a project name fragment from the provided string and queries the Project model for a matching record.
+     *
+     * @param string $projectName Raw project string from the import source.
+     * @return int|null The matching Project id if found, null otherwise.
+     */
     private function cleanProjectName($projectName)
     {
         // find the project or create a new one
