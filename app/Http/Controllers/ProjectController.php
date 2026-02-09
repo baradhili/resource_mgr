@@ -22,6 +22,8 @@ class ProjectController extends Controller
     {
         $searchQuery = $request->input('search');
         $clientFilter = $request->input('client_id');
+        $clients = Client::orderBy('name')->get();
+        Log::info("project-clients" . print_r($clients,true));
 
         $perPage = max(1, min((int) $request->input('perPage', 100), 100));
 
@@ -39,7 +41,7 @@ class ProjectController extends Controller
             })
             ->paginate($perPage);
 
-        return view('project.index', compact('projects'))
+        return view('project.index', compact('projects', 'clients'))
             ->with('i', ($request->input('page', 1) - 1) * $projects->perPage());
     }
 

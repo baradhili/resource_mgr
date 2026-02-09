@@ -4,12 +4,6 @@
     Projects
 @endsection
 
-<?php
-// Fetch clients for the filter dropdown.
-// We use 'name' as both key and value to match the controller's search logic on client names.
-$clients = \App\Models\Client::orderBy('name')->pluck('name', 'name');
-?>
-
 @section('content')
     <div class="container-fluid">
         <div class="row">
@@ -30,11 +24,13 @@ $clients = \App\Models\Client::orderBy('name')->pluck('name', 'name');
                                     <div class="input-group input-group-sm" style="width: 250px;">
                                         <input type="text" class="form-control" id="search" name="search"
                                             placeholder="Search Name, ID..." value="{{ request('search') }}"
-                                            onkeydown="if (event.keyCode == 13) { document.getElementById('filterForm').submit(); return false; }">
+                                            onkeydown="if(event.key === 'Enter') { event.preventDefault(); document.getElementById('filterForm').submit(); }"
+                                            onchange="document.getElementById('filterForm').submit()">
 
                                         <!-- Client Filter Dropdown -->
                                         <div class="input-group-append">
-                                            <select class="form-control" id="client_filter" onchange="filterByClient()"
+                                            <select class="form-control" name="client_id" id="client_filter"
+                                                onchange="document.getElementById('filterForm').submit()"
                                                 style="max-width: 150px; border-left: 0;">
                                                 <option value="">Filter by Client...</option>
                                                 @foreach ($clients as $client)
