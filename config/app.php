@@ -12,4 +12,3 @@ return [
         'Markdown' => GrahamCampbell\Markdown\Facades\Markdown::class,
     ])->toArray(),
 
-];
