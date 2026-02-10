@@ -21,3 +21,5 @@ yarn-error.log
 
 artisan
 resource_mgr.sql
+
+*.sql
