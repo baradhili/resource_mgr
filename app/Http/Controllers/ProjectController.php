@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
 use App\Models\Client;
+use App\Models\Demand;
 use App\Models\Project;
 use App\Models\Resource;
-use App\Models\Demand;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
 
 class ProjectController extends Controller
 {
@@ -23,7 +23,7 @@ class ProjectController extends Controller
         $searchQuery = $request->input('search');
         $clientFilter = $request->input('client_id');
         $clients = Client::orderBy('name')->get();
-        Log::info("project-clients" . print_r($clients,true));
+        Log::info('project-clients'.print_r($clients, true));
 
         $perPage = max(1, min((int) $request->input('perPage', 100), 100));
 
@@ -88,7 +88,7 @@ class ProjectController extends Controller
                 return $resource;
             });
 
-        //get open demands for this project
+        // get open demands for this project
         $demands = Demand::selectRaw('resource_type, MIN(demand_date) as start, MAX(demand_date) as end, AVG(fte) as fte')
             ->where('projects_id', $project->id)
             ->where('fte', '>', 0)
@@ -134,5 +134,4 @@ class ProjectController extends Controller
         return Redirect::route('projects.index')
             ->with('success', 'Project deleted successfully');
     }
-
 }

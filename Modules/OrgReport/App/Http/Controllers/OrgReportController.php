@@ -58,18 +58,19 @@ class OrgReportController extends Controller
             $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
             $projects = Project::whereIn('id', $uniqueProjectIds)->get();
             $currentProjects = $projects;
-            //filter all projects where the project end date is after or within one month of the resource's contract end date
+            // filter all projects where the project end date is after or within one month of the resource's contract end date
             $currentProjects = $currentProjects->filter(function ($project) use ($resource) {
                 $contractEndDate = \Carbon\Carbon::parse($resource->contracts->first()->end_date);
                 $projectEndDate = \Carbon\Carbon::parse($project->end_date);
                 // first is project end date after contract end date?
                 $overlap = $contractEndDate->lt($projectEndDate);
-                //if true return
+                // if true return
                 if ($overlap) {
                     return $overlap;
                 } else {
-                    // second is project end date inside one month less of contract end date? 
+                    // second is project end date inside one month less of contract end date?
                     $overlap = $contractEndDate->copy()->subMonth()->lt($projectEndDate);
+
                     return $overlap;
                 }
             });
@@ -80,9 +81,10 @@ class OrgReportController extends Controller
         $resources = $resources->sortByDesc('tenure');
         // remove any resources where tenure is < 1.5 years or their top contract in contracts has permanent = 1
         $resources = $resources->filter(function ($resource) {
-            return $resource->tenure >= 1.5 && !$resource->contracts->first()->permanent;
+            return $resource->tenure >= 1.5 && ! $resource->contracts->first()->permanent;
         });
-        Log::info("resource: " . json_encode($resources));
+        Log::info('resource: '.json_encode($resources));
+
         return view('orgreport::index', compact('resources', 'regions'));
     }
 }

@@ -2,27 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ResourceRequest;
 use App\Models\Allocation;
 use App\Models\Contract;
-use App\Models\Leave;
 use App\Models\Location;
-use App\Models\Project;
 use App\Models\Resource;
-use App\Models\ResourceSkill;
-use App\Models\ResourceType;
-use App\Models\Skill;
-use App\Models\User;
 use App\Services\CacheService;
 use App\Services\ResourceService;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -62,34 +53,32 @@ class CapacityController extends Controller
             ];
         }
 
-        // Collect our resources from resourceService        
+        // Collect our resources from resourceService
         $resources = $this->resourceService->getResourceList($regionID, true);
 
         // collect the regions from the resources->region
         $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
-
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+            if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
                 $resource->full_name .= ' [c]';
             }
         }
 
-        if (!Cache::has('resourceAvailability')) {
+        if (! Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
             $resourceAvailability = Cache::get('resourceAvailability');
         }
 
-        if (!Cache::has('resourceAllocation')) {
+        if (! Cache::has('resourceAllocation')) {
             $this->cacheService->cacheResourceAllocation();
             $resourceAllocation = Cache::get('resourceAllocation');
         } else {
             $resourceAllocation = Cache::get('resourceAllocation');
         }
-
 
         // filter resourceAvailability by $resources
         $resourceAvailability = array_intersect_key($resourceAvailability, array_flip($resources->pluck('id')->toArray()));
@@ -109,7 +98,6 @@ class CapacityController extends Controller
         }
         unset($resource);
 
-
         // create capacity array where for a resource for a month we subtract availability from allocation
         $resourceCapacity = [];
         foreach ($resourceAvailability as $resourceID => $resource) {
@@ -118,7 +106,7 @@ class CapacityController extends Controller
                 'capacity' => [],
             ];
             foreach ($nextTwelveMonths as $month) {
-                $monthKey = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $monthKey = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                 $availability = 100 * (float) ($resourceAvailability[$resourceID]['availability'][$monthKey] ?? 0);
                 $allocation = (float) ($resourceAllocation[$resourceID]['allocation'][$monthKey] ?? 0);
 
@@ -131,7 +119,7 @@ class CapacityController extends Controller
             $resource = Resource::find($key);
 
             // check if region_id is set
-            if (!$resource->region_id) {
+            if (! $resource->region_id) {
                 // if not then check if location_id is set
                 if ($resource->location_id) {
                     $location = Location::find($resource->location_id);
@@ -146,7 +134,6 @@ class CapacityController extends Controller
                 $capacity['resource'] = $resource;
             }
         }
-
 
         // Paginate the collection
         $paginatedResourceCapacity = new LengthAwarePaginator(
@@ -187,7 +174,7 @@ class CapacityController extends Controller
                 'monthName' => $date->format('M'),
                 'monthFullName' => $date->format('F'),
             ];
-            $sheet->setCellValue([$i + 4, 1], $date->format('M') . ' ' . $date->year);
+            $sheet->setCellValue([$i + 4, 1], $date->format('M').' '.$date->year);
         }
 
         // Collect our resources who have a current contract
@@ -198,25 +185,24 @@ class CapacityController extends Controller
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+            if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
                 $resource->full_name .= ' [c]';
             }
         }
 
-        if (!Cache::has('resourceAvailability')) {
+        if (! Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
             $resourceAvailability = Cache::get('resourceAvailability');
         }
 
-        if (!Cache::has('resourceAllocation')) {
+        if (! Cache::has('resourceAllocation')) {
             $this->cacheService->cacheResourceAllocation();
             $resourceAllocation = Cache::get('resourceAllocation');
         } else {
             $resourceAllocation = Cache::get('resourceAllocation');
         }
-
 
         // filter resourceAvailability by $resources
         $resourceAvailability = array_intersect_key($resourceAvailability, array_flip($resources->pluck('id')->toArray()));
@@ -236,7 +222,6 @@ class CapacityController extends Controller
         }
         unset($resource);
 
-
         // create capacity array where for a resource for a month we subtract availability from allocation
         $resourceCapacity = [];
         foreach ($resourceAvailability as $resourceID => $resource) {
@@ -245,7 +230,7 @@ class CapacityController extends Controller
                 'capacity' => [],
             ];
             foreach ($nextTwelveMonths as $month) {
-                $monthKey = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $monthKey = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                 $availability = 100 * (float) ($resourceAvailability[$resourceID]['availability'][$monthKey] ?? 0);
                 $allocation = (float) ($resourceAllocation[$resourceID]['allocation'][$monthKey] ?? 0);
 
@@ -255,24 +240,24 @@ class CapacityController extends Controller
 
         $resourceCapacity = collect($resourceCapacity)->map(function ($resource, $resourceID) {
             $resourceModel = Resource::find($resourceID);
+
             return array_merge($resource, [
                 'resource_type' => $resourceModel->resourceType->name ?? 'Unknown Resource Type',
                 'region' => $resourceModel->location->region ? $resourceModel->location->region->name : 'Unknown Region',
             ]);
         });
 
-
         // Log::info("resourceCapacity " . json_encode($resourceCapacity));
         // walk the resourceCapacity array output to spreadsheet
         $row = 2;
         foreach ($resourceCapacity as $resourceID => $resource) {
-            $sheet->setCellValue('A' . $row, $resource['name']);
-            $sheet->setCellValue('B' . $row, $resource['resource_type']);
-            $sheet->setCellValue('C' . $row, $resource['region']);
+            $sheet->setCellValue('A'.$row, $resource['name']);
+            $sheet->setCellValue('B'.$row, $resource['resource_type']);
+            $sheet->setCellValue('C'.$row, $resource['region']);
             $col = 'D';
             foreach ($nextTwelveMonths as $month) {
-                $monthKey = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
-                $sheet->setCellValue($col . $row, $resource['capacity'][$monthKey] ?? 0);
+                $monthKey = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $sheet->setCellValue($col.$row, $resource['capacity'][$monthKey] ?? 0);
                 $col++;
             }
             $row++;
@@ -291,4 +276,3 @@ class CapacityController extends Controller
 
     }
 }
-

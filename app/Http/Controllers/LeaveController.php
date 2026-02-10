@@ -67,7 +67,7 @@ class LeaveController extends Controller
             ->whereIn('resources_id', $resources->pluck('id'));
 
         // If the user asked for only current leaves, filter out all leaves that have end dates in the past
-        if (!$old) {
+        if (! $old) {
             $query->where('end_date', '>=', now());
         }
 
@@ -117,7 +117,7 @@ class LeaveController extends Controller
     {
         Leave::create($request->validated());
 
-        //refesh availability
+        // refesh availability
         $this->cacheService->cacheResourceAvailability();
 
         return Redirect::route('leaves.index')
@@ -153,7 +153,7 @@ class LeaveController extends Controller
     {
         $leave->update($request->validated());
 
-        //refesh availability
+        // refesh availability
         $this->cacheService->cacheResourceAvailability();
 
         return Redirect::route('leaves.index')

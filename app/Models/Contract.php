@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class Contract
@@ -54,7 +53,6 @@ class Contract extends Model
         );
     }
 
-
     /**
      * Get the tenure status attribute.
      *
@@ -72,7 +70,6 @@ class Contract extends Model
      *
      * @return string The tenure status: 'normal', 'warning', or 'danger'.
      */
-
     public function getTenureStatusAttribute(): string
     {
         $tenure = config('app.tenure');
@@ -81,7 +78,7 @@ class Contract extends Model
             1
         );
 
-        if (!$tenure) {
+        if (! $tenure) {
             return 'normal';
         }
 
@@ -99,4 +96,3 @@ class Contract extends Model
     // Append the tenure_status attribute to the JSON output
     protected $appends = ['tenure_status', 'tenure'];
 }
-

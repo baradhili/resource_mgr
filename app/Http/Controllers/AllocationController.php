@@ -16,7 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
@@ -43,8 +42,6 @@ class AllocationController extends Controller
     /**
      * Display a listing of the resource.
      */
-
-
     public function index(Request $request): View
     {
         $user = auth()->user();

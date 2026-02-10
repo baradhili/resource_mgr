@@ -18,4 +18,3 @@ Route::middleware(['web', 'auth', 'verified'])->group(function () {
     Route::post('/import/fieldglass', [FieldglassImportController::class, 'importFieldglass'])
         ->name('import.fieldglass');
 });
-

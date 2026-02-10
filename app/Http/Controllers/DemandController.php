@@ -12,13 +12,12 @@ use App\Services\ResourceService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class DemandController extends Controller
 {
@@ -98,7 +97,7 @@ class DemandController extends Controller
             // Get the resource type for the project
             $resourceType = optional($project->demands->first())->resource_type;
             // If the project doesn't have a resource type, continue to the next project
-            if (!in_array($resourceType, $resource_types)) {
+            if (! in_array($resourceType, $resource_types)) {
                 continue;
             }
             // Get the acronym for the resource type
@@ -132,7 +131,7 @@ class DemandController extends Controller
                     ->where('projects_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
-                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // If the total allocation is greater than 0, add the allocation to the project data
                 if ($totalAllocation > 0) {
@@ -146,7 +145,7 @@ class DemandController extends Controller
 
         // Filter out entries with an empty demands array
         $data = array_filter($data, function ($item) {
-            return !empty($item['demands']);
+            return ! empty($item['demands']);
         });
 
         // Pagination - sanitize inputs
@@ -272,7 +271,7 @@ class DemandController extends Controller
      * Edit the overall demand of a project
      *
      * @param  int  $project_id  The id of the project
-     * @param string $resource_type  The name of the resource type we're looking for
+     * @param  string  $resource_type  The name of the resource type we're looking for
      */
     public function editFullDemand($project_id, $resource_type): View
     {
@@ -321,7 +320,7 @@ class DemandController extends Controller
         $demand->fte = $firstDemand->fte;
         $demand->projects_id = $project->id;
 
-        //make sure we keep these for comparison
+        // make sure we keep these for comparison
         session()->put('old_demand', [
             'projects_id' => $demand->projects_id,
             'start_date' => $demand->start_date,
@@ -341,13 +340,11 @@ class DemandController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $projects_id
-     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, $projects_id): RedirectResponse
     {
-        //pull all "old" data for comparison
+        // pull all "old" data for comparison
         $oldDemand = session()->get('old_demand', []);
 
         $old_projects_id = $oldDemand['projects_id'] ?? null;
@@ -448,7 +445,7 @@ class DemandController extends Controller
                 'monthName' => $date->format('M'),
                 'monthFullName' => $date->format('F'),
             ];
-            $sheet->setCellValue([$i + 4, 1], $date->format('M') . ' ' . $date->year);
+            $sheet->setCellValue([$i + 4, 1], $date->format('M').' '.$date->year);
         }
         //  Start and end dates for the period
         $startDate = Carbon::now()->startOfMonth();
@@ -475,7 +472,7 @@ class DemandController extends Controller
             $sheet->setCellValue([1, $i], $project->name);
 
             $resource_type_code = Demand::where('projects_id', '=', $project->id)->value('resource_type');
-            //look up ResourceType object
+            // look up ResourceType object
             $resource_type = ResourceType::find($resource_type_code);
 
             if ($resource_type && $resource_type->name) {
@@ -493,7 +490,7 @@ class DemandController extends Controller
                     ->where('projects_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
-                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Add the calculated base availability to the resource availability array - only if not zero
                 if ($demand > 0) {

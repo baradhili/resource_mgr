@@ -27,5 +27,3 @@ class RegionFactory extends Factory
         ];
     }
 }
-
-

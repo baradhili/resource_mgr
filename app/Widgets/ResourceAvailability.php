@@ -3,10 +3,10 @@
 namespace App\Widgets;
 
 use App\Models\Resource;
-use Arrilot\Widgets\AbstractWidget;
-use Carbon\Carbon;
 use App\Services\CacheService;
 use App\Services\ResourceService;
+use Arrilot\Widgets\AbstractWidget;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -36,7 +36,7 @@ class ResourceAvailability extends AbstractWidget
     public function run()
     {
 
-        //create array nextThreeMonths
+        // create array nextThreeMonths
         $nextThreeMonths = [];
 
         for ($i = 0; $i < 3; $i++) {
@@ -59,7 +59,7 @@ class ResourceAvailability extends AbstractWidget
             $resourceAvailability = Cache::get('resourceAvailability');
         }
 
-        if (!Cache::has('resourceAllocation')) {
+        if (! Cache::has('resourceAllocation')) {
             $this->cacheService->cacheResourceAllocation();
             $resourceAllocation = Cache::get('resourceAllocation');
         } else {
@@ -69,11 +69,11 @@ class ResourceAvailability extends AbstractWidget
         // filter resourceAvailability by $resources
         $resourceAvailability = array_intersect_key($resourceAvailability, array_flip($resources->pluck('id')->toArray()));
 
-         // filter resourceAllocation by $resources
+        // filter resourceAllocation by $resources
         $resourceAllocation = array_intersect_key($resourceAllocation, array_flip($resources->pluck('id')->toArray()));
 
-// Log::info("resourceAvailability: " . json_encode($resourceAvailability));
-// Log::info("resourceAllocation: " . json_encode($resourceAllocation));
+        // Log::info("resourceAvailability: " . json_encode($resourceAvailability));
+        // Log::info("resourceAllocation: " . json_encode($resourceAllocation));
         // create capacity array where for a resource for a month we subtract availability from allocation
         $resourceCapacity = [];
         foreach ($resourceAvailability as $resourceID => $resource) {
@@ -81,20 +81,20 @@ class ResourceAvailability extends AbstractWidget
                 'name' => $resource['name'],
                 'capacity' => [],
                 'availability' => [],
-                'allocation' => []
+                'allocation' => [],
             ];
             foreach ($nextThreeMonths as $month) {
-                $monthKey = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $monthKey = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                 $availability = 100 * (float) ($resourceAvailability[$resourceID]['availability'][$monthKey] ?? 0);
                 $allocation = (float) ($resourceAllocation[$resourceID]['allocation'][$monthKey] ?? 0);
 
-                $resourceCapacity[$resourceID]['capacity'][$monthKey] = ($availability - $allocation)/100;
+                $resourceCapacity[$resourceID]['capacity'][$monthKey] = ($availability - $allocation) / 100;
                 $resourceCapacity[$resourceID]['availability'][$monthKey] = $availability;
                 $resourceCapacity[$resourceID]['allocation'][$monthKey] = $allocation;
 
             }
         }
-// Log::info("resourceCapacity: " . json_encode($resourceCapacity));
+        // Log::info("resourceCapacity: " . json_encode($resourceCapacity));
         $resourceCapacity = collect($resourceCapacity);
         foreach ($resourceCapacity as $key => &$capacity) {
             $resource = Resource::find($key);

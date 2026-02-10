@@ -2,9 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Client;
 use App\Models\Project;
-use App\Models\Region;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProjectFactory extends Factory
@@ -29,8 +27,7 @@ class ProjectFactory extends Factory
             'empowerID' => $this->faker->regexify('[A-Z0-9]{20}'),
             'name' => $this->faker->company,
             'projectManager' => $this->faker->name,
-            'status' => $this->faker->randomElement(['Proposed','Active','Cancelled','Completed','On Hold','Prioritised']),
+            'status' => $this->faker->randomElement(['Proposed', 'Active', 'Cancelled', 'Completed', 'On Hold', 'Prioritised']),
         ];
     }
 }
-

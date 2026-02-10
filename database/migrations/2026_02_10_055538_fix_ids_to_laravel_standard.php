@@ -119,7 +119,7 @@ return new class extends Migration
     {
         // Clean allocations with invalid resources_id
         DB::statement('UPDATE allocations SET resources_id = NULL WHERE resources_id IS NOT NULL AND resources_id NOT IN (SELECT id FROM resources)');
-        
+
         // Clean allocations with invalid projects_id
         DB::statement('UPDATE allocations SET projects_id = NULL WHERE projects_id IS NOT NULL AND projects_id NOT IN (SELECT id FROM projects)');
 
@@ -358,7 +358,7 @@ return new class extends Migration
      */
     private function addForeignKeyIfNotExists(string $table, string $column, string $foreignKey, string $referencedTable, string $onDelete = 'no action'): void
     {
-        if (!$this->foreignKeyExists($table, $foreignKey)) {
+        if (! $this->foreignKeyExists($table, $foreignKey)) {
             Schema::table($table, function (Blueprint $blueprint) use ($column, $foreignKey, $referencedTable, $onDelete) {
                 $blueprint->foreign($column, $foreignKey)
                     ->references('id')->on($referencedTable)

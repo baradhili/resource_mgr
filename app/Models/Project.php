@@ -39,8 +39,6 @@ class Project extends Model
 
     /**
      * Get the allocations for the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function allocations(): HasMany
     {
@@ -57,8 +55,6 @@ class Project extends Model
 
     /**
      * Get the demands for the project.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function demands(): HasMany
     {

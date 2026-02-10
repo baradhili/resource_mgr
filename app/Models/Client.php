@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property $contact_details
  * @property $created_at
  * @property $updated_at
- * `@property` Project[] $projects
+ *                      `@property` Project[] $projects
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */

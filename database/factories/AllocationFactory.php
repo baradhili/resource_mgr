@@ -28,8 +28,8 @@ class AllocationFactory extends Factory
             'fte' => $this->faker->numberBetween(1, 100),
             'resources_id' => Resource::factory(),
             'projects_id' => Project::factory(),
-            'status' => $this->faker->randomElement(['Proposed','Committed']),
-            'source' => $this->faker->randomElement(['Imported','Manual']),
+            'status' => $this->faker->randomElement(['Proposed', 'Committed']),
+            'source' => $this->faker->randomElement(['Imported', 'Manual']),
         ];
     }
 
@@ -47,4 +47,3 @@ class AllocationFactory extends Factory
         return $this->state(['projects_id' => $project->id]);
     }
 }
-

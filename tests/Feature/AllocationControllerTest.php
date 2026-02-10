@@ -13,11 +13,10 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Log;
 
 class AllocationControllerTest extends TestCase
 {
-    use WithFaker, RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
     /**
      * Unit test for the index method
@@ -25,10 +24,10 @@ class AllocationControllerTest extends TestCase
      * @group allocation
      * @group index
      */
-    public function testIndexMethod()
+    public function test_index_method()
     {
         $user = User::factory()->create();
-        
+
         \Spatie\Permission\Models\Role::findOrCreate('super-admin', 'web');
 
         // add all permissions to 'super-admin'
@@ -41,7 +40,7 @@ class AllocationControllerTest extends TestCase
         $this->actingAs($user);
 
         // seed the db with some resources
-        //first create ResourceType, Region & Location
+        // first create ResourceType, Region & Location
         ResourceType::factory()->count(5)->create();
         Region::factory()->count(5)->create();
         Location::factory()->count(5)->create();
@@ -65,5 +64,4 @@ class AllocationControllerTest extends TestCase
         // // assert that we have the correct page
         // $this->assertEquals(1, $response->original->paginatedResourceAllocation->currentPage());
     }
-
 }

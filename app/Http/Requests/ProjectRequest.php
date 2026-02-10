@@ -29,7 +29,7 @@ class ProjectRequest extends FormRequest
             'name' => 'required|string|max:255',
             'projectManager' => 'required|string|max:255',
             // Must match exactly one of the ENUM values defined in your SQL table
-            'status' => 'nullable|in:Proposed,Active,Cancelled,Completed,On Hold,Prioritised', 
+            'status' => 'nullable|in:Proposed,Active,Cancelled,Completed,On Hold,Prioritised',
         ];
     }
 }

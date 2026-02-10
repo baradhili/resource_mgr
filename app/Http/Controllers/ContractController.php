@@ -6,8 +6,8 @@ use App\Http\Requests\ContractRequest;
 use App\Models\Allocation;
 use App\Models\Contract;
 use App\Models\Demand;
-use App\Models\Resource;
 use App\Models\Project;
+use App\Models\Resource;
 use App\Services\CacheService;
 use App\Services\ResourceService;
 use Illuminate\Http\RedirectResponse;
@@ -15,8 +15,6 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class ContractController extends Controller
 {
@@ -64,7 +62,7 @@ class ContractController extends Controller
             ->whereIn('resources_id', $resources->pluck('id'))
             ->orderBy('end_date', 'asc');
 
-        if (!$old) {
+        if (! $old) {
             $query->where('end_date', '>=', now());
         }
 
@@ -135,7 +133,7 @@ class ContractController extends Controller
     public function show($id): View
     {
         $contract = Contract::find($id);
-        //get teh resource for this contract
+        // get teh resource for this contract
         $resource = $contract->resource;
         // calculate tenure in years between contract start and end date, round to 1 decimal place
         if ($resource->contracts && $resource->contracts->isNotEmpty()) {
@@ -154,10 +152,10 @@ class ContractController extends Controller
         $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
         $projects = Project::whereIn('id', $uniqueProjectIds)->get();
         $currentProjects = $projects;
-        //filter all projects where the project end date is after or within one month of the resource's contract end date
+        // filter all projects where the project end date is after or within one month of the resource's contract end date
         $currentProjects = $currentProjects->filter(function ($project) use ($resource) {
 
-            if (!$resource->contracts || $resource->contracts->isEmpty() || !$project->end_date) {
+            if (! $resource->contracts || $resource->contracts->isEmpty() || ! $project->end_date) {
                 return false;
             }
 
@@ -222,10 +220,9 @@ class ContractController extends Controller
      * demand entry and then deletes the original allocation. The demand is
      * created with a fixed resource type of 'Solution Architect'.
      *
-     * @param Request $request The HTTP request containing 'resource_id' and 'end_date'.
+     * @param  Request  $request  The HTTP request containing 'resource_id' and 'end_date'.
      * @return RedirectResponse Redirect to the contracts index page with a success message.
      */
-
     public function cleanProjects(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -256,11 +253,12 @@ class ContractController extends Controller
             \DB::commit();
         } catch (\Exception $e) {
             \DB::rollBack();
+
             return Redirect::route('contracts.index')
-                ->with('error', 'Failed to process allocations: ' . $e->getMessage());
+                ->with('error', 'Failed to process allocations: '.$e->getMessage());
         }
+
         return Redirect::route('contracts.index')
             ->with('success', 'Allocations returned successfully');
     }
-
 }

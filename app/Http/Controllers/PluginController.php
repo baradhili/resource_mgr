@@ -91,13 +91,12 @@ class PluginController extends Controller
     protected function deleteDirectory($dir)
     {
 
-
         // Security check to ensure we're only deleting directories within the Modules folder
         $modulesPath = base_path('Modules');
-        if (!str_starts_with(realpath($dir), realpath($modulesPath))) {
+        if (! str_starts_with(realpath($dir), realpath($modulesPath))) {
             return false;
         }
-        if (!file_exists($dir)) {
+        if (! file_exists($dir)) {
             return true;
         }
 

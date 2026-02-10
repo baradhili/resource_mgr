@@ -3,18 +3,15 @@
 namespace Modules\FieldglassImport\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Resource;
-use App\Models\Contract;
 use App\Models\ChangeRequest;
+use App\Models\Contract;
+use App\Models\Resource;
+use avadim\FastExcelReader\Excel;
+use DateTime;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use avadim\FastExcelReader\Excel;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use DateTime;
 
 class FieldglassImportController extends Controller
 {
@@ -40,11 +37,12 @@ class FieldglassImportController extends Controller
     private $columnWorkerSupervisor = 'J';
 
     private $sheetName = 'IS&T_Workers_-_S&A';
+
     /**
      * Import Fieldglass data into the system. This function
      * reads the uploaded file and stores the data in the database.
      *
-     * @param Request $request - the request object containing the uploaded file
+     * @param  Request  $request  - the request object containing the uploaded file
      * @return RedirectResponse - redirect back to the calling page with a success message
      */
     public function importFieldglass(Request $request): RedirectResponse
@@ -68,35 +66,36 @@ class FieldglassImportController extends Controller
 
         }
 
-        //top row is teh headings :- Worker ID, Work Order ID, Worker, Cost Center Code, Worker Start Date, Work Order Start Date, Work Order End Date, Bill Rate [Standard Time Rate/Day], Bill Rate [ST_HalfDay/Day], Worker Supervisor
-        //For each row while tehre is a value in the Worker column
-        //grab the first row
+        // top row is teh headings :- Worker ID, Work Order ID, Worker, Cost Center Code, Worker Start Date, Work Order Start Date, Work Order End Date, Bill Rate [Standard Time Rate/Day], Bill Rate [ST_HalfDay/Day], Worker Supervisor
+        // For each row while tehre is a value in the Worker column
+        // grab the first row
 
         foreach ($sheet->nextRow() as $rowNum => $rowData) {
-            if ($rowNum == 1 || $rowNum == 2)
+            if ($rowNum == 1 || $rowNum == 2) {
                 continue;
+            }
             // Log::info(("rowData = ".json_encode($rowData)));
 
             if (isset($rowData[$this->columnWorker]) && $rowData[$this->columnWorker] != null) { // Ignore empty lines
                 $worker = $rowData[$this->columnWorker];
-                //worker is in format lastname, firstnames - but empower uses lastname; firstnames - replace comma with semicolon
+                // worker is in format lastname, firstnames - but empower uses lastname; firstnames - replace comma with semicolon
                 $worker = str_replace(',', ';', $worker);
-                //find Resource
+                // find Resource
                 $resource = Resource::where('empowerID', $worker)->first();
                 // Log::info(("resource = ".json_encode($resource)));
                 if ($resource != null) {
 
-                    //find current contract for resource
+                    // find current contract for resource
                     $contract = Contract::where('resources_id', $resource->id)
                         ->orderBy('start_date', 'desc')
                         ->first();
                     if ($contract != null) {
                         // Log:info("contract found");
-                        $importWorkerStart = (new DateTime())->setTimestamp($rowData[$this->columnWorkerStartDate])->format('Y-m-d');
-                        $importWorkerEnd = (new DateTime())->setTimestamp($rowData[$this->columnWorkOrderEndDate])->format('Y-m-d');
-                        $storedContractStart = (new DateTime())->setTimestamp(strtotime($contract->start_date))->format('Y-m-d');
-                        $storedContractEnd = (new DateTime())->setTimestamp(strtotime($contract->end_date))->format('Y-m-d');  
-                        //check if contract dates are correct
+                        $importWorkerStart = (new DateTime)->setTimestamp($rowData[$this->columnWorkerStartDate])->format('Y-m-d');
+                        $importWorkerEnd = (new DateTime)->setTimestamp($rowData[$this->columnWorkOrderEndDate])->format('Y-m-d');
+                        $storedContractStart = (new DateTime)->setTimestamp(strtotime($contract->start_date))->format('Y-m-d');
+                        $storedContractEnd = (new DateTime)->setTimestamp(strtotime($contract->end_date))->format('Y-m-d');
+                        // check if contract dates are correct
                         if ($storedContractStart != $importWorkerStart) {
                             // Log::info("contract start date incorrect");
                             ChangeRequest::create([
@@ -125,6 +124,7 @@ class FieldglassImportController extends Controller
                 }
             }
         }
+
         return redirect()->back()->with('success', 'Data staged successfully for further processing.');
     }
 }

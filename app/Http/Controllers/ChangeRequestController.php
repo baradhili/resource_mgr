@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Allocation;
 use App\Models\ChangeRequest;
-use App\Models\Demand;
 use App\Models\Contract;
+use App\Models\Demand;
 use App\Models\ResourceType;
 use App\Services\CacheService;
 use App\Services\ResourceService;
@@ -42,7 +42,7 @@ class ChangeRequestController extends Controller
 
         // get the resources we manage
         $resources = $this->resourceService->getResourceList()->pluck('id')->toArray();
-        //Log::info("resources: " . json_encode($resources));
+        // Log::info("resources: " . json_encode($resources));
 
         $showHistory = (int) $request->query('history', 0);
 
@@ -92,7 +92,7 @@ class ChangeRequestController extends Controller
 
             } elseif ($changeRequest->record_type === Contract::class) {
                 $contract = $changeRequest->record;
-                $changeRequest->subject = "{$contract->resource->full_name} "; //on project {$contract->project->name} for date {$contract->contract_date}
+                $changeRequest->subject = "{$contract->resource->full_name} "; // on project {$contract->project->name} for date {$contract->contract_date}
             }
         }
 

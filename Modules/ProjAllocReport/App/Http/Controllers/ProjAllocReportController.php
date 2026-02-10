@@ -12,8 +12,8 @@ use App\Services\CacheService;
 use App\Services\ResourceService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 
 class ProjAllocReportController extends Controller
 {
@@ -48,11 +48,12 @@ class ProjAllocReportController extends Controller
         // 4. Find the Solution Architect resource type
         $saResourceType = ResourceType::where('name', 'like', '%Solution Architect%')->first();
 
-        if (!$saResourceType) {
+        if (! $saResourceType) {
             $monthHeaders = [];
             for ($i = 0; $i < 4; $i++) {
                 $monthHeaders[] = Carbon::now()->addMonths($i)->format('M-y');
             }
+
             return view('projallocreport::index', [
                 'headers' => ['Client Name', 'Project Name', 'Resource Name', ...$monthHeaders],
                 'rows' => [],
@@ -135,11 +136,13 @@ class ProjAllocReportController extends Controller
                 $monthKey = Carbon::parse($alloc->allocation_date)->format('Y-m');
             } catch (\Exception $e) {
                 Log::warning("Invalid allocation_date skipped: {$alloc->allocation_date}", ['id' => $alloc->id]);
+
                 continue;
             }
 
-            if (!in_array($monthKey, $monthKeys))
+            if (! in_array($monthKey, $monthKeys)) {
                 continue;
+            }
 
             $pid = $alloc->projects_id;
             $rid = $alloc->resources_id;
@@ -151,7 +154,7 @@ class ProjAllocReportController extends Controller
 
         // 16. Build unique project-resource rows with sorted names
         $rows = [];
-        foreach ($allocations->unique(fn($a) => "{$a->projects_id}_{$a->resources_id}")->values() as $alloc) {
+        foreach ($allocations->unique(fn ($a) => "{$a->projects_id}_{$a->resources_id}")->values() as $alloc) {
             $pid = $alloc->projects_id;
             $rid = $alloc->resources_id;
 
@@ -159,8 +162,9 @@ class ProjAllocReportController extends Controller
             $resource = $resourceLookup[$rid] ?? null;
 
             // Skip if project or resource was somehow filtered out of lookup
-            if (!$project || !$resource)
+            if (! $project || ! $resource) {
                 continue;
+            }
 
             $projectName = $project->name ?? "Project #{$pid}";
             $resourceName = $resource->full_name ?? "Resource #{$rid}";
@@ -171,11 +175,12 @@ class ProjAllocReportController extends Controller
             // Build FTE values for all 4 months (0.00 if no allocation)
             $values = array_map(function ($key) use ($pid, $rid, $dataMatrix) {
                 $val = $dataMatrix[$pid][$rid][$key] ?? 0;
+
                 return number_format($val, 2, '.', '');
             }, $monthKeys);
 
             // Filter out rows that are entirely zero
-            if (array_reduce($values, fn($carry, $val) => $carry && $val === '0.00', true)) {
+            if (array_reduce($values, fn ($carry, $val) => $carry && $val === '0.00', true)) {
                 continue;
             }
 
@@ -183,7 +188,7 @@ class ProjAllocReportController extends Controller
                 'client_name' => $clientName,
                 'project_name' => $projectName,
                 'resource_name' => $resourceName,
-                'values' => $values
+                'values' => $values,
             ];
         }
 

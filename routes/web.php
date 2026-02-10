@@ -2,9 +2,9 @@
 
 use App\Http\Controllers\AllocationController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CapacityController;
 use App\Http\Controllers\ChangeRequestController;
 use App\Http\Controllers\ClientController;
-use App\Http\Controllers\CapacityController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\DemandController;
 use App\Http\Controllers\DemandRequestController;
@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('users', UserController::class);
     // Route::resource('teams', TeamController::class);
     Route::resource('services', ServiceController::class);
-Route::get('/services/downloadDocx/{id}', [App\Http\Controllers\ServiceController::class, 'downloadDocx'])->name('services.downloadDocx');
+    Route::get('/services/downloadDocx/{id}', [App\Http\Controllers\ServiceController::class, 'downloadDocx'])->name('services.downloadDocx');
     Route::resource('estimates', EstimateController::class);
     Route::resource('clients', ClientController::class);
     Route::get('/capacity/export', [CapacityController::class, 'exportCapacity'])->name('capacity.export');

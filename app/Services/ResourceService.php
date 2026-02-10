@@ -14,8 +14,8 @@ class ResourceService
      * This can be resources directly linked to the user, or resources linked to teams that the user owns or manages.
      * The list of resources is filtered by the start and end dates of the contracts.
      *
-     * @param int|null $regionID The ID of the region to filter by. If null, no region filter is applied.
-     * @param bool $all If true, all resources in the database are returned. If false, only resources linked to the user are returned.
+     * @param  int|null  $regionID  The ID of the region to filter by. If null, no region filter is applied.
+     * @param  bool  $all  If true, all resources in the database are returned. If false, only resources linked to the user are returned.
      * @return \Illuminate\Support\Collection A collection of resources that the user is allowed to see.
      */
     public function getResourceList($regionID = null, $all = false)
@@ -69,7 +69,7 @@ class ResourceService
             }
 
             // Log::info("managed resourceids: " . json_encode($resourceIDs));
-           $resources = $resources->merge(
+            $resources = $resources->merge(
                 Resource::whereIn('id', $resourceIDs)
                     ->whereHas('contracts', function ($query) {
                         // FIX: Moved region logic OUT of here. Contracts don't have regions.
@@ -84,7 +84,7 @@ class ResourceService
                     })
                     ->with('contracts')->get()
             );
-            
+
             // Remove duplicates that may result from multiple merge operations
             $resources = $resources->unique('id');
             // Log::info("resources: " . json_encode($resources));
@@ -97,12 +97,12 @@ class ResourceService
                         ->where('end_date', '>=', now());
                 })
                 // FIX: Added the missing region filter for the 'All' case
-                ->when($regionID, function ($query, $regionID) {
-                    return $query->whereHas('region', function ($query) use ($regionID) {
-                        $query->where('id', $regionID);
-                    });
-                })
-                ->get()
+                    ->when($regionID, function ($query, $regionID) {
+                        return $query->whereHas('region', function ($query) use ($regionID) {
+                            $query->where('id', $regionID);
+                        });
+                    })
+                    ->get()
             );
         } else {
             // FIX: Also add region filter to the 'Self' case for consistency
@@ -117,10 +117,10 @@ class ResourceService
             );
         }
         // Remove duplicates that may result from multiple merge operations
-            $resources = $resources->unique('id');
-            // Log::info("resources: " . json_encode($resources));
+        $resources = $resources->unique('id');
+        // Log::info("resources: " . json_encode($resources));
 
-            // Log::info("resources: " . json_encode($resources));
+        // Log::info("resources: " . json_encode($resources));
         // Log::info("resources: " . json_encode($resources));
 
         return $resources;

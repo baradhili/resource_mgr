@@ -14,6 +14,7 @@ class CacheService
     {
         $nextTwelveMonths = collect(range(-1, 11))->map(function ($i) {
             $date = Carbon::now()->addMonthsNoOverflow($i);
+
             return [
                 'year' => $date->year,
                 'month' => $date->month,
@@ -50,7 +51,7 @@ class CacheService
 
                     if ($this->datesOverlap($contractStartDate, $contractEndDate, $monthStartDate, $monthEndDate)) {
                         $baseAvailability = $this->calculateBaseAvailability($contractStartDate, $contractEndDate, $monthStartDate, $monthEndDate, $currentContract->availability);
-                        $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                        $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                         $resourceAvailability[$resource->id]['availability'][$key] = $baseAvailability;
                     }
                 });
@@ -62,7 +63,7 @@ class CacheService
                     $nextTwelveMonths->each(function ($month) use ($resource, $leaveStartDate, $leaveEndDate, &$resourceAvailability) {
                         $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                         $monthEndDate = $monthStartDate->copy()->endOfMonth();
-                        $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                        $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                         if ($this->datesOverlap($leaveStartDate, $leaveEndDate, $monthStartDate, $monthEndDate)) {
                             $leaveAvailability = $this->calculateLeaveAvailability($leaveStartDate, $leaveEndDate, $monthStartDate, $monthEndDate);
@@ -93,6 +94,7 @@ class CacheService
         if ($contractStartDate->isSameMonth($monthStartDate) || $contractEndDate->isSameMonth($monthEndDate)) {
             $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
             $contractDaysInMonth = min($contractEndDate, $monthEndDate)->diffInDays(max($contractStartDate, $monthStartDate)) + 1;
+
             return round(($contractDaysInMonth / $daysInMonth) * $availability, 2);
         }
 
@@ -104,6 +106,7 @@ class CacheService
         if ($leaveStartDate->isSameMonth($monthStartDate) || $leaveEndDate->isSameMonth($monthEndDate)) {
             $daysInMonth = $monthEndDate->diffInDays($monthStartDate) + 1;
             $leaveDaysInMonth = min($leaveEndDate, $monthEndDate)->diffInDays(max($leaveStartDate, $monthStartDate)) + 1;
+
             return round(($leaveDaysInMonth / $daysInMonth) * 1.00, 2);
         }
 
@@ -141,7 +144,7 @@ class CacheService
 
         // Collect the availability
         $resourceAvailability = Cache::get('resourceAvailability');
-        if (!Cache::has('resourceAvailability')) {
+        if (! Cache::has('resourceAvailability')) {
             $this->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
@@ -161,7 +164,7 @@ class CacheService
                     ->where('resources_id', '=', $resource->id)
                     ->sum('fte');
                 // Use year-month as the key
-                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
                 // Get the availability for the month
                 // Get the availability for the current month
                 $availability = isset($resourceAvailability[$resource->id]['availability'][$key]) ? (float) $resourceAvailability[$resource->id]['availability'][$key] : 0.0;

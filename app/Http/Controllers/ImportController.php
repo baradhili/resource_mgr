@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Allocation;
 use App\Models\ChangeRequest;
 use App\Models\Demand;
+use App\Models\Plugin;
 use App\Models\Project;
 use App\Models\PublicHoliday;
 use App\Models\Region;
 use App\Models\Resource;
 use App\Models\ResourceType;
 use App\Models\Team;
-use App\Models\Plugin;
 use App\Services\CacheService;
 use avadim\FastExcelReader\Excel;
 use Carbon\Carbon;
@@ -68,8 +68,9 @@ class ImportController extends Controller
             $plugins[$key]->displayName = preg_replace('/Import$/', '', $plugin->name);
             $plugins[$key]->displayName = preg_replace('/([a-z])([A-Z])/', '$1 $2', $plugins[$key]->displayName);
 
-            $plugins[$key]->route = "import.". strtolower($plugins[$key]->displayName);
+            $plugins[$key]->route = 'import.'.strtolower($plugins[$key]->displayName);
         }
+
         return view('import.index', compact('plugins'));
     }
 
@@ -127,7 +128,7 @@ class ImportController extends Controller
                     // Step through columns 'G' on until blank, capture each filled column into array as monthYear
                     $monthYear = [];
                     foreach ($rowData as $columnLetter => $columnValue) {
-                        if ($columnLetter >= $this->columnDataStart && !is_null($columnValue)) {
+                        if ($columnLetter >= $this->columnDataStart && ! is_null($columnValue)) {
                             $monthYear[] = $columnValue;
                             $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
                         }
@@ -141,7 +142,7 @@ class ImportController extends Controller
                     $resourceNameLower = strtolower($resourceName);
                     $contains = in_array($resourceNameLower, $resourceTypes);
 
-                    if (!$contains) {
+                    if (! $contains) {
 
                         $resource = Resource::where('empowerID', $resourceName)->first();
                         $resourceID = $resource->id ?? null;
@@ -152,7 +153,7 @@ class ImportController extends Controller
                             // check the month allocations
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(ord($this->columnDataStart) + $i);
-                                $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
+                                $fte = (float) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
                                 $existingAllocation = Allocation::where('resources_id', $resourceID)
                                     ->where('projects_id', $projectID)
                                     ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
@@ -170,7 +171,7 @@ class ImportController extends Controller
                                         'status' => 'pending',
                                         // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                     ]);
-                                } elseif (!$existingAllocation) {
+                                } elseif (! $existingAllocation) {
                                     Allocation::create([
                                         'resources_id' => $resourceID,
                                         'projects_id' => $projectID,
@@ -187,8 +188,8 @@ class ImportController extends Controller
 
                         $projectID = $this->checkProject($rowData);
                         // first replace the "resource name" with a resource_type id
-                        $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
-                        
+                        $resourceType = ResourceType::where('name', 'LIKE', $resourceName.'%')->first();
+
                         // Check if the resource type belongs to a team aka someone is going to manage this demand - otherwise skip
                         $belongsToTeam = $ownedResourceTypes->contains(function ($resourceType) use ($resourceName) {
                             return strtolower($resourceType->name) === strtolower($resourceName);
@@ -199,7 +200,7 @@ class ImportController extends Controller
                             // Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
                             for ($i = 0; $i < count($monthYear); $i++) {
                                 $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
-                                $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
+                                $fte = (float) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
                                 $existingDemand = Demand::where('projects_id', $projectID)
                                     ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
                                     ->where('resource_type', $resourceType->id)
@@ -216,7 +217,7 @@ class ImportController extends Controller
                                         'status' => 'pending',
                                         // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                     ]);
-                                } elseif (!$existingDemand) {
+                                } elseif (! $existingDemand) {
 
                                     $resourceType = ResourceType::where('name', 'like', "$resourceName%")->first();
                                     $resourceTypeId = $resourceType ? $resourceType->id : $resourceName;
@@ -240,7 +241,7 @@ class ImportController extends Controller
         // update the cache
         $this->cacheService->cacheResourceAllocation();
 
-        if (!empty($missingResources)) {
+        if (! empty($missingResources)) {
             $missingResourceList = implode(', ', $missingResources);
 
             return redirect()->back()->with('error', "The following resources were not found: $missingResourceList");
@@ -272,7 +273,7 @@ class ImportController extends Controller
         $projectStart = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectStart])->format('Y-m-d');
         $projectEnd = Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectEnd])->format('Y-m-d');
         // check if project exists and check start and end for changes
-        if (!is_null($projectID)) {
+        if (! is_null($projectID)) {
             $projectInDB = Project::find($projectID);
             if ($projectInDB->start_date != $projectStart || $projectInDB->end_date != $projectEnd) {
                 // do stuff later if we need to
@@ -456,7 +457,7 @@ class ImportController extends Controller
             if ($action === 'Accept') {
                 // Handle acceptance logic for Demand
                 // Example: Update Demand model with new data
-                Log::info('accepted demand: ' . print_r($change, true));
+                Log::info('accepted demand: '.print_r($change, true));
                 if ($change['end'] = $change['start']) {
                     $project = Project::where('name', $change['project'])->first();
                     $change['project_id'] = $project->id;
@@ -498,7 +499,7 @@ class ImportController extends Controller
             } elseif ($action === 'Reject') {
                 // Handle rejection logic for Demand
                 // Example: Remove or ignore changes
-                Log::info('rejected demand: ' . print_r($change, true));
+                Log::info('rejected demand: '.print_r($change, true));
                 StagingDemand::where('id', $change['id'])->update(['status' => 'Rejected']);
             }
         } elseif ($type === 'Allocation') {
@@ -514,7 +515,7 @@ class ImportController extends Controller
                 StagingAllocation::where('id', $change['id'])->delete();
                 Artisan::call('app:refresh-cache');
             } elseif ($action === 'Reject') {
-                Log::info('rejected allocation: ' . print_r($change, true));
+                Log::info('rejected allocation: '.print_r($change, true));
                 StagingAllocation::where('id', $change['id'])->update(['status' => 'Rejected']);
                 Artisan::call('app:refresh-cache');
             }

@@ -3,27 +3,22 @@
 namespace Modules\EmpowerImport\App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
 use App\Models\Allocation;
 use App\Models\ChangeRequest;
+use App\Models\Client;
 use App\Models\Demand;
 use App\Models\Project;
-use App\Models\PublicHoliday;
-use App\Models\Region;
 use App\Models\Resource;
 use App\Models\ResourceType;
 use App\Models\Team;
-use App\Models\Client;
-use App\Models\Plugin;
 use App\Services\CacheService;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use avadim\FastExcelReader\Excel;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Collection;
 
 class EmpowerImportController extends Controller
 {
@@ -43,26 +38,39 @@ class EmpowerImportController extends Controller
     private $columnProjectStart = 'F';
 
     private $columnProjectEnd = 'G';
+
     private $columnProjectClient = 'H';
 
     private $columnDataStart = 'I';
 
     private $columnDemandID = 'A';
+
     private $columnDemandType = 'B';
 
     private $columnDemandTitle = 'C';
+
     private $columnDemandOwner = 'D';
+
     private $columnDemandStatus = 'E';
+
     private $columnDemandDuration = 'F';
+
     private $columnDemandCapacity = 'G';
+
     private $columnDemandFunded = 'H';
+
     private $columnDemandDetails = 'I';
 
     private $columnDemandLastChange = 'J';
+
     private $columnDemandExpectedStart = 'K';
+
     private $columnDemandDemandMonth = 'L';
+
     private $columnDemandUnallocated = 'M';
+
     private $columnDemandInScope = 'N';
+
     private $columnDemandFTE = 'O';
 
     public function __construct(CacheService $cacheService)
@@ -86,8 +94,6 @@ class EmpowerImportController extends Controller
      * The function will check if the resource type exists in the ResourceType table, and
      * if so, it will insert the data into the Demand table. If the resource type does not
      * exist, it will insert the data into the Allocations table.
-     *
-     * @return RedirectResponse
      */
     public function importEmpower(Request $request): RedirectResponse
     {
@@ -125,7 +131,7 @@ class EmpowerImportController extends Controller
         // update the cache
         $this->cacheService->cacheResourceAllocation();
 
-        if (!empty($missingResources)) {
+        if (! empty($missingResources)) {
             $missingResourceList = implode(', ', $missingResources);
 
             return redirect()->back()->with('error', "The following resources were not found: $missingResourceList");
@@ -162,11 +168,11 @@ class EmpowerImportController extends Controller
 
         // data is in excel like 15/05/24 needs to be in 2024-05-15
         // Added check to ensure data exists before parsing to avoid Carbon errors
-        $projectStart = !empty($rowData[$this->columnProjectStart])
+        $projectStart = ! empty($rowData[$this->columnProjectStart])
             ? Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectStart])->format('Y-m-d')
             : null;
 
-        $projectEnd = !empty($rowData[$this->columnProjectEnd])
+        $projectEnd = ! empty($rowData[$this->columnProjectEnd])
             ? Carbon::createFromFormat('d/m/y', $rowData[$this->columnProjectEnd])->format('Y-m-d')
             : null;
 
@@ -197,7 +203,6 @@ class EmpowerImportController extends Controller
     private function handleDemand(Excel $excel)
     {
 
-
         return true;
     }
 
@@ -212,7 +217,7 @@ class EmpowerImportController extends Controller
                 // Step through columns 'G' on until blank, capture each filled column into array as monthYear
                 $monthYear = [];
                 foreach ($rowData as $columnLetter => $columnValue) {
-                    if ($columnLetter >= $this->columnDataStart && !is_null($columnValue)) {
+                    if ($columnLetter >= $this->columnDataStart && ! is_null($columnValue)) {
                         $monthYear[] = $columnValue;
                         $monthDate = Carbon::parse($columnValue)->startOfMonth()->format('Y-m-d');
                     }
@@ -226,7 +231,7 @@ class EmpowerImportController extends Controller
                 $resourceNameLower = strtolower($resourceName);
                 $contains = in_array($resourceNameLower, $resourceTypes);
 
-                if (!$contains) {
+                if (! $contains) {
 
                     $resource = Resource::where('empowerID', $resourceName)->first();
                     $resourceID = $resource->id ?? null;
@@ -237,7 +242,7 @@ class EmpowerImportController extends Controller
                         // check the month allocations
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(ord($this->columnDataStart) + $i);
-                            $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
+                            $fte = (float) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
                             $existingAllocation = Allocation::where('resources_id', $resourceID)
                                 ->where('projects_id', $projectID)
                                 ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
@@ -255,7 +260,7 @@ class EmpowerImportController extends Controller
                                     'status' => 'pending',
                                     // 'requested_by' => 0, // 0 will indicate teh import function - otherwise we put the user id
                                 ]);
-                            } elseif (!$existingAllocation) {
+                            } elseif (! $existingAllocation) {
                                 Allocation::create([
                                     'resources_id' => $resourceID,
                                     'projects_id' => $projectID,
@@ -268,13 +273,13 @@ class EmpowerImportController extends Controller
 
                         }
                     }
-                } //else { // Insert these into demand
+                } // else { // Insert these into demand
 
                 //     $projectID = $this->checkProject($rowData);
                 //     // first replace the "resource name" with a resource_type id
                 //     $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
 
-                //     // Check if the resource type belongs to a team aka someone is going to manage this demand 
+                //     // Check if the resource type belongs to a team aka someone is going to manage this demand
                 //     $belongsToTeam = $ownedResourceTypes->contains(function ($resourceType) use ($resourceName) {
                 //         return strtolower($resourceType->name) === strtolower($resourceName);
                 //     });
@@ -282,7 +287,7 @@ class EmpowerImportController extends Controller
 
                 //         $rowData[$this->columnResourceName] = $resourceType ? $resourceType->id : null;
                 //         Log::info("matched demand resource type {$resourceName} to {$resourceType->id}");
-                //         // we should ignore past demand 
+                //         // we should ignore past demand
                 //         for ($i = 0; $i < count($monthYear); $i++) {
                 //             $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
                 //             $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
@@ -323,13 +328,15 @@ class EmpowerImportController extends Controller
                 // }
             }
         }
+
         return true;
     }
 
     private function convertExcelDate($dateValue)
     {
         $unixDate = ($dateValue); // * 86400;
-        return gmdate("Y-m-d", $unixDate);
+
+        return gmdate('Y-m-d', $unixDate);
         //   'where Y is YYYY, m is MM, and d is DD
     }
 
@@ -351,6 +358,7 @@ class EmpowerImportController extends Controller
                 $value /= 30;
                 break;
         }
+
         return $value;
     }
 
@@ -363,13 +371,13 @@ class EmpowerImportController extends Controller
         $demandProjectName = $matches[3] ?? null;
         // Look up the project in the Project Model
         $project = null;
-        if (!is_null($demandEmpowerID)) {
+        if (! is_null($demandEmpowerID)) {
             $project = Project::where('empowerID', $demandEmpowerID)->first();
-        } elseif (!is_null($demandProjectName)) {
+        } elseif (! is_null($demandProjectName)) {
             $project = Project::where('name', 'LIKE', "%{$demandProjectName}%")->first();
         }
         // if we have a match thenus it, otherwise flag
-        if (!is_null($project)) {
+        if (! is_null($project)) {
             $projectID = $project->id;
             Log::info("found a project for {{$projectName}} - {{$project->empoerID}}");
         } else {
@@ -383,7 +391,7 @@ class EmpowerImportController extends Controller
     /**
      * Maps raw status strings from the import file to valid database ENUM values.
      *
-     * @param string $rawStatus The status string from the import file.
+     * @param  string  $rawStatus  The status string from the import file.
      * @return string|null The cleaned status matching the DB ENUM, or null if no match.
      */
     private function cleanProjectStatus($rawStatus)

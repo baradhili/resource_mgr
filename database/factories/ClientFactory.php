@@ -27,4 +27,3 @@ class ClientFactory extends Factory
         ];
     }
 }
-

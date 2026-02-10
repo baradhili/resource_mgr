@@ -5,16 +5,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ServiceRequest;
 use App\Models\Service;
 use App\Models\Skill;
+use GrahamCampbell\Markdown\Facades\Markdown;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\Settings;
-use GrahamCampbell\Markdown\Facades\Markdown;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\Settings;
 
 class ServiceController extends Controller
 {
@@ -98,7 +98,7 @@ class ServiceController extends Controller
         $service = Service::find($id);
         // Decode the JSON data for required_skills
         $service->required_skills = json_decode($service->required_skills, true) ?? [];
-        Log::info('skills: ' . json_encode($service->required_skills));
+        Log::info('skills: '.json_encode($service->required_skills));
         // Fetch all skill names for the whitelist
         $skills = Skill::pluck('skill_name')->toArray();
 
@@ -148,7 +148,7 @@ class ServiceController extends Controller
 
         // Allow table tags + basic formatting
         $allowedTags = '<p><h1><h2><h3><h4><h5><h6><strong><b><em><i><u><ul><ol><li><br><blockquote>'
-            . '<table><thead><tbody><tr><th><td>';
+            .'<table><thead><tbody><tr><th><td>';
 
         $cleanHtml = strip_tags($html, $allowedTags);
 
@@ -164,7 +164,7 @@ class ServiceController extends Controller
         // Configure PHPWord
         Settings::setOutputEscapingEnabled(true);
 
-        $phpWord = new PhpWord();
+        $phpWord = new PhpWord;
         $phpWord->setDefaultFontName('Calibri');
         $phpWord->setDefaultFontSize(11);
 
@@ -178,7 +178,7 @@ class ServiceController extends Controller
         // Add HTML (now with safe table support)
         \PhpOffice\PhpWord\Shared\Html::addHtml($section, $cleanHtml, false, false);
 
-        $fileName = 'service_' . $service->id . '_' . Str::slug($service->service_name) . '.docx';
+        $fileName = 'service_'.$service->id.'_'.Str::slug($service->service_name).'.docx';
 
         return response()->streamDownload(function () use ($phpWord) {
             $writer = IOFactory::createWriter($phpWord, 'Word2007');
