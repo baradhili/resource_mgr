@@ -20,7 +20,7 @@ Its early stages right now, we are looking for help in:
     - Basic Skill library with imports using RSD
     - Estimate creation and management - optionally linked to services and projects
 
-[🐞 Open Issues](https://github.com/your/repo/issues?q=is%3Aopen)
+[🐞 Open Issues](https://github.com/baradhili/resource_mgr/issues?q=is%3Aopen)
 
 
 Yes it is currently Laravel 11 based, not 12. But several of the packages don't yet support 12.
