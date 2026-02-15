@@ -66,7 +66,7 @@ class UpcomingDemand extends AbstractWidget
 
         // Collect the projects_id from demands in our window
         $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
-            ->pluck('projects_id')
+            ->pluck('project_id')
             ->unique()
             ->values()
             ->all();
