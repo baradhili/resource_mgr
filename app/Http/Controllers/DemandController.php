@@ -79,10 +79,10 @@ class DemandController extends Controller
         // Get the resources with contracts in the next 12 months
         $resources = $this->resourceService->getResourceList();
 
-        // Get the projects_id from demands in our window
+        // Get the project_id from demands in our window
         $demandProjectIds = Demand::whereBetween('demand_date', [$startDate, $endDate])
             ->whereIn('resource_type', $resource_types)
-            ->pluck('projects_id')
+            ->pluck('project_id')
             ->unique()
             ->values()
             ->all();
@@ -129,7 +129,7 @@ class DemandController extends Controller
             foreach ($nextTwelveMonths as $month) {
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 $totalAllocation = Demand::where('demand_date', '=', $monthStartDate)
-                    ->where('projects_id', '=', $project->id)
+                    ->where('project_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
@@ -179,7 +179,7 @@ class DemandController extends Controller
         $demand->status = '';
         $demand->resource_type = '';
         $demand->fte = 0.00;
-        $demand->projects_id = null;
+        $demand->project_id = null;
         $demand->source = 'Manual';
 
         $projects = Project::all();
@@ -208,7 +208,7 @@ class DemandController extends Controller
                 'fte' => $fte,
                 'status' => $request->input('status'),
                 'resource_type' => $request->input('resource_type'),
-                'projects_id' => $projectID,
+                'project_id' => $projectID,
             ]);
             $monthStartDate->addMonth();
         }
@@ -223,7 +223,7 @@ class DemandController extends Controller
     public function show($id): View
     {
 
-        $demand_raw = Demand::where('projects_id', $id)->get();
+        $demand_raw = Demand::where('project_id', $id)->get();
         $project = Project::findOrFail($id);
         $demand = new \stdClass;
         $demand->name = $project->name;
@@ -244,7 +244,7 @@ class DemandController extends Controller
      */
     public function edit($project_id, Request $request): RedirectResponse
     {
-        $demandArray = Demand::where('projects_id', $project_id)
+        $demandArray = Demand::where('project_id', $project_id)
             ->whereBetween('demand_date', [now()->startOfYear(), now()->endOfYear()->addYear()])
             ->get();
 
@@ -253,7 +253,7 @@ class DemandController extends Controller
             $allocation->allocation_date = $demand->demand_date;
             $allocation->resources_id = $request->resource_id;
             $allocation->fte = $demand->fte;
-            $allocation->projects_id = $demand->projects_id;
+            $allocation->project_id = $demand->project_id;
             $allocation->status = $demand->status;
             $allocation->source = $demand->source;
             $allocation->save();
@@ -285,7 +285,7 @@ class DemandController extends Controller
         // Get all demands for the project, grouped by resource type, and only
         // where the FTE is greater than 0
         $demands = Demand::selectRaw('resource_type, MIN(demand_date) as start, MAX(demand_date) as end, AVG(fte) as fte')
-            ->where('projects_id', $project->id)
+            ->where('project_id', $project->id)
             ->where('fte', '>', 0)
             ->groupBy('resource_type')
             ->get();
@@ -304,7 +304,7 @@ class DemandController extends Controller
 
         // Find the first demand of the project, which will be used to fill in
         // the form
-        $firstDemand = Demand::where('projects_id', $project->id)
+        $firstDemand = Demand::where('project_id', $project->id)
             ->where('resource_type', $resource_type->id)
             ->first();
 
@@ -319,11 +319,11 @@ class DemandController extends Controller
         $demand->status = $firstDemand->status;
         $demand->resource_type = $resource_type->id;
         $demand->fte = $firstDemand->fte;
-        $demand->projects_id = $project->id;
+        $demand->project_id = $project->id;
 
         //make sure we keep these for comparison
         session()->put('old_demand', [
-            'projects_id' => $demand->projects_id,
+            'project_id' => $demand->project_id,
             'start_date' => $demand->start_date,
             'end_date' => $demand->end_date,
             'status' => $demand->status,
@@ -342,15 +342,15 @@ class DemandController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $projects_id
+     * @param  int  $project_id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $projects_id): RedirectResponse
+    public function update(Request $request, $project_id): RedirectResponse
     {
         //pull all "old" data for comparison
         $oldDemand = session()->get('old_demand', []);
 
-        $old_projects_id = $oldDemand['projects_id'] ?? null;
+        $old_project_id = $oldDemand['project_id'] ?? null;
         $old_start_date = $oldDemand['start_date'] ?? null;
         $old_end_date = $oldDemand['end_date'] ?? null;
         $old_status = $oldDemand['status'] ?? null;
@@ -358,13 +358,13 @@ class DemandController extends Controller
         $old_fte = $oldDemand['fte'] ?? null;
 
         $project = Project::where('name', $request->input('name'))->firstOrFail();
-        $demand = Demand::where('projects_id', $project->id)
+        $demand = Demand::where('project_id', $project->id)
             ->where('demand_date', $request->input('old_start_date'))
             ->first();
 
-        $oldProjects_id = $old_projects_id;
+        $oldProject_id = $old_project_id;
 
-        $storedDemand = Demand::where('projects_id', $old_start_date)
+        $storedDemand = Demand::where('project_id', $old_start_date)
             ->get()
             ->keyBy('demand_date')
             ->toArray();
@@ -376,7 +376,7 @@ class DemandController extends Controller
         $maxDemandDate = array_key_last($storedDemand);
 
         if ($startDate->lt($minDemandDate) || $endDate->gt($maxDemandDate)) {
-            Demand::where('projects_id', $oldProjects_id)->delete();
+            Demand::where('project_id', $oldProject_id)->delete();
 
             $monthStartDate = Carbon::createFromFormat('Y-m-d', $request->input('start_date'))->startOfMonth();
             $monthEndDate = Carbon::createFromFormat('Y-m-d', $request->input('end_date'));
@@ -391,19 +391,19 @@ class DemandController extends Controller
                     'fte' => $fte,
                     'status' => $request->input('status'),
                     'resource_type' => $request->input('resource_type'),
-                    'projects_id' => $projects_id,
+                    'project_id' => $project_id,
                 ]);
 
                 $monthStartDate->addMonth();
             }
         }
 
-        Demand::where('projects_id', $oldProjects_id)
+        Demand::where('project_id', $oldProject_id)
             ->update([
                 'status' => $request->input('status'),
                 'resource_type' => $request->input('resource_type'),
                 'fte' => $request->input('fte'),
-                'projects_id' => $oldProjects_id,
+                'project_id' => $oldProject_id,
             ]);
 
         return Redirect::route('demands.index')
@@ -418,7 +418,7 @@ class DemandController extends Controller
      */
     public function destroy($id): RedirectResponse
     {
-        Demand::where('projects_id', $id)
+        Demand::where('project_id', $id)
             ->whereBetween('demand_date', [now()->startOfMonth(), now()->endOfMonth()->addYear()])
             ->delete();
 
@@ -454,9 +454,9 @@ class DemandController extends Controller
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addYear()->startOfMonth();
 
-        // Collect the projects_id from demands in our window
+        // Collect the project_id from demands in our window
         $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
-            ->pluck('projects_id')
+            ->pluck('project_id')
             ->unique()
             ->toArray();
 
@@ -464,7 +464,7 @@ class DemandController extends Controller
             ->select('id', 'name')
             ->addSelect([
                 'status' => Demand::select('status')
-                    ->whereColumn('projects_id', 'projects.id')
+                    ->whereColumn('project_id', 'projects.id')
                     ->orderBy('demand_date')
                     ->limit(1),
             ])
@@ -474,7 +474,7 @@ class DemandController extends Controller
 
             $sheet->setCellValue([1, $i], $project->name);
 
-            $resource_type_code = Demand::where('projects_id', '=', $project->id)->value('resource_type');
+            $resource_type_code = Demand::where('project_id', '=', $project->id)->value('resource_type');
             //look up ResourceType object
             $resource_type = ResourceType::find($resource_type_code);
 
@@ -490,7 +490,7 @@ class DemandController extends Controller
             foreach ($nextTwelveMonths as $month) {
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 $demand = Demand::where('demand_date', '=', $monthStartDate)
-                    ->where('projects_id', '=', $project->id)
+                    ->where('project_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
