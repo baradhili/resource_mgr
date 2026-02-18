@@ -223,21 +223,57 @@ class ResourceController extends Controller
         // pick our resource out
         $resourceAvailability = $resourceAvailability[$id]['availability'];
 
-        $resource = Resource::with(['region', 'location'])->find($id);
+        $resource = Resource::with(['region', 'location','contracts','skills','leaves'])->find($id);
         // if Region is ""region": []," update based on location
         if (is_null($resource->region_id) || empty($resource->region)) {
-
             $resource->region_id = $resource->location->region->id;
             $resource->save();
         }
 
+         // Modify resource names to add [c] if the resource is not permanent
+        if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+            $resource->full_name .= ' [c]';
+            //find end of current contract and insert it into $resource->contract_end
+            $contracts = $resource->contracts()->get();
+            $resource->contract_end = $contracts->last()->end_date;
 
+            //calculate tenure in years from current contract start to contract_end
+            $startDate = \Carbon\Carbon::parse($resource->contracts[0]->start_date);
+            $endDate = \Carbon\Carbon::parse($resource->contract_end);
+            $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
+
+        }
+
+        //update leave: copy any leave into $resource->leave where end_date is between now and next 12 months
+        $now = \Carbon\Carbon::now();
+        $future = \Carbon\Carbon::now()->addMonthsNoOverflow(12);
+
+        $leaves = Leave::whereBetween('end_date', [$now, $future])->get();
+        $resource->leaves = $resource->leaves->merge($leaves);
+        
+        Log::info('leaves: '.json_encode($resource->leaves));
+        
+        // Get the skills for the resource
+        $resourceSkills = ResourceSkill::where('resources_id', $id)
+            ->select('skills_id', 'proficiency_levels')
+            ->pluck('proficiency_levels', 'skills_id')
+            ->toArray();
+
+        $skills = Skill::whereIn('id', array_keys($resourceSkills))->get(['id', 'skill_name']);
+        foreach ($resourceSkills as $skillId => $proficiencyLevel) {
+            $resourceSkills[$skillId] = [
+                'proficiency_level' => $proficiencyLevel,
+                'skill_name' => $skills->firstWhere('id', $skillId)->skill_name,
+            ];
+        }
+        $skills = $resourceSkills;
         $allocations = $resource->allocations()->get();
 
         $projects = $allocations->map(function ($allocation) {
             return $allocation->project;
         })->unique();
-
+Log::info('resource: '.json_encode($resource));
+        
         foreach ($projects as $project) {
 
             // $allocationArray[$project->id] = [

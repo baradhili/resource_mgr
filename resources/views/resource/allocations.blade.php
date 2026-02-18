@@ -20,6 +20,41 @@
                             <strong>Empowerid:</strong>
                             {{ $resource->empowerID }}
                         </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Region:</strong>
+                            {{ $resource->region->name }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Location:</strong>
+                            {{ $resource->location->name }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Leave:</strong>
+                            <table class="table table-striped table-hover">
+                                <thead class="thead">
+                                    <tr>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($resource->leaves as $leave)
+                                    <tr>
+                                        <td>{{ \Carbon\Carbon::parse($leave->start_date)->format('Y/m/d') }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($leave->end_date)->format('Y/m/d') }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Current Contract End Date:</strong>
+                            {{ \Carbon\Carbon::parse($resource->contract_end)->format('Y/m/d') }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Tenure:</strong>
+                            {{ number_format($resource->tenure, 1) }}
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
@@ -45,7 +80,7 @@
                                                     </a>
                                                 @endcan
                                             </td>
-                                            
+
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php
