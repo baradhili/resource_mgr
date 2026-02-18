@@ -33,6 +33,13 @@ class Contract extends Model
      */
     protected $fillable = ['start_date', 'end_date', 'availability', 'resources_id', 'permanent'];
 
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
+
+    protected $appends = ['tenure_years'];
+
     public function resource(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
@@ -46,12 +53,17 @@ class Contract extends Model
      *
      * @return float The calculated tenure of the contract.
      */
-    public function getTenureAttribute(): float
+    public function getTenureYearsAttribute(): float
     {
-        return $this->permanent ? 0 : number_format(
-            Carbon::parse($this->end_date)->floatDiffInYears(Carbon::parse($this->start_date)),
-            1
-        );
+        if (!$this->start_date || !$this->end_date) {
+            return 0.0;
+        }
+
+        $start = Carbon::parse($this->start_date);
+        $end = Carbon::parse($this->end_date);
+
+        // Calculate the difference in years with one decimal place
+        return round($start->diffInDays($end) / 365.25, 1);
     }
 
 
@@ -96,7 +108,5 @@ class Contract extends Model
         return 'normal';
     }
 
-    // Append the tenure_status attribute to the JSON output
-    protected $appends = ['tenure_status', 'tenure'];
 }
 

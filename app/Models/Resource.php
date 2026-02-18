@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Carbon\Carbon;
 
 /**
  * Class Resource
@@ -59,10 +60,38 @@ class Resource extends Model
     {
         return $this->hasMany(\App\Models\Contract::class, 'resources_id', 'id');
     }
+    /**
+     * Get the current contract for this resource.
+     *
+     * The current contract is the one that is active at the current date. There is only ever one current contract per resource.
+     * A contract is considered active if its start date is less than or equal to the current date,
+     * and its end date is greater than or equal to the current date.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function currentContract()
+    {
+        return $this->hasOne(Contract::class, 'resources_id')
+            ->where('start_date', '<=', Carbon::now())
+            ->where('end_date', '>=', Carbon::now());
+    }
 
     public function leaves(): HasMany
     {
         return $this->hasMany(\App\Models\Leave::class, 'resources_id', 'id');
+    }
+
+    /**
+     * Get the active leaves for this resource.
+     *
+     * Leaves are considered active if their end date is greater than or equal to the current date.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activeLeaves()
+    {
+        return $this->hasMany(Leave::class, 'resources_id')
+            ->where('end_date', '>=', Carbon::now());
     }
 
     public function skills(): BelongsToMany
@@ -109,4 +138,6 @@ class Resource extends Model
     {
         return $this->contracts()->value('permanent');
     }
+
+
 }

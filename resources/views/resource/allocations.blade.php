@@ -30,22 +30,17 @@
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Leave:</strong>
-                            <table class="table table-striped table-hover">
-                                <thead class="thead">
-                                    <tr>
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($resource->leaves as $leave)
-                                    <tr>
-                                        <td>{{ \Carbon\Carbon::parse($leave->start_date)->format('Y/m/d') }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($leave->end_date)->format('Y/m/d') }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            @if ($resource->activeLeaves->isEmpty())
+                                <p class="text-muted">No leave booked</p>
+                            @else
+                                <table class="table table-striped table-hover">
+                                    <thead class="thead">
+                                        <tr>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            …
+                                </table>
+                            @endif
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Current Contract End Date:</strong>
@@ -53,7 +48,7 @@
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Tenure:</strong>
-                            {{ number_format($resource->tenure, 1) }}
+                            {{ $resource->currentContract->tenure_years  }}
                         </div>
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">

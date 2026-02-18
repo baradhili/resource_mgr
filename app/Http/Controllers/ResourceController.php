@@ -223,7 +223,7 @@ class ResourceController extends Controller
         // pick our resource out
         $resourceAvailability = $resourceAvailability[$id]['availability'];
 
-        $resource = Resource::with(['region', 'location','contracts','skills','leaves'])->find($id);
+        $resource = Resource::with(['region', 'location','currentContract','skills','activeLeaves'])->find($id);
         // if Region is ""region": []," update based on location
         if (is_null($resource->region_id) || empty($resource->region)) {
             $resource->region_id = $resource->location->region->id;
@@ -231,27 +231,19 @@ class ResourceController extends Controller
         }
 
          // Modify resource names to add [c] if the resource is not permanent
-        if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
+        if (isset($resource->currentContract[0]) && !$resource->currentContract[0]->permanent) {
             $resource->full_name .= ' [c]';
             //find end of current contract and insert it into $resource->contract_end
-            $contracts = $resource->contracts()->get();
-            $resource->contract_end = $contracts->last()->end_date;
+            $contract = $resource->currentContract;
+            $resource->contract_end = $contract->end_date;
 
             //calculate tenure in years from current contract start to contract_end
             $startDate = \Carbon\Carbon::parse($resource->contracts[0]->start_date);
             $endDate = \Carbon\Carbon::parse($resource->contract_end);
+Log::info("start date: ".json_encode($startDate)." end date: ".json_encode($endDate));
             $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
 
         }
-
-        //update leave: copy any leave into $resource->leave where end_date is between now and next 12 months
-        $now = \Carbon\Carbon::now();
-        $future = \Carbon\Carbon::now()->addMonthsNoOverflow(12);
-
-        $leaves = Leave::whereBetween('end_date', [$now, $future])->get();
-        $resource->leaves = $resource->leaves->merge($leaves);
-        
-        Log::info('leaves: '.json_encode($resource->leaves));
         
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resources_id', $id)
