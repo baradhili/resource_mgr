@@ -31,7 +31,6 @@
         "symfony/dom-crawler": "^7.0"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^4.0",
         "fakerphp/faker": "^1.0",
         "ibex/crud-generator": "^2.0",
         "jeroenzwart/laravel-csv-seeder": "^1.0",
