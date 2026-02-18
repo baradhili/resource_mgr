@@ -8,6 +8,7 @@ use App\Models\Contract;
 use App\Models\Leave;
 use App\Models\Location;
 use App\Models\Project;
+use App\Models\Region;
 use App\Models\Resource;
 use App\Models\ResourceSkill;
 use App\Models\ResourceType;
@@ -62,12 +63,12 @@ class ResourceController extends Controller
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
+            if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
                 $resource->full_name .= ' [c]';
             }
         }
 
-        if (! Cache::has('resourceAvailability')) {
+        if (!Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
@@ -151,7 +152,7 @@ class ResourceController extends Controller
     public function store(ResourceRequest $request): RedirectResponse
     {
         Resource::create($request->validated());
-
+        Log::info('Validated fields: ' . print_r($request->validated(), true));
         return Redirect::route('resources.index')
             ->with('success', 'Resource created successfully.');
     }
@@ -164,7 +165,7 @@ class ResourceController extends Controller
         $resource = Resource::with(['location', 'skills', 'contracts', 'allocations', 'leaves', 'user', 'resourceType'])->find($id);
 
         // Modify resource names to add [c] if the resource is not permanent
-        if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
+        if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
             $resource->full_name .= ' [c]';
         }
 
@@ -211,7 +212,7 @@ class ResourceController extends Controller
             ];
         }
 
-        if (! Cache::has('resourceAvailability')) {
+        if (!Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
@@ -222,7 +223,14 @@ class ResourceController extends Controller
         // pick our resource out
         $resourceAvailability = $resourceAvailability[$id]['availability'];
 
-        $resource = Resource::find($id);
+        $resource = Resource::with(['region', 'location'])->find($id);
+        // if Region is ""region": []," update based on location
+        if (is_null($resource->region_id) || empty($resource->region)) {
+
+            $resource->region_id = $resource->location->region->id;
+            $resource->save();
+        }
+
 
         $allocations = $resource->allocations()->get();
 
@@ -244,7 +252,7 @@ class ResourceController extends Controller
                     ->pluck('fte')
                     ->first();
                 // if ($totalAllocation !== null) Log::info(print_r($totalAllocation,true) . "Resource: {$resource->id} Date: {$monthStartDate} Project: {$project->id}");
-                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Get the availability for the current month
                 $availability = isset($resourceAvailability[$key]) ? (float) $resourceAvailability[$key] : 0.0;
@@ -273,12 +281,12 @@ class ResourceController extends Controller
             }
 
         }
-	if (!isset($allocationArray)) {
-		    $allocationArray = [];
-	} else {
-		$projectIds = array_keys($allocationArray);
-        	$projects = Project::whereIn('id', $projectIds)->get();
-	}
+        if (!isset($allocationArray)) {
+            $allocationArray = [];
+        } else {
+            $projectIds = array_keys($allocationArray);
+            $projects = Project::whereIn('id', $projectIds)->get();
+        }
         // Log::info("resource: {$resource->name} has allocated projects: " . print_r($allocationArray,true));
 
         return view('resource.allocations', compact('resource', 'allocationArray', 'projects', 'nextTwelveMonths'));
