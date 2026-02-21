@@ -69,13 +69,18 @@ class Resource extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function currentContract()
+    public function currentContract(): HasOne
     {
         return $this->hasOne(Contract::class, 'resources_id')
             ->where('start_date', '<=', Carbon::now())
             ->where('end_date', '>=', Carbon::now());
     }
 
+    /**
+     * Get all the leaves for this resource.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function leaves(): HasMany
     {
         return $this->hasMany(\App\Models\Leave::class, 'resources_id', 'id');
@@ -88,7 +93,7 @@ class Resource extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function activeLeaves()
+    public function activeLeaves(): HasMany
     {
         return $this->hasMany(Leave::class, 'resources_id')
             ->where('end_date', '>=', Carbon::now());
@@ -124,7 +129,7 @@ class Resource extends Model
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getResourcesByTypes(array $resourceTypes)
+    public static function getResourcesByTypes(array $resourceTypes): Collection
     {
         return self::whereIn('resource_type', $resourceTypes)->get();
     }
@@ -132,11 +137,19 @@ class Resource extends Model
     /**
      * Get the 'permanent' value for the resource's contracts.
      *
+     * Return true for Permanent, false for contract, null if no contracts
+     * 
      * @return bool|null
      */
-    public function employmentStatus()
+    public function employmentStatus(): bool|null
     {
-        return $this->contracts()->value('permanent');
+        $contracts = $this->contracts;
+
+        if ($contracts->isEmpty()) {
+            return null;
+        }
+
+        return $contracts->value('permanent') === true;
     }
 
 

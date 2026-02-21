@@ -44,11 +44,24 @@
                         </div>
                         <div class="form-group mb-2 mb20">
                             <strong>Current Contract End Date:</strong>
-                            {{ \Carbon\Carbon::parse($resource->contract_end)->format('Y/m/d') }}
+                            @if ($resource->currentContract && $resource->currentContract->permanent === 1)
+                                Permanent
+                            @elseif ($resource->currentContract)
+                                {{ \Carbon\Carbon::parse($resource->currentContract->end_date)->format('Y/m/d') }}
+                            @else
+                                N/A
+                            @endif
+                           
                         </div>
                         <div class="form-group mb-2 mb20">
-                            <strong>Tenure:</strong>
-                            {{ $resource->currentContract->tenure_years  }}
+                            <strong>Tenure at end of current contract:</strong>
+                            @if ($resource->currentContract && $resource->currentContract->permanent === 1)
+                                N/A
+                            @elseif ($resource->currentContract)
+                                {{  $resource->currentContract->tenure_years  }}
+                            @else
+                                N/A
+                            @endif
                         </div>
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">

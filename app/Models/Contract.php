@@ -89,7 +89,7 @@ class Contract extends Model
     {
         $tenure = config('app.tenure');
         $calc = $this->permanent ? 0 : number_format(
-            Carbon::parse($this->end_date)->floatDiffInYears(Carbon::parse($this->start_date)),
+            $this->end_date->floatDiffInYears($this->start_date),
             1
         );
 

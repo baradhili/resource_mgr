@@ -63,9 +63,7 @@ class ResourceController extends Controller
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
-                $resource->full_name .= ' [c]';
-            }
+            $resource->full_name .= $resource->employmentStatus() === false ? ' [c]' : '';
         }
 
         if (!Cache::has('resourceAvailability')) {
@@ -152,7 +150,7 @@ class ResourceController extends Controller
     public function store(ResourceRequest $request): RedirectResponse
     {
         Resource::create($request->validated());
-        Log::info('Validated fields: ' . print_r($request->validated(), true));
+        // Log::info('Validated fields: ' . print_r($request->validated(), true));
         return Redirect::route('resources.index')
             ->with('success', 'Resource created successfully.');
     }
@@ -223,28 +221,28 @@ class ResourceController extends Controller
         // pick our resource out
         $resourceAvailability = $resourceAvailability[$id]['availability'];
 
-        $resource = Resource::with(['region', 'location','currentContract','skills','activeLeaves'])->find($id);
+        $resource = Resource::with(['region', 'location', 'currentContract', 'skills', 'activeLeaves'])->find($id);
         // if Region is ""region": []," update based on location
-        if (is_null($resource->region_id) || empty($resource->region)) {
-            $resource->region_id = $resource->location->region->id;
-            $resource->save();
-        }
+        // if (is_null($resource->region_id) || empty($resource->region)) {
+        //     $resource->region_id = $resource->location->region->id;
+        //     $resource->save();
+        // }
 
-         // Modify resource names to add [c] if the resource is not permanent
-        if (isset($resource->currentContract[0]) && !$resource->currentContract[0]->permanent) {
+        // Modify resource names to add [c] if the resource is not permanent
+        if ($resource->employmentStatus() === false) {
             $resource->full_name .= ' [c]';
             //find end of current contract and insert it into $resource->contract_end
-            $contract = $resource->currentContract;
-            $resource->contract_end = $contract->end_date;
+            // $contract = $resource->currentContract;
+            // $resource->contract_end = $contract->end_date;
 
-            //calculate tenure in years from current contract start to contract_end
-            $startDate = \Carbon\Carbon::parse($resource->contracts[0]->start_date);
-            $endDate = \Carbon\Carbon::parse($resource->contract_end);
-Log::info("start date: ".json_encode($startDate)." end date: ".json_encode($endDate));
-            $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
+            // //calculate tenure in years from current contract start to contract_end
+            // $startDate = \Carbon\Carbon::parse($contract->start_date);
+            // $endDate = \Carbon\Carbon::parse($resource->contract_end);
+
+            // $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
 
         }
-        
+
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resources_id', $id)
             ->select('skills_id', 'proficiency_levels')
@@ -264,8 +262,8 @@ Log::info("start date: ".json_encode($startDate)." end date: ".json_encode($endD
         $projects = $allocations->map(function ($allocation) {
             return $allocation->project;
         })->unique();
-Log::info('resource: '.json_encode($resource));
-        
+
+
         foreach ($projects as $project) {
 
             // $allocationArray[$project->id] = [
@@ -315,7 +313,6 @@ Log::info('resource: '.json_encode($resource));
             $projectIds = array_keys($allocationArray);
             $projects = Project::whereIn('id', $projectIds)->get();
         }
-        // Log::info("resource: {$resource->name} has allocated projects: " . print_r($allocationArray,true));
 
         return view('resource.allocations', compact('resource', 'allocationArray', 'projects', 'nextTwelveMonths'));
     }
