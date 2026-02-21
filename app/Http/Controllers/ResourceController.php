@@ -149,7 +149,11 @@ class ResourceController extends Controller
      */
     public function store(ResourceRequest $request): RedirectResponse
     {
-        Resource::create($request->validated());
+        $resource = Resource::create($request->validated());
+        // update region and location
+        $location = Location::find($request->validated()['location_id']);
+        $resource->region_id = $location->region_id;
+        $resource->save();
         // Log::info('Validated fields: ' . print_r($request->validated(), true));
         return Redirect::route('resources.index')
             ->with('success', 'Resource created successfully.');
@@ -344,7 +348,7 @@ class ResourceController extends Controller
         if (array_key_exists('userID', $request->validated()) && $request->validated()['userID'] !== null) {
             $resource->user_id = $request->validated()['userID'];
         }
-        // $resource->resource_type = $request->validated()['resource_type'];
+        // update region and location
         $resource->location_id = $request->validated()['location_id'];
         $location = Location::find($request->validated()['location_id']);
         $resource->region_id = $location->region_id;
