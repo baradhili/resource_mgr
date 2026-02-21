@@ -15,13 +15,25 @@
                                 {{ __('Resources and Availability') }}
                             </span>
                             <div class="float-right">
-                                {{-- <form action="{{ route('resources.index') }}" method="get"
+                                <form action="{{ route('resources.index') }}" method="get"
                                     class="d-inline-flex align-items-center" id="filterForm">
+                                    <input type="hidden" name="perPage" value="{{ request('perPage', 10) }}">
                                     <input type="text" class="form-control" id="search" name="search"
                                         placeholder="Search..." style="width: auto;" value="{{ request('search') }}"
                                         onkeydown="if (event.keyCode == 13) { document.getElementById('filterForm').submit(); return false; }">
+                                    <select class="form-control" id="region_id" name="region_id" style="width: auto;"
+                                        onchange="document.getElementById('filterForm').submit(); return false;">
+                                        <option value="" selected>All</option>
+                                        @foreach ($regions as $region)
+                                            @if ($region->id !== null)
+                                                <option value="{{ $region->id }}"
+                                                    {{ request('region_id') == $region->id ? 'selected' : '' }}>
+                                                    {{ $region->name }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
                                 </form>
-                                &nbsp; --}}
+                                &nbsp;
                                 @can('resources.create')
                                     <a href="{{ route('resources.create') }}" class="btn btn-primary btn-sm float-right"
                                         data-placement="left">

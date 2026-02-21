@@ -20,6 +20,49 @@
                             <strong>Empowerid:</strong>
                             {{ $resource->empowerID }}
                         </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Region:</strong>
+                            {{ $resource->region->name }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Location:</strong>
+                            {{ $resource->location->name }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Leave:</strong>
+                            @if ($resource->activeLeaves->isEmpty())
+                                <p class="text-muted">No leave booked</p>
+                            @else
+                                <table class="table table-striped table-hover">
+                                    <thead class="thead">
+                                        <tr>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            …
+                                </table>
+                            @endif
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Current Contract End Date:</strong>
+                            @if ($resource->currentContract && $resource->currentContract->permanent === 1)
+                                Permanent
+                            @elseif ($resource->currentContract)
+                                {{ \Carbon\Carbon::parse($resource->currentContract->end_date)->format('Y/m/d') }}
+                            @else
+                                N/A
+                            @endif
+                           
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Tenure at end of current contract:</strong>
+                            @if ($resource->currentContract && $resource->currentContract->permanent === 1)
+                                N/A
+                            @elseif ($resource->currentContract)
+                                {{  $resource->currentContract->tenure_years  }}
+                            @else
+                                N/A
+                            @endif
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
@@ -45,7 +88,7 @@
                                                     </a>
                                                 @endcan
                                             </td>
-                                            
+
                                             <!-- Populate availability for each month -->
                                             @foreach ($nextTwelveMonths as $month)
                                                 @php

@@ -8,6 +8,7 @@ use App\Models\Contract;
 use App\Models\Leave;
 use App\Models\Location;
 use App\Models\Project;
+use App\Models\Region;
 use App\Models\Resource;
 use App\Models\ResourceSkill;
 use App\Models\ResourceType;
@@ -58,16 +59,18 @@ class ResourceController extends Controller
         }
 
         // Collect our resources who have a current contract
-        $resources = $this->resourceService->getResourceList(null, true);
+        $resources = $this->resourceService->getResourceList($regionID, true);
+
+        // collect the regions from the resources->region
+        $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
-                $resource->full_name .= ' [c]';
-            }
+            Log::info($resource->full_name. " " . $resource->employmentStatus() );
+            $resource->full_name .= $resource->employmentStatus() === 1 ? '' : ' [c]';
         }
 
-        if (! Cache::has('resourceAvailability')) {
+        if (!Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
@@ -85,7 +88,7 @@ class ResourceController extends Controller
 
         // Get and sanitize pagination inputs
         $page = max(1, (int) $request->input('page', 1));
-        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
+        $perPage = max(1, min((int) $request->input('perPage', default: 25), 100));
 
         // Paginate the collection
         $paginatedResourceAvailability = new LengthAwarePaginator(
@@ -96,7 +99,7 @@ class ResourceController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('resource.index', compact('resources', 'paginatedResourceAvailability', 'nextTwelveMonths'))
+        return view('resource.index', compact('resources', 'paginatedResourceAvailability', 'nextTwelveMonths', 'regions'))
             ->with('i', ($page - 1) * $perPage);
     }
 
@@ -150,8 +153,12 @@ class ResourceController extends Controller
      */
     public function store(ResourceRequest $request): RedirectResponse
     {
-        Resource::create($request->validated());
-
+        $resource = Resource::create($request->validated());
+        // update region and location
+        $location = Location::find($request->validated()['location_id']);
+        $resource->region_id = $location->region_id;
+        $resource->save();
+        // Log::info('Validated fields: ' . print_r($request->validated(), true));
         return Redirect::route('resources.index')
             ->with('success', 'Resource created successfully.');
     }
@@ -164,7 +171,7 @@ class ResourceController extends Controller
         $resource = Resource::with(['location', 'skills', 'contracts', 'allocations', 'leaves', 'user', 'resourceType'])->find($id);
 
         // Modify resource names to add [c] if the resource is not permanent
-        if (isset($resource->contracts[0]) && ! $resource->contracts[0]->permanent) {
+        if (isset($resource->contracts[0]) && !$resource->contracts[0]->permanent) {
             $resource->full_name .= ' [c]';
         }
 
@@ -211,7 +218,7 @@ class ResourceController extends Controller
             ];
         }
 
-        if (! Cache::has('resourceAvailability')) {
+        if (!Cache::has('resourceAvailability')) {
             $this->cacheService->cacheResourceAvailability();
             $resourceAvailability = Cache::get('resourceAvailability');
         } else {
@@ -222,13 +229,48 @@ class ResourceController extends Controller
         // pick our resource out
         $resourceAvailability = $resourceAvailability[$id]['availability'];
 
-        $resource = Resource::find($id);
+        $resource = Resource::with(['region', 'location', 'currentContract', 'skills', 'activeLeaves'])->find($id);
+        // if Region is ""region": []," update based on location
+        // if (is_null($resource->region_id) || empty($resource->region)) {
+        //     $resource->region_id = $resource->location->region->id;
+        //     $resource->save();
+        // }
 
+        // Modify resource names to add [c] if the resource is not permanent
+        if ($resource->employmentStatus() === false) {
+            $resource->full_name .= ' [c]';
+            //find end of current contract and insert it into $resource->contract_end
+            // $contract = $resource->currentContract;
+            // $resource->contract_end = $contract->end_date;
+
+            // //calculate tenure in years from current contract start to contract_end
+            // $startDate = \Carbon\Carbon::parse($contract->start_date);
+            // $endDate = \Carbon\Carbon::parse($resource->contract_end);
+
+            // $resource->tenure = round($endDate->diffInDays($startDate) / 365.25, 1);
+
+        }
+
+        // Get the skills for the resource
+        $resourceSkills = ResourceSkill::where('resources_id', $id)
+            ->select('skills_id', 'proficiency_levels')
+            ->pluck('proficiency_levels', 'skills_id')
+            ->toArray();
+
+        $skills = Skill::whereIn('id', array_keys($resourceSkills))->get(['id', 'skill_name']);
+        foreach ($resourceSkills as $skillId => $proficiencyLevel) {
+            $resourceSkills[$skillId] = [
+                'proficiency_level' => $proficiencyLevel,
+                'skill_name' => $skills->firstWhere('id', $skillId)->skill_name,
+            ];
+        }
+        $skills = $resourceSkills;
         $allocations = $resource->allocations()->get();
 
         $projects = $allocations->map(function ($allocation) {
             return $allocation->project;
         })->unique();
+
 
         foreach ($projects as $project) {
 
@@ -244,7 +286,7 @@ class ResourceController extends Controller
                     ->pluck('fte')
                     ->first();
                 // if ($totalAllocation !== null) Log::info(print_r($totalAllocation,true) . "Resource: {$resource->id} Date: {$monthStartDate} Project: {$project->id}");
-                $key = $month['year'].'-'.str_pad($month['month'], 2, '0', STR_PAD_LEFT);
+                $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);
 
                 // Get the availability for the current month
                 $availability = isset($resourceAvailability[$key]) ? (float) $resourceAvailability[$key] : 0.0;
@@ -273,13 +315,12 @@ class ResourceController extends Controller
             }
 
         }
-	if (!isset($allocationArray)) {
-		    $allocationArray = [];
-	} else {
-		$projectIds = array_keys($allocationArray);
-        	$projects = Project::whereIn('id', $projectIds)->get();
-	}
-        // Log::info("resource: {$resource->name} has allocated projects: " . print_r($allocationArray,true));
+        if (!isset($allocationArray)) {
+            $allocationArray = [];
+        } else {
+            $projectIds = array_keys($allocationArray);
+            $projects = Project::whereIn('id', $projectIds)->get();
+        }
 
         return view('resource.allocations', compact('resource', 'allocationArray', 'projects', 'nextTwelveMonths'));
     }
@@ -311,7 +352,7 @@ class ResourceController extends Controller
         if (array_key_exists('userID', $request->validated()) && $request->validated()['userID'] !== null) {
             $resource->user_id = $request->validated()['userID'];
         }
-        // $resource->resource_type = $request->validated()['resource_type'];
+        // update region and location
         $resource->location_id = $request->validated()['location_id'];
         $location = Location::find($request->validated()['location_id']);
         $resource->region_id = $location->region_id;

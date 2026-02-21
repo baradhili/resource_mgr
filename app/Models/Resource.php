@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class Resource
@@ -20,16 +24,16 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property float $baseAvailability
  * @property int $region_id
  * @property int $location_id
- * @property Allocation[] $allocations
- * @property Contract[] $contracts
- * @property Leave[] $leaves
- * @property ResourceSkill[] $skills
- * @property Region $region
- * @property Location $location
- * @property User $user
- * @property ResourceType $resourceType
+ * @property-read Allocation[] $allocations
+ * @property-read Contract[] $contracts
+ * @property-read Leave[] $leaves
+ * @property-read ResourceSkill[] $skills
+ * @property-read Region $region
+ * @property-read Location $location
+ * @property-read User $user
+ * @property-read ResourceType $resourceType
  *
- * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin Builder
  */
 class Resource extends Model
 {
@@ -50,44 +54,113 @@ class Resource extends Model
         'location_id',
     ];
 
+    protected $casts = [
+        'resource_type' => 'integer',
+        'baseAvailability' => 'float',
+        'region_id' => 'integer',
+        'location_id' => 'integer',
+    ];
+
     public function allocations(): HasMany
     {
-        return $this->hasMany(\App\Models\Allocation::class, 'resources_id', 'id');
+        return $this->hasMany(Allocation::class, 'resources_id');
     }
 
     public function contracts(): HasMany
     {
-        return $this->hasMany(\App\Models\Contract::class, 'resources_id', 'id');
+        return $this->hasMany(Contract::class, 'resources_id');
+    }
+    /**
+     * Get the current contract for this resource.
+     *
+     * The current contract is the one that is active at the current date. There is only ever one current contract per resource.
+     * A contract is considered active if its start date is less than or equal to the current date,
+     * and its end date is greater than or equal to the current date.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function currentContract(): HasOne
+    {
+        return $this->hasOne(Contract::class, 'resources_id')
+            ->where('start_date', '<=', Carbon::now())
+            ->where('end_date', '>=', Carbon::now());
     }
 
+    /**
+     * Get all the leaves for this resource.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function leaves(): HasMany
     {
-        return $this->hasMany(\App\Models\Leave::class, 'resources_id', 'id');
+        return $this->hasMany(Leave::class, 'resources_id');
+    }
+
+    /**
+     * Get the active leaves for this resource.
+     *
+     * Leaves are considered active if their end date is greater than or equal to the current date.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activeLeaves(): HasMany
+    {
+        return $this->hasMany(Leave::class, 'resources_id')
+            ->where('end_date', '>=', Carbon::now());
     }
 
     public function skills(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Skill::class, 'resource_skill', 'resources_id', 'skills_id');
+        return $this->belongsToMany(Skill::class, 'resource_skill', 'resources_id', 'skills_id');
     }
 
     public function region(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Region::class, 'region_id', 'id')->withDefault();
+        return $this->belongsTo(Region::class)->withDefault();
     }
 
     public function location(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id')->withDefault();
+        return $this->belongsTo(Location::class)->withDefault();
     }
 
     public function user(): HasOne
     {
-        return $this->hasOne(\App\Models\User::class, 'resource_id', 'id')->withDefault();
+        return $this->hasOne(User::class, 'resource_id')->withDefault();
     }
 
     public function resourceType(): BelongsTo
     {
-        return $this->belongsTo(ResourceType::class, 'resource_type', 'id')->withDefault();
+        return $this->belongsTo(ResourceType::class, 'resource_type')->withDefault();
+    }
+
+    /**
+     * Scope a query to only include resources with active contracts.
+     */
+    public function scopeWithActiveContract(Builder $query): Builder
+    {
+        return $query->whereHas('contracts', function (Builder $q) {
+            $q->where('start_date', '<=', Carbon::now())
+                ->where('end_date', '>=', Carbon::now());
+        });
+    }
+
+    /**
+     * Scope a query to only include resources in a specific region.
+     *
+     * Usage:
+     *   Resource::region(5)->get();
+     *   Resource::region($regionId)->with('location')->paginate(20);
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param int|\App\Models\Region $region The region ID or Region instance
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRegion(Builder $query, int|Region $region): Builder
+    {
+        $regionId = $region instanceof Region ? $region->id : $region;
+
+        return $query->where('region_id', $regionId);
     }
 
     /**
@@ -95,18 +168,22 @@ class Resource extends Model
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public static function getResourcesByTypes(array $resourceTypes)
+    public static function getResourcesByTypes(array $resourceTypes): Collection
     {
         return self::whereIn('resource_type', $resourceTypes)->get();
     }
 
     /**
-     * Get the 'permanent' value for the resource's contracts.
+     * Get the employment status for a resource.
      *
+     * Return true for Permanent, false for contract
+     * 
      * @return bool|null
      */
-    public function employmentStatus()
+    public function employmentStatus(): bool|null
     {
-        return $this->contracts()->value('permanent');
+        return $this->currentContract?->permanent === true;
     }
+
+
 }

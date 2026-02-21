@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Nwidart\Modules\Facades\Module;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,14 +14,14 @@ class ReportModulesController extends Controller
 {
     public function index()
     {
-        Log::info("in reportmodulescontroller") ;
+        
         try {
 
             $modules = collect(Module::allEnabled())
             ->sortBy(fn($module) => $module->get('priority', 0))
             ->values(); // Reset keys after sort
             $reportModules = [];
-
+// TODO - cache this stuff so it doesn't have to run every time
             foreach ($modules as $module) {
                 // Skip non-Report modules
                 if ($module->get('type') !== 'Report') continue;
@@ -53,7 +54,7 @@ class ReportModulesController extends Controller
                     'url' => route($routeName),
                 ];
 
-                Log::info("Added report module: {$displayName}");
+                
             }
 
             // Generate clean HTML output
