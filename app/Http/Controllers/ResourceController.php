@@ -59,11 +59,15 @@ class ResourceController extends Controller
         }
 
         // Collect our resources who have a current contract
-        $resources = $this->resourceService->getResourceList(null, true);
+        $resources = $this->resourceService->getResourceList($regionID, true);
+
+        // collect the regions from the resources->region
+        $regions = $resources->pluck('region')->filter()->unique()->values()->all();
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            $resource->full_name .= $resource->employmentStatus() === false ? ' [c]' : '';
+            Log::info($resource->full_name. " " . $resource->employmentStatus() );
+            $resource->full_name .= $resource->employmentStatus() === 1 ? '' : ' [c]';
         }
 
         if (!Cache::has('resourceAvailability')) {
@@ -84,7 +88,7 @@ class ResourceController extends Controller
 
         // Get and sanitize pagination inputs
         $page = max(1, (int) $request->input('page', 1));
-        $perPage = max(1, min((int) $request->input('perPage', 10), 100));
+        $perPage = max(1, min((int) $request->input('perPage', default: 25), 100));
 
         // Paginate the collection
         $paginatedResourceAvailability = new LengthAwarePaginator(
@@ -95,7 +99,7 @@ class ResourceController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('resource.index', compact('resources', 'paginatedResourceAvailability', 'nextTwelveMonths'))
+        return view('resource.index', compact('resources', 'paginatedResourceAvailability', 'nextTwelveMonths', 'regions'))
             ->with('i', ($page - 1) * $perPage);
     }
 

@@ -49,7 +49,6 @@ class CapacityController extends Controller
         // check if they are asking for a region
         $regionID = $request->input('region_id');
         $page = max(1, (int) $request->input('page', 1));
-        $page = max(1, (int) $request->input('page', 1));
         $perPage = max(1, min((int) $request->input('perPage', 10), 100));
         $nextTwelveMonths = [];
         for ($i = 0; $i < 12; $i++) {
