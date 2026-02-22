@@ -25,6 +25,7 @@ class DemandRequest extends Model
     protected $table = 'demand_requests';
 
     protected $fillable = [
+        'client_id',
         'project_id',
         'requester_id',
         'forecast_demand_id',
@@ -62,6 +63,10 @@ class DemandRequest extends Model
     // ------------------------------------------------------------------
     // Relationships
     // ------------------------------------------------------------------
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public function project(): BelongsTo
     {

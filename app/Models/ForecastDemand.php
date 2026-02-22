@@ -20,6 +20,7 @@ class ForecastDemand extends Model
     protected $table = 'forecast_demands';
 
     protected $fillable = [
+        'client_id',
         'opportunity_id', // External CRM ID
         'owner_id',       // Sales Rep
         'stage',
@@ -48,6 +49,10 @@ class ForecastDemand extends Model
     // ------------------------------------------------------------------
     // Relationships
     // ------------------------------------------------------------------
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
 
     public function owner(): BelongsTo
     {
@@ -75,7 +80,7 @@ class ForecastDemand extends Model
     public function scopeLikelyToWin($query, int $threshold = 70)
     {
         return $query->where('win_probability', '>=', $threshold)
-                     ->where('status', ForecastStatus::Active);
+            ->where('status', ForecastStatus::Active);
     }
 
     /**
@@ -87,22 +92,22 @@ class ForecastDemand extends Model
         return $query->where(function ($q) use ($year, $quarter) {
             // Starts in this quarter
             $q->where('start_year', $year)
-              ->where('start_quarter', $quarter)
-              // OR started earlier but overlaps into this quarter
-              ->orWhere(function ($sub) use ($year, $quarter) {
-                  $sub->where('start_year', '<', $year)
-                      ->orWhere(function ($s) use ($year, $quarter) {
-                          $s->where('start_year', $year)
-                            ->where('start_quarter', '<', $quarter);
-                      });
-              });
+                ->where('start_quarter', $quarter)
+                // OR started earlier but overlaps into this quarter
+                ->orWhere(function ($sub) use ($year, $quarter) {
+                    $sub->where('start_year', '<', $year)
+                        ->orWhere(function ($s) use ($year, $quarter) {
+                            $s->where('start_year', $year)
+                                ->where('start_quarter', '<', $quarter);
+                        });
+                });
         });
     }
 
     public function scopeUnconverted($query)
     {
         return $query->where('status', ForecastStatus::Active)
-                     ->whereDoesntHave('demandRequests');
+            ->whereDoesntHave('demandRequests');
     }
 
     // ------------------------------------------------------------------
@@ -144,7 +149,7 @@ class ForecastDemand extends Model
     {
         $this->update([
             'stage' => $stage,
-            'status' => match($stage) {
+            'status' => match ($stage) {
                 ForecastStage::Won => ForecastStatus::Converted,
                 ForecastStage::Lost => ForecastStatus::Archived,
                 default => ForecastStatus::Active,
@@ -191,5 +196,22 @@ class ForecastDemand extends Model
         $forecastEnd = $this->approximate_end_date;
 
         return $start->lessThan($forecastEnd) && $end->greaterThan($forecastStart);
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $request) {
+            // Auto-populate client_id from forecast_demand if not set
+            if (!$request->client_id && $request->forecast_demand_id) {
+                $request->client_id = ForecastDemand::find($request->forecast_demand_id)?->client_id;
+            }
+        });
+
+        static::updating(function (self $request) {
+            // Keep client_id in sync if forecast_demand_id changes
+            if ($request->isDirty('forecast_demand_id') && $request->forecast_demand_id) {
+                $request->client_id = ForecastDemand::find($request->forecast_demand_id)?->client_id;
+            }
+        });
     }
 }

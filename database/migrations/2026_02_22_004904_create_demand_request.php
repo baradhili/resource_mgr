@@ -47,6 +47,10 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
+            $table->foreignId('client_id')
+                ->constrained('clients')
+                ->unique()
+                ->cascadeOnDelete();
 
             // ------------------------------------------------------------------
             // Status & Attributes

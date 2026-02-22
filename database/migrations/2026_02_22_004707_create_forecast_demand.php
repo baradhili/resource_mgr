@@ -29,6 +29,11 @@ return new class extends Migration
                 ->default(50)
                 ->comment('0-100 percentage');
 
+            $table->foreignId('client_id')
+                ->constrained('clients')
+                ->unique()
+                ->cascadeOnDelete();
+
             $table->year('start_year');
             $table->unsignedTinyInteger('start_quarter')->default(1)->index();
             $table->unsignedSmallInteger('duration_months')->default(12);
