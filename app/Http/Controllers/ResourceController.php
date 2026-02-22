@@ -66,7 +66,6 @@ class ResourceController extends Controller
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            Log::info($resource->full_name. " " . $resource->employmentStatus() );
             $resource->full_name .= $resource->employmentStatus() === 1 ? '' : ' [c]';
         }
 
