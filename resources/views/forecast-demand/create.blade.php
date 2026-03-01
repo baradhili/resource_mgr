@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ __('Create') }} Funding Approval Stage
+    {{ __('Create') }} Forecast Demand
 @endsection
 
 @section('content')
@@ -11,13 +11,13 @@
 
                 <div class="card card-default">
                     <div class="card-header">
-                        <span class="card-title">{{ __('Create') }} Funding Approval Stage</span>
+                        <span class="card-title">{{ __('Create') }} Forecast Demand</span>
                     </div>
                     <div class="card-body bg-white">
-                        <form method="POST" action="{{ route('funding-approval-stages.store') }}"  role="form" enctype="multipart/form-data">
+                        <form method="POST" action="{{ route('forecast-demands.store') }}"  role="form" enctype="multipart/form-data">
                             @csrf
 
-                            @include('funding-approval-stage.form')
+                            @include('forecast-demand.form')
 
                         </form>
                     </div>
