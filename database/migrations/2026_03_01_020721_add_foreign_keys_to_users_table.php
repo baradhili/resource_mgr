@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('leaves', function (Blueprint $table) {
-            $table->foreign(['resources_id'], 'fk_leave_resources1')->references(['id'])->on('resources')->onUpdate('no action')->onDelete('no action');
+        Schema::table('users', function (Blueprint $table) {
+            $table->foreign(['reports'], '1')->references(['id'])->on('users')->onUpdate('restrict')->onDelete('restrict');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('leaves', function (Blueprint $table) {
-            $table->dropForeign('fk_leave_resources1');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropForeign('1');
         });
     }
 };

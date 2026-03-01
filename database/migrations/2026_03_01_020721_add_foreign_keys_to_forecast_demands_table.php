@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('demands', function (Blueprint $table) {
+        Schema::table('forecast_demands', function (Blueprint $table) {
             $table->foreign(['client_id'])->references(['id'])->on('clients')->onUpdate('restrict')->onDelete('cascade');
+            $table->foreign(['owner_id'])->references(['id'])->on('users')->onUpdate('restrict')->onDelete('cascade');
         });
     }
 
@@ -21,8 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('demands', function (Blueprint $table) {
-            $table->dropForeign('demands_client_id_foreign');
+        Schema::table('forecast_demands', function (Blueprint $table) {
+            $table->dropForeign('forecast_demands_client_id_foreign');
+            $table->dropForeign('forecast_demands_owner_id_foreign');
         });
     }
 };

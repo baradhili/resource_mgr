@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('resources', function (Blueprint $table) {
-            $table->integer('id', true);
+            $table->bigIncrements('id');
             $table->string('full_name')->nullable();
             $table->string('empowerID')->nullable()->unique('empowerid_unique');
             $table->timestamps();

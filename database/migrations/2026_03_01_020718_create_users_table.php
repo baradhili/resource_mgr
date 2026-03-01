@@ -20,8 +20,8 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->json('settings')->nullable();
-            $table->unsignedInteger('current_team_id')->nullable();
-            $table->integer('resource_id')->nullable()->index('users_resource_id_foreign');
+            $table->unsignedBigInteger('current_team_id')->nullable();
+            $table->unsignedBigInteger('resource_id')->nullable()->index('users_resource_id_foreign');
             $table->unsignedBigInteger('reports')->nullable()->index('1');
         });
     }

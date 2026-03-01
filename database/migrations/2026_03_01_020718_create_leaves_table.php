@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contracts', function (Blueprint $table) {
+        Schema::create('leaves', function (Blueprint $table) {
             $table->integer('id', true);
-            $table->dateTime('start_date')->nullable();
-            $table->dateTime('end_date')->nullable();
-            $table->decimal('availability', 3)->nullable();
-            $table->integer('resources_id')->index('fk_contract_resources_idx');
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+            $table->unsignedBigInteger('resource_id')->nullable()->index('leaves_resource_id_foreign');
             $table->timestamps();
-            $table->boolean('permanent')->default(false);
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contracts');
+        Schema::dropIfExists('leaves');
     }
 };

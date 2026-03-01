@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leaves', function (Blueprint $table) {
-            $table->integer('id', true);
-            $table->dateTime('start_date');
-            $table->dateTime('end_date')->nullable();
-            $table->integer('resources_id')->index('fk_leave_resources1_idx');
+        Schema::create('team_user', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id')->index('team_user_user_id_foreign');
+            $table->unsignedBigInteger('team_id')->index('team_user_team_id_foreign');
             $table->timestamps();
+
+            $table->primary(['user_id', 'team_id']);
         });
     }
 
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leaves');
+        Schema::dropIfExists('team_user');
     }
 };

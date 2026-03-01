@@ -16,8 +16,8 @@ return new class extends Migration
             $table->enum('source', ['Imported', 'Manual'])->nullable()->index();
             $table->date('allocation_date')->nullable();
             $table->decimal('fte', 3)->nullable();
-            $table->integer('resources_id')->index('fk_allocations_resources1_idx');
-            $table->integer('projects_id')->index('fk_allocations_projects1_idx');
+            $table->unsignedBigInteger('resource_id')->nullable()->index('allocations_resource_id_foreign');
+            $table->unsignedBigInteger('project_id')->nullable()->index('allocations_project_id_foreign');
             $table->enum('status', ['Proposed', 'Committed'])->nullable();
             $table->timestamps();
         });

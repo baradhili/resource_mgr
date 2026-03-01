@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('password_resets', function (Blueprint $table) {
-            $table->string('email')->index();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
+        Schema::table('contracts', function (Blueprint $table) {
+            $table->foreign(['resource_id'])->references(['id'])->on('resources')->onUpdate('restrict')->onDelete('set null');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('password_resets');
+        Schema::table('contracts', function (Blueprint $table) {
+            $table->dropForeign('contracts_resource_id_foreign');
+        });
     }
 };

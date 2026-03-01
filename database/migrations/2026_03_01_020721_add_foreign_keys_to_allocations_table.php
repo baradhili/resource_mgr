@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('allocations', function (Blueprint $table) {
-            $table->foreign(['resources_id'], 'fk_allocations_resources1')->references(['id'])->on('resources')->onUpdate('no action')->onDelete('no action');
+            $table->foreign(['project_id'])->references(['id'])->on('projects')->onUpdate('restrict')->onDelete('set null');
+            $table->foreign(['resource_id'])->references(['id'])->on('resources')->onUpdate('restrict')->onDelete('set null');
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('allocations', function (Blueprint $table) {
-            $table->dropForeign('fk_allocations_resources1');
+            $table->dropForeign('allocations_project_id_foreign');
+            $table->dropForeign('allocations_resource_id_foreign');
         });
     }
 };

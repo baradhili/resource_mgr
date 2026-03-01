@@ -14,14 +14,16 @@ return new class extends Migration
         Schema::create('demands', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('client_id')->index('demands_client_id_foreign');
-            $table->unsignedBigInteger('project_id')->nullable();
-            $table->dateTime('expected_start_date')->nullable();
-            $table->dateTime('expected_end_date')->nullable();
+            $table->unsignedBigInteger('project_id')->nullable()->index('demands_project_id_foreign');
+            $table->date('expected_start_date')->nullable();
+            $table->date('expected_end_date')->nullable();
             $table->decimal('fte', 3)->nullable()->comment('FTE requested');
             $table->string('status')->default('new')->comment('Sales funnel stage');
             $table->text('source')->nullable()->comment('Original source of demand');
             $table->text('notes')->nullable()->comment('Additional structured data from imports');
             $table->timestamps();
+            $table->date('demand_date')->nullable();
+            $table->string('resource_type')->nullable();
         });
     }
 

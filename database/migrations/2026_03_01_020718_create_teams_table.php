@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('project_service', function (Blueprint $table) {
+        Schema::create('teams', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('project_id')->index('project_service_project_id_foreign');
-            $table->unsignedBigInteger('service_id')->index('project_service_service_id_foreign');
-            $table->integer('quantity')->default(1);
-            $table->decimal('total_cost', 10)->nullable();
+            $table->unsignedBigInteger('owner_id')->nullable()->index('teams_owner_id_foreign');
+            $table->string('name');
             $table->timestamps();
+            $table->unsignedBigInteger('parent_team_id')->nullable()->index();
+            $table->unsignedBigInteger('resource_type')->nullable()->index('teams_resource_type_foreign');
         });
     }
 
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('project_service');
+        Schema::dropIfExists('teams');
     }
 };

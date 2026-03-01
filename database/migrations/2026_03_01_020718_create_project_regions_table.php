@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('team_user', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->index('team_user_user_id_foreign');
-            $table->unsignedInteger('team_id')->index('team_user_team_id_foreign');
+        Schema::create('project_regions', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('project_id')->nullable()->index('project_regions_project_id_foreign');
             $table->timestamps();
+            $table->unsignedBigInteger('region_id')->index('project_regions_region_id_foreign');
         });
     }
 
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('team_user');
+        Schema::dropIfExists('project_regions');
     }
 };

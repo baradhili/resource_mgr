@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('staging_demands', function (Blueprint $table) {
-            $table->foreign(['projects_id'])->references(['id'])->on('projects')->onUpdate('restrict')->onDelete('set null');
+        Schema::table('leaves', function (Blueprint $table) {
+            $table->foreign(['resource_id'])->references(['id'])->on('resources')->onUpdate('restrict')->onDelete('set null');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('staging_demands', function (Blueprint $table) {
-            $table->dropForeign('staging_demands_projects_id_foreign');
+        Schema::table('leaves', function (Blueprint $table) {
+            $table->dropForeign('leaves_resource_id_foreign');
         });
     }
 };

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('teams', function (Blueprint $table) {
-            $table->foreign(['resource_type'])->references(['id'])->on('resource_types')->onUpdate('restrict')->onDelete('set null');
+        Schema::table('resource_skill', function (Blueprint $table) {
+            $table->foreign(['skill_id'])->references(['id'])->on('skills')->onUpdate('restrict')->onDelete('cascade');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('teams', function (Blueprint $table) {
-            $table->dropForeign('teams_resource_type_foreign');
+        Schema::table('resource_skill', function (Blueprint $table) {
+            $table->dropForeign('resource_skill_skill_id_foreign');
         });
     }
 };
