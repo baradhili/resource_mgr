@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property $fte
  * @property $status
  * @property $resource_type
- * @property $projects_id
+ * @property $project_id
  * @property $source
  * @property $created_at
  * @property $updated_at
@@ -31,11 +31,11 @@ class Demand extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['demand_date', 'fte', 'status', 'resource_type', 'projects_id', 'source'];
+    protected $fillable = ['demand_date', 'fte', 'status', 'resource_type', 'project_id', 'source'];
 
     public function project(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Project::class, 'projects_id', 'id');
+        return $this->belongsTo(\App\Models\Project::class, 'project_id', 'id');
     }
 
     public function resourcType(): BelongsTo

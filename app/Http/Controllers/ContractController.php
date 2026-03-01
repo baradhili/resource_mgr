@@ -151,7 +151,7 @@ class ContractController extends Controller
             ? $resource->contracts->first()->end_date
             : \Carbon\Carbon::now()->addMonths(3);
         $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $endDate])->get();
-        $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
+        $uniqueProjectIds = $allocations->pluck('project_id')->unique()->values()->all();
         $projects = Project::whereIn('id', $uniqueProjectIds)->get();
         $currentProjects = $projects;
         //filter all projects where the project end date is after or within one month of the resource's contract end date
@@ -247,7 +247,7 @@ class ContractController extends Controller
                 $demand = new Demand;
                 $demand->demand_date = $allocation->allocation_date;
                 $demand->fte = $allocation->fte;
-                $demand->projects_id = $allocation->projects_id;
+                $demand->project_id = $allocation->project_id;
                 $demand->resource_type = $resource_type;
                 $demand->save();
 

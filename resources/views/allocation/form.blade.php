@@ -44,12 +44,12 @@
             {!! $errors->first('resource_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="projects_id" class="form-label">{{ __('Resource') }}</label>
-            <select name="projects_id" class="form-control @error('projects_id') is-invalid @enderror"
+            <label for="project_id" class="form-label">{{ __('Resource') }}</label>
+            <select name="project_id" class="form-control @error('project_id') is-invalid @enderror"
                 id="resources_id">
                 <option value="">{{ __('Select a Project') }}</option>
                 @foreach ($projects as $project)
-                    <option value="{{ $project->id }}" @if (old('projects_id', $allocation?->projects_id) == $project->id) selected @endif>
+                    <option value="{{ $project->id }}" @if (old('project_id', $allocation?->project_id) == $project->id) selected @endif>
                         {{ $project->empowerID . ' ' . $project->name }}</option>
                 @endforeach
 

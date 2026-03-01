@@ -44,7 +44,7 @@ class Project extends Model
      */
     public function allocations(): HasMany
     {
-        return $this->hasMany(\App\Models\Allocation::class, 'projects_id', 'id');
+        return $this->hasMany(\App\Models\Allocation::class, 'project_id', 'id');
     }
 
     /**
@@ -62,7 +62,7 @@ class Project extends Model
      */
     public function demands(): HasMany
     {
-        return $this->hasMany(\App\Models\Demand::class, 'projects_id', 'id');
+        return $this->hasMany(\App\Models\Demand::class, 'project_id', 'id');
     }
 
     /**
@@ -70,7 +70,7 @@ class Project extends Model
      */
     // public function projectRegions()
     // {
-    //     return $this->hasMany(\App\Models\ProjectRegion::class, foreignKey: 'projects_id','id');
+    //     return $this->hasMany(\App\Models\ProjectRegion::class, foreignKey: 'project_id','id');
     // }
 
     /**
@@ -78,7 +78,7 @@ class Project extends Model
      */
     // public function projectServices()
     // {
-    //     return $this->hasMany(\App\Models\ProjectService::class, foreignKey: 'projects_id','id');
+    //     return $this->hasMany(\App\Models\ProjectService::class, foreignKey: 'project_id','id');
     // }
 
 }

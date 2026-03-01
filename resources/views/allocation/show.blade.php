@@ -38,7 +38,7 @@
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Projects Id:</strong>
-                                    {{ $allocation->projects_id }}
+                                    {{ $allocation->project_id }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Status:</strong>

@@ -67,7 +67,7 @@ class ProjAllocReportController extends Controller
             ->get();
 
         // 6. Get all projects from these allocations
-        $projectIds = $allocations->pluck('projects_id')->unique();
+        $projectIds = $allocations->pluck('project_id')->unique();
 
         // 7. Filter Projects by Client ID if provided
         $projectsQuery = Project::whereIn('id', $projectIds);
@@ -81,7 +81,7 @@ class ProjAllocReportController extends Controller
         $validProjectIds = $projects->pluck('id');
 
         // 8. Re-filter allocations to ONLY those belonging to the valid (and client-filtered) projects
-        $allocations = $allocations->whereIn('projects_id', $validProjectIds);
+        $allocations = $allocations->whereIn('project_id', $validProjectIds);
 
         // 9. Collect all resources allocated from the filtered Allocations
         $resourceIds = $allocations->pluck('resources_id')->unique();
@@ -100,7 +100,7 @@ class ProjAllocReportController extends Controller
         // 12. Get FINAL allocations matching the $resources AND $validProjects in the date range
         $allocations = Allocation::whereBetween('allocation_date', [$startDate, $endDate])
             ->whereIn('resources_id', $resources->pluck('id')->toArray())
-            ->whereIn('projects_id', $validProjectIds) // Ensure we stick to the client's projects
+            ->whereIn('project_id', $validProjectIds) // Ensure we stick to the client's projects
             ->get();
 
         // 13. Generate CORRECT month keys (Y-m) and headers (M-y) for 4-month window
@@ -141,7 +141,7 @@ class ProjAllocReportController extends Controller
             if (!in_array($monthKey, $monthKeys))
                 continue;
 
-            $pid = $alloc->projects_id;
+            $pid = $alloc->project_id;
             $rid = $alloc->resources_id;
             $fte = floatval($alloc->fte ?? 0);
             if ($fte > 0) {
@@ -151,8 +151,8 @@ class ProjAllocReportController extends Controller
 
         // 16. Build unique project-resource rows with sorted names
         $rows = [];
-        foreach ($allocations->unique(fn($a) => "{$a->projects_id}_{$a->resources_id}")->values() as $alloc) {
-            $pid = $alloc->projects_id;
+        foreach ($allocations->unique(fn($a) => "{$a->project_id}_{$a->resources_id}")->values() as $alloc) {
+            $pid = $alloc->project_id;
             $rid = $alloc->resources_id;
 
             $project = $projectLookup[$pid] ?? null;
