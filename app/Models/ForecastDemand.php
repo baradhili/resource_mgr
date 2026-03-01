@@ -22,11 +22,8 @@ class ForecastDemand extends Model
     protected $fillable = [
         'client_id',
         'opportunity_id', // External CRM ID
-        'owner_id',       // Sales Rep
+        'owner_id',       // Business Partner
         'stage',
-        'win_probability',
-        'role_title',     // High level role (e.g., "Development Team")
-        'quantity_fte',
         'start_year',
         'start_quarter',  // 1-4
         'duration_months',
@@ -60,12 +57,12 @@ class ForecastDemand extends Model
     }
 
     /**
-     * The detailed DemandRequests generated from this forecast.
-     * This is where the specific Roles, Skills, and Estimates live.
+     * Estimates created during the Proposal/Estimate stage.
+     * Estimate is the single source of truth for proposal details.
      */
-    public function demandRequests(): HasMany
+    public function estimates(): HasMany
     {
-        return $this->hasMany(DemandRequest::class, 'forecast_demand_id');
+        return $this->hasMany(Estimate::class, 'forecast_demand_id');
     }
 
     // ------------------------------------------------------------------
