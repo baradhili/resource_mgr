@@ -26,7 +26,7 @@ class AllocationFactory extends Factory
         return [
             'allocation_date' => $this->faker->date(),
             'fte' => $this->faker->numberBetween(1, 100),
-            'resources_id' => Resource::factory(),
+            'resource_id' => Resource::factory(),
             'project_id' => Project::factory(),
             'status' => $this->faker->randomElement(['Proposed','Committed']),
             'source' => $this->faker->randomElement(['Imported','Manual']),

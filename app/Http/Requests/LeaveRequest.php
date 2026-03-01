@@ -24,7 +24,7 @@ class LeaveRequest extends FormRequest
         return [
             'start_date' => 'required',
             'end_date' => 'required',
-            'resources_id' => 'required',
+            'resource_id' => 'required',
         ];
     }
 }

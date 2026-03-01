@@ -75,12 +75,12 @@ class ProjectController extends Controller
         $project = Project::with(['client', 'allocations'])->findOrFail($id);
 
         $resources = $project->allocations
-            ->pluck('resources_id')
+            ->pluck('resource_id')
             ->unique()
             ->transform(function ($resourceId) use ($project) {
                 $resource = Resource::find($resourceId);
                 $resource->current = $project->allocations
-                    ->where('resources_id', $resourceId)
+                    ->where('resource_id', $resourceId)
                     ->where('allocation_date', '>=', now()->startOfMonth())
                     ->count() > 0;
                 $resource->resourceType_name = $resource->resourceType->name;

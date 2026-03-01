@@ -84,7 +84,7 @@ class ProjAllocReportController extends Controller
         $allocations = $allocations->whereIn('project_id', $validProjectIds);
 
         // 9. Collect all resources allocated from the filtered Allocations
-        $resourceIds = $allocations->pluck('resources_id')->unique();
+        $resourceIds = $allocations->pluck('resource_id')->unique();
         $resources = Resource::whereIn('id', $resourceIds)->get();
 
         // 10. Filter $resources by resource type = saResourceType
@@ -99,7 +99,7 @@ class ProjAllocReportController extends Controller
 
         // 12. Get FINAL allocations matching the $resources AND $validProjects in the date range
         $allocations = Allocation::whereBetween('allocation_date', [$startDate, $endDate])
-            ->whereIn('resources_id', $resources->pluck('id')->toArray())
+            ->whereIn('resource_id', $resources->pluck('id')->toArray())
             ->whereIn('project_id', $validProjectIds) // Ensure we stick to the client's projects
             ->get();
 
@@ -142,7 +142,7 @@ class ProjAllocReportController extends Controller
                 continue;
 
             $pid = $alloc->project_id;
-            $rid = $alloc->resources_id;
+            $rid = $alloc->resource_id;
             $fte = floatval($alloc->fte ?? 0);
             if ($fte > 0) {
                 $dataMatrix[$pid][$rid][$monthKey] = ($dataMatrix[$pid][$rid][$monthKey] ?? 0) + $fte;
@@ -151,9 +151,9 @@ class ProjAllocReportController extends Controller
 
         // 16. Build unique project-resource rows with sorted names
         $rows = [];
-        foreach ($allocations->unique(fn($a) => "{$a->project_id}_{$a->resources_id}")->values() as $alloc) {
+        foreach ($allocations->unique(fn($a) => "{$a->project_id}_{$a->resource_id}")->values() as $alloc) {
             $pid = $alloc->project_id;
-            $rid = $alloc->resources_id;
+            $rid = $alloc->resource_id;
 
             $project = $projectLookup[$pid] ?? null;
             $resource = $resourceLookup[$rid] ?? null;

@@ -26,7 +26,7 @@ class ContractSeeder extends Seeder
             Contract::create([
                 'start_date' => $val[0],
                 'end_date' => $val[1],
-                'resources_id' => $val[2],
+                'resource_id' => $val[2],
             ]);
         }
 

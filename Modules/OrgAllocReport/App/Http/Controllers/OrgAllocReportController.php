@@ -67,7 +67,7 @@ class OrgAllocReportController extends Controller
 
             foreach ($currentProjects as $project) {
                 $allocatedThisMonth = $project->allocations()
-                    ->where('resources_id', '=', $resource->id)
+                    ->where('resource_id', '=', $resource->id)
                     ->whereBetween('allocation_date', [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()])
                     ->pluck('fte')
                     ->first();

@@ -30,7 +30,7 @@
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Resources Id:</strong>
-                                    {{ $leave->resources_id }}
+                                    {{ $leave->resource_id }}
                                 </div>
 
                     </div>

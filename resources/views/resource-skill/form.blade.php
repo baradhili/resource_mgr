@@ -2,19 +2,19 @@
     <div class="col-md-12">
         
         <div class="form-group mb-2 mb20">
-            <label for="resources_id" class="form-label">{{ __('Resources') }}</label>
+            <label for="resource_id" class="form-label">{{ __('Resources') }}</label>
             @if($resource->id != 0)
                 <input type="text" class="form-control" value="{{ $resource->full_name }}" readonly>
-                <input type="hidden" name="resources_id" value="{{ $resource->id }}">
+                <input type="hidden" name="resource_id" value="{{ $resource->id }}">
             @else
-                <select name="resources_id" class="form-control @error('resources_id') is-invalid @enderror" id="resources_id">
+                <select name="resource_id" class="form-control @error('resource_id') is-invalid @enderror" id="resource_id">
                     <option value="">{{ __('Select a Resource') }}</option>
                     @foreach ($resources as $res)
-                        <option value="{{ $res->id }}" @if(old('resources_id', $resourceSkill?->resources_id) == $res->id) selected @endif>{{ $res->full_name }}</option>
+                        <option value="{{ $res->id }}" @if(old('resource_id', $resourceSkill?->resource_id) == $res->id) selected @endif>{{ $res->full_name }}</option>
                     @endforeach
                 </select>
             @endif
-            {!! $errors->first('resources_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+            {!! $errors->first('resource_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
             <label for="skills_id" class="form-label">{{ __('Skills') }}</label>

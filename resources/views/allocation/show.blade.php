@@ -34,7 +34,7 @@
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Resources Id:</strong>
-                                    {{ $allocation->resources_id }}
+                                    {{ $allocation->resource_id }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Projects Id:</strong>

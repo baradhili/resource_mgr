@@ -153,7 +153,7 @@ class ImportController extends Controller
     //                         for ($i = 0; $i < count($monthYear); $i++) {
     //                             $columnLetter = chr(ord($this->columnDataStart) + $i);
     //                             $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
-    //                             $existingAllocation = Allocation::where('resources_id', $resourceID)
+    //                             $existingAllocation = Allocation::where('resource_id', $resourceID)
     //                                 ->where('project_id', $projectID)
     //                                 ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
     //                                 ->first();
@@ -172,7 +172,7 @@ class ImportController extends Controller
     //                                 ]);
     //                             } elseif (!$existingAllocation) {
     //                                 Allocation::create([
-    //                                     'resources_id' => $resourceID,
+    //                                     'resource_id' => $resourceID,
     //                                     'project_id' => $projectID,
     //                                     'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'),
     //                                     'fte' => $fte,

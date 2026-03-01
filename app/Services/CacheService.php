@@ -158,7 +158,7 @@ class CacheService
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1)->format('Y-m-d');
 
                 $totalAllocation = Allocation::where('allocation_date', '=', $monthStartDate)
-                    ->where('resources_id', '=', $resource->id)
+                    ->where('resource_id', '=', $resource->id)
                     ->sum('fte');
                 // Use year-month as the key
                 $key = $month['year'] . '-' . str_pad($month['month'], 2, '0', STR_PAD_LEFT);

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property $id
  * @property $start_date
  * @property $end_date
- * @property $resources_id
+ * @property $resource_id
  * @property $created_at
  * @property $updated_at
  * @property resource $resource
@@ -28,10 +28,10 @@ class Leave extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['start_date', 'end_date', 'resources_id'];
+    protected $fillable = ['start_date', 'end_date', 'resource_id'];
 
     public function resource(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
+        return $this->belongsTo(\App\Models\Resource::class, 'resource_id', 'id');
     }
 }

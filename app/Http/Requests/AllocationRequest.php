@@ -23,7 +23,7 @@ class AllocationRequest extends FormRequest
     {
         return [
             'allocation_date' => 'required',
-            'resources_id' => 'required',
+            'resource_id' => 'required',
             'project_id' => 'required',
         ];
     }

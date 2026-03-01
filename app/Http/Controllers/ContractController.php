@@ -61,7 +61,7 @@ class ContractController extends Controller
         // assemble the query based on old and search values
 
         $query = Contract::query()
-            ->whereIn('resources_id', $resources->pluck('id'))
+            ->whereIn('resource_id', $resources->pluck('id'))
             ->orderBy('end_date', 'asc');
 
         if (!$old) {
@@ -76,7 +76,7 @@ class ContractController extends Controller
 
         $contractResult = $query->get();
 
-        // $contractResult = Contract::whereIn('resources_id', $resources->pluck('id'))
+        // $contractResult = Contract::whereIn('resource_id', $resources->pluck('id'))
         //     ->orderBy('end_date', 'asc')
         //     ->get();
 
@@ -235,7 +235,7 @@ class ContractController extends Controller
         $resourceID = $request->resource_id;
         $end_date = $request->end_date;
 
-        $allocations = Allocation::where('resources_id', $resourceID)
+        $allocations = Allocation::where('resource_id', $resourceID)
             ->whereDate('allocation_date', '>=', $end_date)
             ->get();
 

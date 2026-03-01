@@ -251,7 +251,7 @@ class DemandController extends Controller
         foreach ($demandArray as $demand) {
             $allocation = new Allocation;
             $allocation->allocation_date = $demand->demand_date;
-            $allocation->resources_id = $request->resource_id;
+            $allocation->resource_id = $request->resource_id;
             $allocation->fte = $demand->fte;
             $allocation->project_id = $demand->project_id;
             $allocation->status = $demand->status;

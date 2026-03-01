@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Class ResourceSkill
  *
- * @property $resources_id
+ * @property $resource_id
  * @property $skills_id
  * @property $proficiency_levels
  * @property $created_at
@@ -30,11 +30,11 @@ class ResourceSkill extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['resources_id', 'skills_id', 'proficiency_levels'];
+    protected $fillable = ['resource_id', 'skills_id', 'proficiency_levels'];
 
     public function resource(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
+        return $this->belongsTo(\App\Models\Resource::class, 'resource_id', 'id');
     }
 
     public function skill(): BelongsTo

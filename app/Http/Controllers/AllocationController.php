@@ -197,17 +197,17 @@ class AllocationController extends Controller
             if ($request->input('end_date')) {
                 $allocationArray = Allocation::where('projects_id', $project_id)
                     ->whereBetween('allocation_date', [$startDate, $endDate])
-                    ->where('resources_id', '=', $request->resource_id)
+                    ->where('resource_id', '=', $request->resource_id)
                     ->get();
             } else {
                 $allocationArray = Allocation::where('projects_id', $project_id)
                     ->where('allocation_date', '>=', $startDate)
-                    ->where('resources_id', '=', $request->resource_id)
+                    ->where('resource_id', '=', $request->resource_id)
                     ->get();
             }
         } else {
             $allocationArray = Allocation::where('projects_id', $project_id)
-                ->where('resources_id', '=', $request->resource_id)
+                ->where('resource_id', '=', $request->resource_id)
                 ->get();
         }
 
@@ -236,7 +236,7 @@ class AllocationController extends Controller
     {
         $allocation_date = Carbon::parse($request->monthKey.'-01')->format('Y-m-d');
         $allocation = Allocation::where('projects_id', $request->projectId)
-            ->where('resources_id', $request->resourceId)
+            ->where('resource_id', $request->resourceId)
             ->where('allocation_date', $allocation_date)
             ->first();
         $resources = Resource::all();
