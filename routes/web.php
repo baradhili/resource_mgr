@@ -103,9 +103,6 @@ Route::get('/services/downloadDocx/{id}', [App\Http\Controllers\ServiceControlle
         // Route::get('/import/holidays', [ImportController::class, 'importHolidays'])->name('import.holidays');
         Route::resource('public-holidays', PublicHolidayController::class);
         Route::resource('sites', SiteController::class);
-        Route::resource('domains', DomainController::class);
-        Route::resource('funding-approval-stages', FundingApprovalStageController::class);
-        Route::resource('requests', DemandRequestController::class);
         Route::get('change-requests/{changeRequest}/approve', [ChangeRequestController::class, 'approve'])->name('change-requests.approve');
         Route::resource('change-requests', ChangeRequestController::class);
     });
