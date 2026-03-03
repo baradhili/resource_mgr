@@ -86,8 +86,8 @@ class DemandRequest extends Model
     public function skills(): BelongsToMany
     {
         return $this->belongsToMany(Skill::class, 'demand_request_skills')
-                    ->withPivot('competency_level')
-                    ->withTimestamps();
+            ->withPivot('competency_level')
+            ->withTimestamps();
     }
 
     public function estimates(): HasMany
@@ -127,13 +127,13 @@ class DemandRequest extends Model
     public function scopeUnallocated($query)
     {
         return $query->whereNull('allocated_resource_id')
-                     ->where('status', '!=', DemandStatus::Rejected);
+            ->where('status', '!=', DemandStatus::Rejected);
     }
 
     public function scopeUrgent($query)
     {
         return $query->where('priority', 'critical')
-                     ->where('start_date', '<=', Carbon::now()->addWeek());
+            ->where('start_date', '<=', Carbon::now()->addWeek());
     }
 
     public function scopeNeedsEstimate($query)
@@ -155,7 +155,7 @@ class DemandRequest extends Model
     {
         // Governance: Only allocate if Approved AND Funded
         return $query->where('status', DemandStatus::Approved)
-                     ->where('is_funded', true);
+            ->where('is_funded', true);
     }
 
     // ------------------------------------------------------------------
@@ -165,7 +165,7 @@ class DemandRequest extends Model
     public function createEstimate(array $data): Estimate
     {
         $estimate = $this->estimates()->create($data);
-        
+
         $this->update([
             'status' => DemandStatus::Estimated,
         ]);
@@ -194,9 +194,9 @@ class DemandRequest extends Model
      * Requires an approved estimate to link against.
      */
     public function markAsFunded(
-        FundingSource $source, 
-        string $budgetCode, 
-        float $amount, 
+        FundingSource $source,
+        string $budgetCode,
+        float $amount,
         User $approver,
         ?int $estimateId = null
     ): void {
@@ -231,7 +231,7 @@ class DemandRequest extends Model
             'funded_at' => null,
             'funded_estimate_id' => null,
             // Revert status to Approved (waiting for funding)
-            'status' => DemandStatus::Approved, 
+            'status' => DemandStatus::Approved,
         ]);
     }
 
@@ -262,7 +262,7 @@ class DemandRequest extends Model
 
     public function isOverdue(): bool
     {
-        return in_array($this->status, [DemandStatus::Sourcing, DemandStatus::Approved])
-            && $this->start_date->isPast();
+        return in_array($this->status, [DemandStatus::Sourcing, DemandStatus::Approved], true)
+            && $this->start_date?->isPast() === true;
     }
 }

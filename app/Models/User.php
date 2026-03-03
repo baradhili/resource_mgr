@@ -30,12 +30,12 @@ use Spatie\Permission\Traits\HasRoles;
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
  * @method \Illuminate\Database\Eloquent\Builder|\App\Models\User query()
- * @method \App\Models\User|null find(int|string|object $id, array $columns = ['*'])
- * @method \App\Models\User|null findOrFail(int|string|object $id, array $columns = ['*'])
- * @method \App\Models\User|null findOrNew(array $attributes = [], array $values = [])
- * @method \App\Models\User|newModelInstance(array $attributes = [])
+ * @method \App\Models\User find(int|string|object $id, array $columns = ['*'])
+ * @method \App\Models\User findOrFail(int|string|object $id, array $columns = ['*'])
+ * @method \App\Models\User findOrNew(array $attributes = [], array $values = [])
+ * @method \App\Models\User newModelInstance(array $attributes = [])
  * @method \Illuminate\Database\Eloquent\Collection|\App\Models\User[] get()
- * @method \Illuminate\Database\Eloquent\Builder withTrashed()
+ * 
  */
 class User extends Authenticatable
 {

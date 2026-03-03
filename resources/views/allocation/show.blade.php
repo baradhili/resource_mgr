@@ -33,7 +33,7 @@
                                     {{ $allocation->fte }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Resources Id:</strong>
+                                    <strong>Resource Id:</strong>
                                     {{ $allocation->resource_id }}
                                 </div>
                                 <div class="form-group mb-2 mb20">

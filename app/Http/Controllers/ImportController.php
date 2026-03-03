@@ -68,7 +68,7 @@ class ImportController extends Controller
             $plugins[$key]->displayName = preg_replace('/Import$/', '', $plugin->name);
             $plugins[$key]->displayName = preg_replace('/([a-z])([A-Z])/', '$1 $2', $plugins[$key]->displayName);
 
-            $plugins[$key]->route = "import.". strtolower($plugins[$key]->displayName);
+            $plugins[$key]->route = "import." . strtolower($plugins[$key]->displayName);
         }
         return view('import.index', compact('plugins'));
     }
@@ -188,7 +188,7 @@ class ImportController extends Controller
     //                     $projectID = $this->checkProject($rowData);
     //                     // first replace the "resource name" with a resource_type id
     //                     $resourceType = ResourceType::where('name', 'LIKE', $resourceName . '%')->first();
-                        
+
     //                     // Check if the resource type belongs to a team aka someone is going to manage this demand - otherwise skip
     //                     $belongsToTeam = $ownedResourceTypes->contains(function ($resourceType) use ($resourceName) {
     //                         return strtolower($resourceType->name) === strtolower($resourceName);
@@ -304,10 +304,10 @@ class ImportController extends Controller
         foreach ($stagedDemands as $stagedDemand) {
 
             // Check if we have an existing Demand
-            $demand = $demands->firstWhere('project_id', $stagedDemand->project_id);
-            if ($demand) {
-                $demand = $demand->where('demand_date', $stagedDemand->demand_date)->first();
-            }
+            $demand = $demands->first(function ($d) use ($stagedDemand) {
+                return (int) $d->project_id === (int) $stagedDemand->project_id
+                    && $d->demand_date === $stagedDemand->demand_date;
+            });
 
             // If we have an existing demand then process as a change
             if ($demand) {
@@ -380,10 +380,10 @@ class ImportController extends Controller
         $changes = [];
 
         foreach ($stagedAllocations as $stagedAllocation) {
-            $allocation = $allocations->firstWhere('project_id', $stagedAllocation->project_id);
-            if ($allocation) {
-                $allocation = $allocation->where('allocation_date', $stagedAllocation->allocation_date)->first();
-            }
+            $allocation = $allocations->first(function ($a) use ($stagedAllocation) {
+                return (int) $a->project_id === (int) $stagedAllocation->project_id
+                    && $a->allocation_date === $stagedAllocation->allocation_date;
+            });
 
             if ($allocation) {
                 if ($stagedAllocation->fte != $allocation->fte) {

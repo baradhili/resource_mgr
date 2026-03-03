@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Log;
  * @property-read Allocation[] $allocations
  * @property-read Contract[] $contracts
  * @property-read Leave[] $leaves
- * @property-read ResourceSkill[] $skills
+ * @property-read ResourceSkill[] $skill
  * @property-read Region $region
  * @property-read Location $location
  * @property-read User $user
@@ -109,9 +109,9 @@ class Resource extends Model
             ->where('end_date', '>=', Carbon::now());
     }
 
-    public function skills(): BelongsToMany
+    public function skill(): BelongsToMany
     {
-        return $this->belongsToMany(Skill::class, 'resource_skill', 'resource_id', 'skills_id');
+        return $this->belongsToMany(Skill::class, 'resource_skill', 'resource_id', 'skill_id');
     }
 
     public function region(): BelongsTo

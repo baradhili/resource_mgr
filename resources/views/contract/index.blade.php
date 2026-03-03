@@ -70,7 +70,12 @@
                                         @endphp
                                         <tr>
                                             <td>
-                                                <a href="{{ route('resources.allocations', $contract->resource_id) }}">{{ $contract->resource->full_name }}</a>
+                                                @if ($contract->resource_id && $contract->resource)
+                                                    <a
+                                                        href="{{ route('resources.allocations', $contract->resource_id) }}">{{ $contract->resource->full_name }}</a>
+                                                @else
+                                                    <span class="text-muted">{{ __('Resource unavailable') }}</span>
+                                                @endif
                                                 @if ($monthsDifference <= 3)
                                                     @if ($monthsDifference >= 2)
                                                         <span data-toggle="tooltip" data-placement="top"

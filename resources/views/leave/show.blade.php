@@ -29,7 +29,7 @@
                                     {{ $leave->end_date }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Resources Id:</strong>
+                                    <strong>Resource Id:</strong>
                                     {{ $leave->resource_id }}
                                 </div>
 

@@ -48,7 +48,7 @@ class DemandRequestController extends Controller
      */
     public function show($id): View
     {
-        $demandRequest = DemandRequest::find($id);
+        $demandRequest = DemandRequest::findOrFail($id);
 
         return view('demand-request.show', compact('demandRequest'));
     }
@@ -58,7 +58,7 @@ class DemandRequestController extends Controller
      */
     public function edit($id): View
     {
-        $demandRequest = DemandRequest::find($id);
+        $demandRequest = DemandRequest::findOrFail($id);
 
         return view('demand-request.edit', compact('demandRequest'));
     }

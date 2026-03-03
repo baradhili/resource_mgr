@@ -86,19 +86,14 @@ class ForecastDemand extends Model
      */
     public function scopeImpactingQuarter($query, int $year, int $quarter)
     {
-        return $query->where(function ($q) use ($year, $quarter) {
-            // Starts in this quarter
-            $q->where('start_year', $year)
-                ->where('start_quarter', $quarter)
-                // OR started earlier but overlaps into this quarter
-                ->orWhere(function ($sub) use ($year, $quarter) {
-                    $sub->where('start_year', '<', $year)
-                        ->orWhere(function ($s) use ($year, $quarter) {
-                            $s->where('start_year', $year)
-                                ->where('start_quarter', '<', $quarter);
-                        });
-                });
-        });
+        // Calculate target quarter start/end in months since epoch for comparison
+        $targetStartMonths = ($year * 12) + (($quarter - 1) * 3);
+        $targetEndMonths = $targetStartMonths + 3;
+
+        return $query->whereRaw(
+            '(start_year * 12 + (start_quarter - 1) * 3) < ? AND (start_year * 12 + (start_quarter - 1) * 3 + duration_months) > ?',
+            [$targetEndMonths, $targetStartMonths]
+        );
     }
 
     /**
@@ -140,7 +135,7 @@ class ForecastDemand extends Model
      * This is typically done when the Opportunity moves to the "Estimate" stage.
      * 
      */
-   
+
     /**
      * Check if this forecast overlaps with a given date range.
      * Useful for conflict detection.
@@ -153,20 +148,5 @@ class ForecastDemand extends Model
         return $start->lessThan($forecastEnd) && $end->greaterThan($forecastStart);
     }
 
-    protected static function booted(): void
-    {
-        static::creating(function (self $request) {
-            // Auto-populate client_id from forecast_demand if not set
-            if (!$request->client_id && $request->forecast_demand_id) {
-                $request->client_id = ForecastDemand::find($request->forecast_demand_id)?->client_id;
-            }
-        });
 
-        static::updating(function (self $request) {
-            // Keep client_id in sync if forecast_demand_id changes
-            if ($request->isDirty('forecast_demand_id') && $request->forecast_demand_id) {
-                $request->client_id = ForecastDemand::find($request->forecast_demand_id)?->client_id;
-            }
-        });
-    }
 }
