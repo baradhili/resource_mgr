@@ -253,7 +253,7 @@ class DemandRequest extends Model
         ]);
     }
 
-    public function reject(string $reason): void
+    public function reject(): void
     {
         $this->update([
             'status' => DemandStatus::Rejected,

@@ -74,9 +74,9 @@ class DemandRequestController extends Controller
             ->with('success', 'DemandRequest updated successfully');
     }
 
-    public function destroy($id): RedirectResponse
+    public function destroy(DemandRequest $demandRequest): RedirectResponse
     {
-        DemandRequest::find($id)->delete();
+        $demandRequest->delete();
 
         return Redirect::route('demand-requests.index')
             ->with('success', 'DemandRequest deleted successfully');
