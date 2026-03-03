@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  * @property $start_date
  * @property $end_date
  * @property $availability
- * @property $resources_id
+ * @property $resource_id
  * @property $created_at
  * @property $updated_at
  * @property resource $resource
@@ -31,7 +31,7 @@ class Contract extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['start_date', 'end_date', 'availability', 'resources_id', 'permanent'];
+    protected $fillable = ['start_date', 'end_date', 'availability', 'resource_id', 'permanent'];
 
     protected $casts = [
         'start_date' => 'datetime',
@@ -44,7 +44,7 @@ class Contract extends Model
 
     public function resource(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
+        return $this->belongsTo(\App\Models\Resource::class, 'resource_id', 'id');
     }
 
     /**

@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Log;
  * @property-read Allocation[] $allocations
  * @property-read Contract[] $contracts
  * @property-read Leave[] $leaves
- * @property-read ResourceSkill[] $skills
+ * @property-read ResourceSkill[] $skill
  * @property-read Region $region
  * @property-read Location $location
  * @property-read User $user
@@ -63,12 +63,12 @@ class Resource extends Model
 
     public function allocations(): HasMany
     {
-        return $this->hasMany(Allocation::class, 'resources_id');
+        return $this->hasMany(Allocation::class, 'resource_id');
     }
 
     public function contracts(): HasMany
     {
-        return $this->hasMany(Contract::class, 'resources_id');
+        return $this->hasMany(Contract::class, 'resource_id');
     }
     /**
      * Get the current contract for this resource.
@@ -81,7 +81,7 @@ class Resource extends Model
      */
     public function currentContract(): HasOne
     {
-        return $this->hasOne(Contract::class, 'resources_id')
+        return $this->hasOne(Contract::class, 'resource_id')
             ->where('start_date', '<=', Carbon::now())
             ->where('end_date', '>=', Carbon::now());
     }
@@ -93,7 +93,7 @@ class Resource extends Model
      */
     public function leaves(): HasMany
     {
-        return $this->hasMany(Leave::class, 'resources_id');
+        return $this->hasMany(Leave::class, 'resource_id');
     }
 
     /**
@@ -105,13 +105,13 @@ class Resource extends Model
      */
     public function activeLeaves(): HasMany
     {
-        return $this->hasMany(Leave::class, 'resources_id')
+        return $this->hasMany(Leave::class, 'resource_id')
             ->where('end_date', '>=', Carbon::now());
     }
 
-    public function skills(): BelongsToMany
+    public function skill(): BelongsToMany
     {
-        return $this->belongsToMany(Skill::class, 'resource_skill', 'resources_id', 'skills_id');
+        return $this->belongsToMany(Skill::class, 'resource_skill', 'resource_id', 'skill_id');
     }
 
     public function region(): BelongsTo

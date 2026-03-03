@@ -87,7 +87,7 @@ class FieldglassImportController extends Controller
                 if ($resource != null) {
 
                     //find current contract for resource
-                    $contract = Contract::where('resources_id', $resource->id)
+                    $contract = Contract::where('resource_id', $resource->id)
                         ->orderBy('start_date', 'desc')
                         ->first();
                     if ($contract != null) {

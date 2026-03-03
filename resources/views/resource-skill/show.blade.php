@@ -22,7 +22,7 @@
                         
                                 <div class="form-group mb-2 mb20">
                                     <strong>Resources Id:</strong>
-                                    {{ $resourceSkill->resources_id }}
+                                    {{ $resourceSkill->resource_id }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Skills Id:</strong>

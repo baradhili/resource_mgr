@@ -53,7 +53,7 @@ class AllocationControllerTest extends TestCase
 
         // // create some allocations
         Allocation::factory()->count(10)->create([
-            'projects_id' => $project->id,
+            'project_id' => $project->id,
         ]);
 
         // // call the index method

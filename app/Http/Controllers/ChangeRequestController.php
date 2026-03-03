@@ -53,7 +53,7 @@ class ChangeRequestController extends Controller
                 function ($query, $type) use ($resources, $resourceTypes) {
                     if ($type === Allocation::class) {
                         $query->when(! empty($resources), function ($query) use ($resources) {
-                            $query->whereIn('resources_id', $resources);
+                            $query->whereIn('resource_id', $resources);
                         });
                     } elseif ($type === Demand::class) {
                         $query->when(! empty($resourceTypes), function ($query) use ($resourceTypes) {
@@ -61,7 +61,7 @@ class ChangeRequestController extends Controller
                         });
                     } elseif ($type == Contract::class) {
                         $query->when(! empty($resources), function ($query) use ($resources) {
-                            $query->whereIn('resources_id', $resources);
+                            $query->whereIn('resource_id', $resources);
                         });
                     }
                 }

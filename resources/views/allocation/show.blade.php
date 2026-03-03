@@ -33,12 +33,12 @@
                                     {{ $allocation->fte }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
-                                    <strong>Resources Id:</strong>
-                                    {{ $allocation->resources_id }}
+                                    <strong>Resource Id:</strong>
+                                    {{ $allocation->resource_id }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Projects Id:</strong>
-                                    {{ $allocation->projects_id }}
+                                    {{ $allocation->project_id }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Status:</strong>

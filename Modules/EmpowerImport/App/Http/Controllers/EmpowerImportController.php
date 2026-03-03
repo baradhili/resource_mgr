@@ -238,8 +238,8 @@ class EmpowerImportController extends Controller
                         for ($i = 0; $i < count($monthYear); $i++) {
                             $columnLetter = chr(ord($this->columnDataStart) + $i);
                             $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
-                            $existingAllocation = Allocation::where('resources_id', $resourceID)
-                                ->where('projects_id', $projectID)
+                            $existingAllocation = Allocation::where('resource_id', $resourceID)
+                                ->where('project_id', $projectID)
                                 ->where('allocation_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
                                 ->first();
                             // if its a change
@@ -257,8 +257,8 @@ class EmpowerImportController extends Controller
                                 ]);
                             } elseif (!$existingAllocation) {
                                 Allocation::create([
-                                    'resources_id' => $resourceID,
-                                    'projects_id' => $projectID,
+                                    'resource_id' => $resourceID,
+                                    'project_id' => $projectID,
                                     'allocation_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'),
                                     'fte' => $fte,
                                     'status' => 'Proposed',
@@ -286,7 +286,7 @@ class EmpowerImportController extends Controller
                 //         for ($i = 0; $i < count($monthYear); $i++) {
                 //             $columnLetter = chr(ord($this->columnDataStart) + $i); // 'H' + i
                 //             $fte = (double) number_format(min(max((float) $rowData[$columnLetter], 0.00), 9.99), 2, '.', '');
-                //             $existingDemand = Demand::where('projects_id', $projectID)
+                //             $existingDemand = Demand::where('project_id', $projectID)
                 //                 ->where('demand_date', Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'))
                 //                 ->where('resource_type', $resourceType->id)
                 //                 ->first();
@@ -308,7 +308,7 @@ class EmpowerImportController extends Controller
                 //                 $resourceTypeId = $resourceType ? $resourceType->id : $resourceName;
 
                 //                 Demand::create([
-                //                     'projects_id' => $projectID,
+                //                     'project_id' => $projectID,
                 //                     'demand_date' => Carbon::createFromFormat('Y-m', $monthYear[$i])->startOfMonth()->format('Y-m-d'),
                 //                     'fte' => $fte,
                 //                     'resource_type' => $resourceTypeId,

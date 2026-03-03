@@ -39,7 +39,7 @@ class ResourceSkillController extends Controller
             $resource = Resource::findOrFail($resourceId);
             // Log::info("resource id = " . $resource->full_name);
 
-            $skills = ResourceSkill::where('resources_id', $resource->id)->get();
+            $skills = ResourceSkill::where('resource_id', $resource->id)->get();
 
             $allSkills = Skill::all();
             $unassignedSkills = $allSkills->diff($skills);
@@ -50,7 +50,7 @@ class ResourceSkillController extends Controller
             $resource = new Resource;
             $resource->id = 0;
 
-            $currentContracts = Contract::where('end_date', '>=', Carbon::today())->pluck('resources_id');
+            $currentContracts = Contract::where('end_date', '>=', Carbon::today())->pluck('resource_id');
             $resources = Resource::whereIn('id', $currentContracts)->get();
 
             $allSkills = Skill::all();

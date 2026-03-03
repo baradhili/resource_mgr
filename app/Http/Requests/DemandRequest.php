@@ -23,7 +23,7 @@ class DemandRequest extends FormRequest
     {
         return [
             'demand_date' => 'required',
-            'projects_id' => 'required',
+            'project_id' => 'required',
         ];
     }
 }

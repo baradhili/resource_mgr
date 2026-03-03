@@ -22,7 +22,7 @@ class ResourceSkillRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'resources_id' => 'required',
+            'resource_id' => 'required',
             'skills_id' => 'required',
             'proficiency_levels' => 'required',
         ];

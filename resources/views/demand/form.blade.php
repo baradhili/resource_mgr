@@ -1,14 +1,14 @@
 <div class="row padding-1 p-1">
     <div class="col-md-12">
         <div class="form-group mb-2 mb20">
-            <label for="projects_id" class="form-label">{{ __('Projects') }}</label>
+            <label for="project_id" class="form-label">{{ __('Projects') }}</label>
             <div class="input-group">
                 <select class="form-control" name="project_id" id="project_id">
                     <option value="" disabled {{ isset($demand) ? 'hidden' : 'selected' }}>Search for a project
                     </option>
                     @foreach ($projects as $project)
                         <option value="{{ $project->id }}"
-                            {{ isset($demand) && $demand->projects_id == $project->id ? 'selected' : '' }}>
+                            {{ isset($demand) && $demand->project_id == $project->id ? 'selected' : '' }}>
                             {{ strlen($project->empowerID) > 1 ? $project->empowerID . ' - ' . $project->name : 'domain - ' . $project->name }}
                         </option>
                     @endforeach
@@ -25,7 +25,7 @@
                     </button>
                 </div>
             </div>
-            {!! $errors->first('projects_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+            {!! $errors->first('project_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
 
         <div class="form-group mb-2 mb20">

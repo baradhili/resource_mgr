@@ -14,11 +14,11 @@
             {!! $errors->first('end_date', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="resources_id" class="form-label">{{ __('Resource') }}</label>
-            <select name="resources_id" class="form-control @error('resources_id') is-invalid @enderror" id="resources_id">
+            <label for="resource_id" class="form-label">{{ __('Resource') }}</label>
+            <select name="resource_id" class="form-control @error('resource_id') is-invalid @enderror" id="resource_id">
                 <option value="">{{ __('Select a Resource') }}</option>
                 @foreach ($resources as $resource)
-                    <option value="{{ $resource->id }}" @if(old('resources_id', $leave?->resources_id) == $resource->id) selected
+                    <option value="{{ $resource->id }}" @if(old('resource_id', $leave?->resource_id) == $resource->id) selected
                     @endif>{{ $resource->full_name }}</option>
                 @endforeach
             </select>

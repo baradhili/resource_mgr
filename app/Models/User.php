@@ -14,6 +14,29 @@ use Illuminate\Notifications\Notifiable;
 use Mpociot\Teamwork\Traits\UserHasTeams;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * Class User
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property int|null $current_team_id
+ * @property int|null $resource_id
+ * @property string $password
+ * @property string|null $reports
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string|null $remember_token
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @method \Illuminate\Database\Eloquent\Builder|\App\Models\User query()
+ * @method \App\Models\User find(int|string|object $id, array $columns = ['*'])
+ * @method \App\Models\User findOrFail(int|string|object $id, array $columns = ['*'])
+ * @method \App\Models\User findOrNew(array $attributes = [], array $values = [])
+ * @method \App\Models\User newModelInstance(array $attributes = [])
+ * @method \Illuminate\Database\Eloquent\Collection|\App\Models\User[] get()
+ * 
+ */
 class User extends Authenticatable
 {
     use HasFactory, HasRoles, HasSettingsField, Notifiable, UserHasTeams;
@@ -87,3 +110,4 @@ class User extends Authenticatable
         return $this->belongsTo(Resource::class, 'resource_id');
     }
 }
+

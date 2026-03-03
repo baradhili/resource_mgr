@@ -64,7 +64,7 @@ class LeaveController extends Controller
 
         // Build the query based on the old and search values
         $query = Leave::query()
-            ->whereIn('resources_id', $resources->pluck('id'));
+            ->whereIn('resource_id', $resources->pluck('id'));
 
         // If the user asked for only current leaves, filter out all leaves that have end dates in the past
         if (!$old) {

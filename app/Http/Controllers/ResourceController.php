@@ -66,7 +66,6 @@ class ResourceController extends Controller
 
         // Modify resource names to add [c] if the resource is not permanent
         foreach ($resources as $resource) {
-            Log::info($resource->full_name. " " . $resource->employmentStatus() );
             $resource->full_name .= $resource->employmentStatus() === 1 ? '' : ' [c]';
         }
 
@@ -116,7 +115,7 @@ class ResourceController extends Controller
                 'name' => $skill->skill_name,
             ];
         })->toArray();
-        $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
+        $resourceSkills = ResourceSkill::where('resource_id', $resource->id)
             ->with('skill')
             ->get();
         $resourceTypes = ResourceType::all();
@@ -138,7 +137,7 @@ class ResourceController extends Controller
                 'name' => $skill->skill_name,
             ];
         })->toArray();
-        $resourceSkills = ResourceSkill::where('resources_id', $resource->id)
+        $resourceSkills = ResourceSkill::where('resource_id', $resource->id)
             ->with('skill')
             ->get();
 
@@ -176,7 +175,7 @@ class ResourceController extends Controller
         }
 
         // Get the skills for the resource
-        $resourceSkills = ResourceSkill::where('resources_id', $id)
+        $resourceSkills = ResourceSkill::where('resource_id', $id)
             ->select('skills_id', 'proficiency_levels')
             ->pluck('proficiency_levels', 'skills_id')
             ->toArray();
@@ -191,9 +190,9 @@ class ResourceController extends Controller
         $skills = $resourceSkills;
 
         $projects = Project::whereIn('id', function ($query) use ($resource) {
-            $query->select('projects_id')
+            $query->select('project_id')
                 ->from('allocations')
-                ->where('resources_id', $resource->id)
+                ->where('resource_id', $resource->id)
                 ->distinct();
         })->get();
 
@@ -252,7 +251,7 @@ class ResourceController extends Controller
         }
 
         // Get the skills for the resource
-        $resourceSkills = ResourceSkill::where('resources_id', $id)
+        $resourceSkills = ResourceSkill::where('resource_id', $id)
             ->select('skills_id', 'proficiency_levels')
             ->pluck('proficiency_levels', 'skills_id')
             ->toArray();
@@ -280,9 +279,9 @@ class ResourceController extends Controller
 
             foreach ($nextTwelveMonths as $month) {
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
-                $totalAllocation = Allocation::where('resources_id', '=', $resource->id)
+                $totalAllocation = Allocation::where('resource_id', '=', $resource->id)
                     ->where('allocation_date', '=', $monthStartDate)
-                    ->where('projects_id', '=', $project->id)
+                    ->where('project_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
                 // if ($totalAllocation !== null) Log::info(print_r($totalAllocation,true) . "Resource: {$resource->id} Date: {$monthStartDate} Project: {$project->id}");
@@ -362,7 +361,7 @@ class ResourceController extends Controller
         // Synchronize ResourceSkill entries
         $resource->skills()->sync($skillsData);
 
-        // $resourceSkills = ResourceSkill::where('resources_id', $resource->id)->get();
+        // $resourceSkills = ResourceSkill::where('resource_id', $resource->id)->get();
         // Log::info("resourceskills-after: " . json_encode($resourceSkills));
 
         return Redirect::route('resources.index')

@@ -64,7 +64,7 @@ class UpcomingDemand extends AbstractWidget
         $startDate = Carbon::now()->startOfMonth();
         $endDate = Carbon::now()->addMonths(3)->startOfMonth();
 
-        // Collect the projects_id from demands in our window
+        // Collect the project_id from demands in our window
         $demandIDs = Demand::whereBetween('demand_date', [$startDate, $endDate])
             ->pluck('project_id')
             ->unique()
@@ -87,7 +87,7 @@ class UpcomingDemand extends AbstractWidget
 
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 $totalAllocation = Demand::where('demand_date', '=', $monthStartDate)
-                    ->where('projects_id', '=', $project->id)
+                    ->where('project_id', '=', $project->id)
                     ->whereIn('resource_type', $resource_types)
                     ->pluck('fte')
                     ->first();

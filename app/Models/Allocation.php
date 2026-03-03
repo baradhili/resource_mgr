@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $source
  * @property string|null $allocation_date
  * @property string|null $fte
- * @property int $resources_id
- * @property int $projects_id
+ * @property int $resource_id
+ * @property int $project_id
  * @property string|null $status
  * @property string|null $created_at
  * @property string|null $updated_at
@@ -32,15 +32,15 @@ class Allocation extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['allocation_date', 'fte', 'resources_id', 'projects_id', 'status', 'source'];
+    protected $fillable = ['allocation_date', 'fte', 'resource_id', 'project_id', 'status', 'source'];
 
     public function project(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Project::class, 'projects_id', 'id');
+        return $this->belongsTo(\App\Models\Project::class, 'project_id', 'id');
     }
 
     public function resource(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Resource::class, 'resources_id', 'id');
+        return $this->belongsTo(\App\Models\Resource::class, 'resource_id', 'id');
     }
 }
