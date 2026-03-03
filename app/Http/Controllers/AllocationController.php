@@ -195,18 +195,18 @@ class AllocationController extends Controller
 
         if ($request->input('start_date')) {
             if ($request->input('end_date')) {
-                $allocationArray = Allocation::where('projects_id', $project_id)
+                $allocationArray = Allocation::where('project_id', $project_id)
                     ->whereBetween('allocation_date', [$startDate, $endDate])
                     ->where('resource_id', '=', $request->resource_id)
                     ->get();
             } else {
-                $allocationArray = Allocation::where('projects_id', $project_id)
+                $allocationArray = Allocation::where('project_id', $project_id)
                     ->where('allocation_date', '>=', $startDate)
                     ->where('resource_id', '=', $request->resource_id)
                     ->get();
             }
         } else {
-            $allocationArray = Allocation::where('projects_id', $project_id)
+            $allocationArray = Allocation::where('project_id', $project_id)
                 ->where('resource_id', '=', $request->resource_id)
                 ->get();
         }

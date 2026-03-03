@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Enums;
+
 enum ForecastStatus: string
 {
     case Active = 'active';       // Still in funnel

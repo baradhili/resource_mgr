@@ -48,7 +48,7 @@ class ForecastDemandController extends Controller
      */
     public function show($id): View
     {
-        $forecastDemand = ForecastDemand::find($id);
+        $forecastDemand = ForecastDemand::findOrFail($id);
 
         return view('forecast-demand.show', compact('forecastDemand'));
     }
@@ -58,7 +58,7 @@ class ForecastDemandController extends Controller
      */
     public function edit($id): View
     {
-        $forecastDemand = ForecastDemand::find($id);
+        $forecastDemand = ForecastDemand::findOrFail($id);
 
         return view('forecast-demand.edit', compact('forecastDemand'));
     }
@@ -82,3 +82,4 @@ class ForecastDemandController extends Controller
             ->with('success', 'ForecastDemand deleted successfully');
     }
 }
+

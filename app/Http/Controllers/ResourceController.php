@@ -190,7 +190,7 @@ class ResourceController extends Controller
         $skills = $resourceSkills;
 
         $projects = Project::whereIn('id', function ($query) use ($resource) {
-            $query->select('projects_id')
+            $query->select('project_id')
                 ->from('allocations')
                 ->where('resource_id', $resource->id)
                 ->distinct();
@@ -281,7 +281,7 @@ class ResourceController extends Controller
                 $monthStartDate = Carbon::create($month['year'], $month['month'], 1);
                 $totalAllocation = Allocation::where('resource_id', '=', $resource->id)
                     ->where('allocation_date', '=', $monthStartDate)
-                    ->where('projects_id', '=', $project->id)
+                    ->where('project_id', '=', $project->id)
                     ->pluck('fte')
                     ->first();
                 // if ($totalAllocation !== null) Log::info(print_r($totalAllocation,true) . "Resource: {$resource->id} Date: {$monthStartDate} Project: {$project->id}");

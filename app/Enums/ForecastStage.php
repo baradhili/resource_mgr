@@ -1,4 +1,7 @@
 <?php
+
+namespace App\Enums;
+
 enum ForecastStage: string
 {
     case Plan = 'plan';         // High level, no details

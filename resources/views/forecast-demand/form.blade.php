@@ -13,13 +13,12 @@
         </div>
         <div class="form-group mb-2 mb20">
             <label for="stage" class="form-label">{{ __('Stage') }}</label>
-            <input type="text" name="stage" class="form-control @error('stage') is-invalid @enderror" value="{{ old('stage', $forecastDemand?->stage) }}" id="stage" placeholder="Stage">
+            <input type="text" name="stage" class="form-control `@error`('stage') is-invalid `@enderror`" value="{{ old('stage', $forecastDemand?->stage?->value) }}" id="stage" placeholder="Stage">
             {!! $errors->first('stage', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
             <label for="status" class="form-label">{{ __('Status') }}</label>
-            <input type="text" name="status" class="form-control @error('status') is-invalid @enderror" value="{{ old('status', $forecastDemand?->status) }}" id="status" placeholder="Status">
-            {!! $errors->first('status', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+            <input type="text" name="status" class="form-control `@error`('status') is-invalid `@enderror`" value="{{ old('status', $forecastDemand?->status?->value) }}" id="status" placeholder="Status">            {!! $errors->first('status', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
             <label for="win_probability" class="form-label">{{ __('Win Probability') }}</label>

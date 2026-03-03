@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\User;
-use App\Models\ResourceManagement\DemandRequest;
+use App\Models\DemandRequest;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -101,25 +101,6 @@ class ForecastDemand extends Model
         });
     }
 
-    public function scopeUnconverted($query)
-    {
-        return $query->where('status', ForecastStatus::Active)
-            ->whereDoesntHave('demandRequests');
-    }
-
-    // ------------------------------------------------------------------
-    // Business Logic (The "Resource Manager" Brain)
-    // ------------------------------------------------------------------
-
-    /**
-     * Calculate weighted FTE for capacity planning.
-     * 1.0 FTE at 50% probability = 0.5 weighted FTE.
-     */
-    public function getWeightedFteAttribute(): float
-    {
-        return (float) $this->quantity_fte * ($this->win_probability / 100);
-    }
-
     /**
      * Get the start date as a Carbon instance (approximate).
      * Assumes start of quarter (Jan 1, Apr 1, etc).
@@ -155,34 +136,11 @@ class ForecastDemand extends Model
     }
 
     /**
-     * Create a detailed DemandRequest from this high-level Forecast.
+     * TODO Create a Estimate from this high-level Forecast.
      * This is typically done when the Opportunity moves to the "Estimate" stage.
-     * The DemandRequest will then hold the specific Skills/Roles/Estimates.
+     * 
      */
-    public function createDetailedRequest(array $details = []): DemandRequest
-    {
-        return DB::transaction(function () use ($details) {
-            $request = $this->demandRequests()->create([
-                'project_id' => $details['project_id'] ?? null,
-                'requester_id' => $this->owner_id,
-                'forecast_demand_id' => $this->id,
-                'role_title' => $details['role_title'] ?? $this->role_title,
-                'quantity_fte' => $details['quantity_fte'] ?? $this->quantity_fte,
-                'start_date' => $details['start_date'] ?? $this->approximate_start_date,
-                'end_date' => $details['end_date'] ?? $this->approximate_end_date,
-                'priority' => 'normal',
-                'status' => \App\Enums\DemandStatus::PendingEstimate,
-            ]);
-
-            // If deal is already won, move request to Approved/Sourcing
-            if ($this->stage === ForecastStage::Won) {
-                $request->approveEstimate(); // Skip estimate step if already priced
-            }
-
-            return $request;
-        });
-    }
-
+   
     /**
      * Check if this forecast overlaps with a given date range.
      * Useful for conflict detection.
