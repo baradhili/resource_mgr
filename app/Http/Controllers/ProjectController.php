@@ -90,7 +90,7 @@ class ProjectController extends Controller
 
         //get open demands for this project
         $demands = Demand::selectRaw('resource_type, MIN(demand_date) as start, MAX(demand_date) as end, AVG(fte) as fte')
-            ->where('projects_id', $project->id)
+            ->where('project_id', $project->id)
             ->where('fte', '>', 0)
             ->groupBy('resource_type')
             ->get()

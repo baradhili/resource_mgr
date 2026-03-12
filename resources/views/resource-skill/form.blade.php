@@ -17,14 +17,14 @@
             {!! $errors->first('resource_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
-            <label for="skills_id" class="form-label">{{ __('Skills') }}</label>
-            <select name="skills_id" class="form-control @error('skills_id') is-invalid @enderror" id="skills_id">
+            <label for="skill_id" class="form-label">{{ __('Skills') }}</label>
+            <select name="skill_id" class="form-control @error('skill_id') is-invalid @enderror" id="skill_id">
                 <option value="">{{ __('Select a Skill') }}</option>
                 @foreach ($unassignedSkills as $skill)
-                    <option value="{{ $skill->id }}" @if(old('skills_id', $resourceSkill?->skills_id) == $skill->id) selected @endif>{{ $skill->skill_name }}</option>
+                    <option value="{{ $skill->id }}" @if(old('skill_id', $resourceSkill?->skill_id) == $skill->id) selected @endif>{{ $skill->skill_name }}</option>
                 @endforeach
             </select>
-            {!! $errors->first('skills_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
+            {!! $errors->first('skill_id', '<div class="invalid-feedback" role="alert"><strong>:message</strong></div>') !!}
         </div>
         <div class="form-group mb-2 mb20">
             <label for="proficiency_levels" class="form-label">{{ __('Proficiency Levels') }}</label>

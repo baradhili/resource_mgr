@@ -42,6 +42,6 @@ class Skill extends Model
 
     public function resourceSkills(): HasMany
     {
-        return $this->hasMany(\App\Models\ResourceSkill::class, 'id', 'skills_id');
+        return $this->hasMany(\App\Models\ResourceSkill::class, 'id', 'skill_id');
     }
 }

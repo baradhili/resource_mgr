@@ -26,7 +26,7 @@
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Skills Id:</strong>
-                                    {{ $resourceSkill->skills_id }}
+                                    {{ $resourceSkill->skill_id }}
                                 </div>
                                 <div class="form-group mb-2 mb20">
                                     <strong>Proficiency Levels:</strong>

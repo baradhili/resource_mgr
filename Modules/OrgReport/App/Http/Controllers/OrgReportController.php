@@ -55,7 +55,7 @@ class OrgReportController extends Controller
             }
             // find the project ids from teh resource's current allocations
             $allocations = $resource->allocations()->whereBetween('allocation_date', [\Carbon\Carbon::now()->startOfMonth(), $resource->contracts->first()->end_date])->get();
-            $uniqueProjectIds = $allocations->pluck('projects_id')->unique()->values()->all();
+            $uniqueProjectIds = $allocations->pluck('project_id')->unique()->values()->all();
             $projects = Project::whereIn('id', $uniqueProjectIds)->get();
             $currentProjects = $projects;
             //filter all projects where the project end date is after or within one month of the resource's contract end date

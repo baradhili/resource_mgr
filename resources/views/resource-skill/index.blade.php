@@ -49,7 +49,7 @@
                                             <td>{{ ++$i }}</td>
                                             
 										<td >{{ $resourceSkill->resource_id }}</td>
-										<td >{{ $resourceSkill->skills_id }}</td>
+										<td >{{ $resourceSkill->skill_id }}</td>
 										<td >{{ $resourceSkill->proficiency_levels }}</td>
 
                                             <td>
