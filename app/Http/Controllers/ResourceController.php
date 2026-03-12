@@ -176,8 +176,8 @@ class ResourceController extends Controller
 
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resource_id', $id)
-            ->select('skills_id', 'proficiency_levels')
-            ->pluck('proficiency_levels', 'skills_id')
+            ->select('skill_id', 'proficiency_levels')
+            ->pluck('proficiency_levels', 'skill_id')
             ->toArray();
 
         $skills = Skill::whereIn('id', array_keys($resourceSkills))->get(['id', 'skill_name']);
@@ -228,7 +228,7 @@ class ResourceController extends Controller
         // pick our resource out
         $resourceAvailability = $resourceAvailability[$id]['availability'];
 
-        $resource = Resource::with(['region', 'location', 'currentContract', 'skills', 'activeLeaves'])->find($id);
+        $resource = Resource::with(['region', 'location', 'currentContract', 'skill', 'activeLeaves'])->find($id);
         // if Region is ""region": []," update based on location
         // if (is_null($resource->region_id) || empty($resource->region)) {
         //     $resource->region_id = $resource->location->region->id;
@@ -252,8 +252,8 @@ class ResourceController extends Controller
 
         // Get the skills for the resource
         $resourceSkills = ResourceSkill::where('resource_id', $id)
-            ->select('skills_id', 'proficiency_levels')
-            ->pluck('proficiency_levels', 'skills_id')
+            ->select('skill_id', 'proficiency_levels')
+            ->pluck('proficiency_levels', 'skill_id')
             ->toArray();
 
         $skills = Skill::whereIn('id', array_keys($resourceSkills))->get(['id', 'skill_name']);

@@ -16,11 +16,12 @@
                                 {{ __('Resource Skills') }}
                             </span>
 
-                             <div class="float-right">
-                                <a href="{{ route('resource-skills.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
+                            <div class="float-right">
+                                <a href="{{ route('resource-skills.create') }}" class="btn btn-primary btn-sm float-right"
+                                    data-placement="left">
+                                    {{ __('Create New') }}
                                 </a>
-                              </div>
+                            </div>
                         </div>
                     </div>
                     @if ($message = Session::get('success'))
@@ -35,10 +36,10 @@
                                 <thead class="thead">
                                     <tr>
                                         <th>No</th>
-                                        
-									<th >Resources Id</th>
-									<th >Skills Id</th>
-									<th >Proficiency Levels</th>
+
+                                        <th>Resources Id</th>
+                                        <th>Skills Id</th>
+                                        <th>Proficiency Levels</th>
 
                                         <th></th>
                                     </tr>
@@ -47,18 +48,25 @@
                                     @foreach ($resourceSkills as $resourceSkill)
                                         <tr>
                                             <td>{{ ++$i }}</td>
-                                            
-										<td >{{ $resourceSkill->resource_id }}</td>
-										<td >{{ $resourceSkill->skills_id }}</td>
-										<td >{{ $resourceSkill->proficiency_levels }}</td>
+
+                                            <td>{{ $resourceSkill->resource_id }}</td>
+                                            <td>{{ $resourceSkill->skill_id }}</td>
+                                            <td>{{ $resourceSkill->proficiency_levels }}</td>
 
                                             <td>
-                                                <form action="{{ route('resource-skills.destroy', $resourceSkill->id) }}" method="POST">
-                                                    <a class="btn btn-sm btn-primary " href="{{ route('resource-skills.show', $resourceSkill->id) }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                    <a class="btn btn-sm btn-success" href="{{ route('resource-skills.edit', $resourceSkill->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <form action="{{ route('resource-skills.destroy', $resourceSkill->id) }}"
+                                                    method="POST">
+                                                    <a class="btn btn-sm btn-primary "
+                                                        href="{{ route('resource-skills.show', $resourceSkill->id) }}"><i
+                                                            class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
+                                                    <a class="btn btn-sm btn-success"
+                                                        href="{{ route('resource-skills.edit', $resourceSkill->id) }}"><i
+                                                            class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        onclick="event.preventDefault(); confirm('Are you sure to delete?') ? this.closest('form').submit() : false;"><i
+                                                            class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
                                                 </form>
                                             </td>
                                         </tr>
@@ -68,7 +76,10 @@
                         </div>
                     </div>
                 </div>
-                @include('partials.pagination', ['paginator' => $resourceSkills, 'route' => 'resource-skills.index'])
+                @include('partials.pagination', [
+                    'paginator' => $resourceSkills,
+                    'route' => 'resource-skills.index',
+                ])
             </div>
         </div>
     </div>

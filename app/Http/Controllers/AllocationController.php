@@ -215,10 +215,11 @@ class AllocationController extends Controller
         $resourceType = $resource->pluck('resource_type')->first();
         foreach ($allocationArray as $allocation) {
             $demand = new Demand;
-            $demand->demand_date = $allocation->allocation_date;
+            $demand->demand_date = $allocation->allocated_date;
             $demand->fte = $allocation->fte;
-            $demand->projects_id = $allocation->projects_id;
+            $demand->project_id = $allocation->project_id;
             $demand->resource_type = $resourceType;
+            $demand->client_id = $allocation->project->client_id;
             $demand->save();
 
             $allocation->delete();
@@ -235,7 +236,7 @@ class AllocationController extends Controller
     public function editOne(Request $request): View
     {
         $allocation_date = Carbon::parse($request->monthKey.'-01')->format('Y-m-d');
-        $allocation = Allocation::where('projects_id', $request->projectId)
+        $allocation = Allocation::where('project_id', $request->projectId)
             ->where('resource_id', $request->resourceId)
             ->where('allocation_date', $allocation_date)
             ->first();
