@@ -215,11 +215,11 @@ class AllocationController extends Controller
         $resourceType = $resource->pluck('resource_type')->first();
         foreach ($allocationArray as $allocation) {
             $demand = new Demand;
-            $demand->demand_date = $allocated->allocated_date;
-            $demand->fte = $allocated->fte;
-            $demand->project_id = $allocated->project_id;
+            $demand->demand_date = $allocation->allocated_date;
+            $demand->fte = $allocation->fte;
+            $demand->project_id = $allocation->project_id;
             $demand->resource_type = $resourceType;
-            $demand->client_id = $allocated->project->client_id;
+            $demand->client_id = $allocation->project->client_id;
             $demand->save();
 
             $allocation->delete();
