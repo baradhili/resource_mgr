@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Class Demand
  *
  * @property int $id
- * @property int|null $client_id
+ * @property int $client_id
  * @property int|null $project_id
  * @property string|null $expected_start_date
  * @property string|null $expected_end_date
@@ -36,7 +36,7 @@ class Demand extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['client_id', 'project_id', 'expected_start_date', 'expected_end_date', 'fte', 'status', 'source', 'notes', 'created_at', 'updated_at', 'demand_date', 'resource_type'];
+    protected $fillable = ['client_id', 'project_id', 'expected_start_date', 'expected_end_date', 'fte', 'status', 'source', 'notes', 'demand_date', 'resource_type'];
 
     public function client(): BelongsTo
     {
@@ -48,7 +48,7 @@ class Demand extends Model
         return $this->belongsTo(\App\Models\Project::class, 'project_id', 'id');
     }
 
-    public function resourcType(): BelongsTo
+    public function resourceType(): BelongsTo
     {
         return $this->belongsTo(\App\Models\ResourceType::class, 'resource_type', 'id');
     }
