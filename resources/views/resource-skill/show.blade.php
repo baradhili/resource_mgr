@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('template_title')
-    {{ $resourceSkill->name ?? __('Show') . " " . __('Resource Skill') }}
+    {{ $resourceSkill->name ?? __('Show') . ' ' . __('Resource Skill') }}
 @endsection
 
 @section('content')
@@ -14,24 +14,25 @@
                             <span class="card-title">{{ __('Show') }} Resource Skill</span>
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-primary btn-sm" href="{{ route('resource-skills.index') }}"> {{ __('Back') }}</a>
+                            <a class="btn btn-primary btn-sm" href="{{ route('resource-skills.index') }}">
+                                {{ __('Back') }}</a>
                         </div>
                     </div>
 
                     <div class="card-body bg-white">
-                        
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Resources Id:</strong>
-                                    {{ $resourceSkill->resource_id }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Skills Id:</strong>
-                                    {{ $resourceSkill->skill_id }}
-                                </div>
-                                <div class="form-group mb-2 mb20">
-                                    <strong>Proficiency Levels:</strong>
-                                    {{ $resourceSkill->proficiency_levels }}
-                                </div>
+
+                        <div class="form-group mb-2 mb20">
+                            <strong>Resources Id:</strong>
+                            {{ $resourceSkill->resource_id }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Skills Id:</strong>
+                            {{ $resourceSkill->skill_id }}
+                        </div>
+                        <div class="form-group mb-2 mb20">
+                            <strong>Proficiency Levels:</strong>
+                            {{ $resourceSkill->proficiency_levels }}
+                        </div>
 
                     </div>
                 </div>

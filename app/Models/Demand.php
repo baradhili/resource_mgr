@@ -9,16 +9,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Class Demand
  *
- * @property $id
- * @property $demand_date
- * @property $fte
- * @property $status
- * @property $resource_type
- * @property $project_id
- * @property $source
- * @property $created_at
- * @property $updated_at
- * @property Project $project
+ * @property int $id
+ * @property int|null $client_id
+ * @property int|null $project_id
+ * @property string|null $expected_start_date
+ * @property string|null $expected_end_date
+ * @property string|null $fte
+ * @property string $status
+ * @property string|null $source
+ * @property string|null $notes
+ * @property string|null $created_at
+ * @property string|null $updated_at
+ * @property string|null $demand_date
+ * @property string|null $resource_type
+ * @property Client|null $client
+ * @property Project|null $project
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
@@ -31,7 +36,12 @@ class Demand extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['demand_date', 'fte', 'status', 'resource_type', 'project_id', 'source'];
+    protected $fillable = ['client_id', 'project_id', 'expected_start_date', 'expected_end_date', 'fte', 'status', 'source', 'notes', 'created_at', 'updated_at', 'demand_date', 'resource_type'];
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Client::class, 'client_id', 'id');
+    }
 
     public function project(): BelongsTo
     {
@@ -42,4 +52,5 @@ class Demand extends Model
     {
         return $this->belongsTo(\App\Models\ResourceType::class, 'resource_type', 'id');
     }
+
 }
