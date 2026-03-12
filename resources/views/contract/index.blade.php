@@ -66,7 +66,7 @@
                                             // Calculate the difference in months between the end_date and today
                                             $endDate = \Carbon\Carbon::parse($contract->end_date);
                                             $today = \Carbon\Carbon::today();
-                                            $monthsDifference = $endDate->diffInMonths($today);
+                                            $monthsDifference = $today->diffInMonths($endDate);
                                         @endphp
                                         <tr>
                                             <td>
